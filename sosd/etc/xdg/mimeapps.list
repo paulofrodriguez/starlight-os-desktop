@@ -1,4 +1,7 @@
 [Default Applications]
-text/html=starlight-browser.desktop
-x-scheme-handler/http=starlight-browser.desktop
-x-scheme-handler/https=starlight-browser.desktop
+text/html=chromium.desktop
+x-scheme-handler/http=chromium.desktop
+x-scheme-handler/https=chromium.desktop
+application/vnd.debian.binary-package=gdebi.desktop
+application/x-deb=gdebi.desktop
+application/x-debian-package=gdebi.desktop

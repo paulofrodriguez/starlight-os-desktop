@@ -66,6 +66,10 @@ for name in gnome-shell-dark.css gnome-shell-light.css gnome-shell-high-contrast
         fail "GNOME Shell background rule absent from ${name}"
     grep -Fq '#panel {' <<<"${css}" || fail "Starlight panel rule absent from ${name}"
     grep -Fq '#dash .dash-background' <<<"${css}" || fail "Starlight dash rule absent from ${name}"
+    grep -Fq '#dashtodockContainer .dash-background' <<<"${css}" || \
+        fail "Starlight Dash to Dock rule absent from ${name}"
+    grep -Fq 'background-gradient-start: rgba(19, 46, 74, 0.82);' <<<"${css}" || \
+        fail "translucent navy dock gradient absent from ${name}"
     grep -Fq '.calendar .calendar-day.calendar-today' <<<"${css}" || \
         fail "Starlight calendar accent rule absent from ${name}"
     grep -Fq '.calendar-day-base' <<<"${css}" || \

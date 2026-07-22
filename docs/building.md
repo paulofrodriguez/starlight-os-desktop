@@ -52,6 +52,11 @@ The pipeline builds the chroot before the binary stage and copies the Syslinux
 modules from that chroot into the ISO template. This avoids depending on
 bootloader paths or versions from the build host.
 
+The final live and installed systems keep active online Debian APT sources in
+`/etc/apt/sources.list`, pointing at `deb.debian.org` for `trixie` and
+`trixie-updates`, and `security.debian.org` for `trixie-security`. Active
+`cdrom:` repositories are removed during image configuration.
+
 The boot menu currently has no background image. Visual branding remains
 disabled until it can be tested independently from login and installer flows.
 
@@ -70,8 +75,9 @@ Add package names to the responsibility-specific file in `packages/`, one per
 line. Do not add desktop metapackages. Run validation, build the ISO, then
 inspect the package manifest and boot-test it.
 
-Chromium and Firefox ESR are installed from Debian packages. No Snap, Google
-repository, or Chrome binary is included.
+Chromium and Firefox ESR are installed from Debian packages. Chromium is the
+default browser and dock favourite. No Snap, Google repository, or Chrome binary
+is included.
 
 ## Cleaning
 

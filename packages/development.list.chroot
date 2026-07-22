@@ -1,4 +1,8 @@
 build-essential
+dkms
+linux-headers-amd64
+perl
+bzip2
 git
 curl
 wget

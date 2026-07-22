@@ -30,6 +30,7 @@ test -f "${PROJECT_ROOT}/sosd/etc/skel/.profile"
 test -f "${PROJECT_ROOT}/sosd/usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/metadata.json"
 test -f "${PROJECT_ROOT}/sosd/usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/extension.js"
 for helper_script in \
+    starlight-configure-debian-apt-sources \
     starlight-enable-debian-components \
     starlight-enable-steam-i386 \
     starlight-configure-flathub \
@@ -55,6 +56,18 @@ rg -Fq '${LIVE_USERNAME}:${LIVE_USERNAME}' \
 rg -q '^After=live-config.service$' \
     "${PROJECT_ROOT}/sosd/etc/systemd/system/starlight-live-session.service"
 rg -q '^SOSD_BUILD_JOBS=2$' "${PROJECT_ROOT}/config/build.env"
+rg -Fxq 'deb https://deb.debian.org/debian trixie main contrib non-free non-free-firmware' \
+    "${PROJECT_ROOT}/config/apt/sources.list.chroot"
+rg -Fxq 'deb https://deb.debian.org/debian trixie-updates main contrib non-free non-free-firmware' \
+    "${PROJECT_ROOT}/config/apt/sources.list.chroot"
+rg -Fxq 'deb https://security.debian.org/debian-security trixie-security main contrib non-free non-free-firmware' \
+    "${PROJECT_ROOT}/config/apt/sources.list.chroot"
+! rg -q '^[[:space:]]*deb[[:space:]]+cdrom:' \
+    "${PROJECT_ROOT}/config/apt/sources.list.chroot"
+rg -Fq 'config/includes.chroot/etc/apt/sources.list' \
+    "${PROJECT_ROOT}/scripts/build.sh"
+rg -Fq '/usr/local/sbin/starlight-configure-debian-apt-sources' \
+    "${PROJECT_ROOT}/hooks/010-configure-system.hook.chroot"
 rg -Fq "picture-uri='file:///usr/share/backgrounds/starlight/starlight-wallpaper.png'" \
     "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
 rg -Fxq "accent-color='yellow'" \
@@ -71,6 +84,30 @@ rg -Fxq "exec='ptyxis'" \
     "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
 rg -Fq "'starlight-clock-right@starlightbrasil.com'" \
     "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
+rg -Fq "favorite-apps=['chromium.desktop'" \
+    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
+! rg -q "favorite-apps=.*firefox" \
+    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
+rg -Fxq 'text/html=chromium.desktop' "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list"
+rg -Fxq 'x-scheme-handler/http=chromium.desktop' "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list"
+rg -Fxq 'x-scheme-handler/https=chromium.desktop' "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list"
+rg -Fxq 'application/vnd.debian.binary-package=gdebi.desktop' \
+    "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list"
+rg -Fxq 'application/x-deb=gdebi.desktop' "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list"
+rg -Fxq 'application/x-debian-package=gdebi.desktop' \
+    "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list"
+! rg -q '^application/(vnd\.debian\.binary-package|x-deb|x-debian-package)=.*(file-roller|FileRoller)' \
+    "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list"
+rg -Fxq "background-color='#07182b'" \
+    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
+rg -Fxq "background-opacity=0.74" \
+    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
+rg -Fq '#dashtodockContainer .dash-background' \
+    "${PROJECT_ROOT}/assets/gdm/starlight-os-vega/assets/starlight-os-vega-gdm.css"
+rg -Fq 'background-gradient-start: rgba(19, 46, 74, 0.82);' \
+    "${PROJECT_ROOT}/assets/gdm/starlight-os-vega/assets/starlight-os-vega-gdm.css"
+rg -Fq 'border: 1px solid rgba(147, 190, 235, 0.28);' \
+    "${PROJECT_ROOT}/assets/gdm/starlight-os-vega/assets/starlight-os-vega-gdm.css"
 rg -Fq 'Main.panel.statusArea.dateMenu' \
     "${PROJECT_ROOT}/sosd/usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/extension.js"
 rg -Fq 'Main.panel._rightBox' \
@@ -184,9 +221,20 @@ rg -q '^incus$' "${PROJECT_ROOT}/packages/incus.list.chroot"
 rg -q '^incus-client$' "${PROJECT_ROOT}/packages/incus.list.chroot"
 rg -q '^incus-extra$' "${PROJECT_ROOT}/packages/incus.list.chroot"
 rg -q '^gnome-tweaks$' "${PROJECT_ROOT}/packages/gnome.list.chroot"
+! rg -q '^(task-gnome-desktop|libreoffice|libreoffice-gtk3)$' \
+    "${PROJECT_ROOT}/packages/gnome.list.chroot"
+! rg -q '^(task-gnome-desktop|libreoffice|libreoffice-gtk3)$' \
+    "${PROJECT_ROOT}/metapackages/distro-desktop-gnome.depends"
 rg -q '^ptyxis$' "${PROJECT_ROOT}/packages/development.list.chroot"
 rg -q '^gnome-terminal$' "${PROJECT_ROOT}/packages/development.list.chroot"
 rg -q '^starship$' "${PROJECT_ROOT}/packages/development.list.chroot"
+rg -q '^build-essential$' "${PROJECT_ROOT}/packages/development.list.chroot"
+rg -q '^dkms$' "${PROJECT_ROOT}/packages/development.list.chroot"
+rg -q '^linux-headers-amd64$' "${PROJECT_ROOT}/packages/development.list.chroot"
+rg -q '^perl$' "${PROJECT_ROOT}/packages/development.list.chroot"
+rg -q '^bzip2$' "${PROJECT_ROOT}/packages/development.list.chroot"
+rg -q '^dkms$' "${PROJECT_ROOT}/metapackages/distro-devtools.depends"
+rg -q '^linux-headers-amd64$' "${PROJECT_ROOT}/metapackages/distro-devtools.depends"
 rg -q '^fonts-cascadia-code$' "${PROJECT_ROOT}/packages/terminal-fonts.list.chroot"
 rg -q '^fonts-noto-color-emoji$' "${PROJECT_ROOT}/packages/terminal-fonts.list.chroot"
 rg -q '^gir1.2-xapp-1.0$' "${PROJECT_ROOT}/packages/webapps-support.list.chroot"

@@ -36,10 +36,11 @@ autenticação. Os seletores foram confirmados no GNOME Shell 48.7 do Debian 13
 Trixie.
 
 O mesmo recurso é usado pelo GNOME Shell da sessão. Por isso, o override Vega
-também deixa o painel superior azul-marinho, o dash da Visão Geral escuro e
-os estados de foco, seleção e aplicações em execução dourados. Dash to Dock,
-Blur my Shell e a extensão local `starlight-clock-right@starlightbrasil.com`
-compõem os ajustes padrão da sessão.
+também deixa o painel superior azul-marinho, o dash da Visão Geral e o Dash to
+Dock com superfície flutuante translúcida azul-marinho, gradiente vertical,
+borda fria discreta e sombra. Os estados de foco, seleção e aplicações em
+execução permanecem dourados. Dash to Dock, Blur my Shell e a extensão local
+`starlight-clock-right@starlightbrasil.com` compõem os ajustes padrão da sessão.
 
 No GDM, tanto a lista inicial de usuários quanto o prompt de senha recebem o
 painel azul-marinho, bordas douradas discretas, avatar com aro dourado e

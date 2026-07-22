@@ -21,17 +21,19 @@ exec-arg=''
 [org/gnome/shell]
 disable-user-extensions=false
 enabled-extensions=['blur-my-shell@aunetx', 'dash-to-dock@micxgx.gmail.com', 'starlight-clock-right@starlightbrasil.com']
+favorite-apps=['chromium.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Ptyxis.desktop', 'org.gnome.Software.desktop', 'starlight-install.desktop']
 
-# Dash to Dock owns the desktop dock appearance. Keep its colour explicit so
-# it does not inherit the grey fallback from the upstream GNOME theme.
+# Dash to Dock owns the desktop dock appearance. Keep it as a floating,
+# translucent navy surface instead of inheriting the grey upstream fallback.
 [org/gnome/shell/extensions/dash-to-dock]
 dock-position='BOTTOM'
 extend-height=false
 dash-max-icon-size=48
+custom-theme-shrink=false
 custom-background-color=true
-background-color='#08111e'
+background-color='#07182b'
 transparency-mode='FIXED'
-background-opacity=0.96
+background-opacity=0.74
 custom-theme-customize-running-dots=true
 custom-theme-running-dots-color='#f3c653'
 custom-theme-running-dots-border-color='#c89b3c'

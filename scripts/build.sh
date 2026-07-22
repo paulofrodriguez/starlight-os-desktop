@@ -193,6 +193,8 @@ install -D -m 0644 "${PROJECT_ROOT}/branding/starlight-gdm-logo.png" \
     config/includes.chroot/usr/share/starlight/starlight-gdm-logo.png
 install -D -m 0644 "${PROJECT_ROOT}/config/apt/sources.list.chroot" \
     config/includes.chroot/usr/share/starlight/sources.list
+install -D -m 0644 "${PROJECT_ROOT}/config/apt/sources.list.chroot" \
+    config/includes.chroot/etc/apt/sources.list
 
 rsync -a "${PROJECT_ROOT}/config/bootloaders/" config/bootloaders/
 install -m 0644 "${PROJECT_ROOT}/branding/starlight-boot-menu.png" \

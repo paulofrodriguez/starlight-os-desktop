@@ -5,6 +5,7 @@ trap 'echo "Starlight image verification failed at line ${LINENO}: ${BASH_COMMAN
 required_commands=(
     gnome-shell gnome-calculator gnome-calendar gnome-system-monitor epiphany
     gnome-tweaks chromium firefox-esr ffmpeg pipewire wpctl flatpak git docker podman
+    gdebi-gtk
     qemu-system-x86_64 virsh virt-manager starlight-firstboot starlight-browser
     starlight-launch-installer webapp-manager unsquashfs rsync grub-install grub-mkconfig
     grub-mkstandalone grub-probe efibootmgr mkfs.vfat
@@ -24,7 +25,8 @@ require_installed_package() {
 for package_name in user-setup gnome-shell-extension-blur-my-shell \
     gnome-shell-extension-dashtodock gnome-shell-extension-prefs \
     gnome-tweaks papirus-icon-theme wps-office webapp-manager dosfstools efibootmgr \
-    grub2-common grub-pc-bin grub-efi-amd64-bin; do
+    grub2-common grub-pc-bin grub-efi-amd64-bin build-essential dkms \
+    linux-headers-amd64 perl bzip2; do
     require_installed_package "${package_name}"
 done
 
@@ -46,6 +48,11 @@ done
 
 test -f /etc/systemd/system/starlight-firstboot.service
 test -f /etc/systemd/system/starlight-live-session.service
+test -x /usr/local/sbin/starlight-configure-debian-apt-sources
+grep -Fxq 'deb https://deb.debian.org/debian trixie main contrib non-free non-free-firmware' /etc/apt/sources.list
+grep -Fxq 'deb https://deb.debian.org/debian trixie-updates main contrib non-free non-free-firmware' /etc/apt/sources.list
+grep -Fxq 'deb https://security.debian.org/debian-security trixie-security main contrib non-free non-free-firmware' /etc/apt/sources.list
+! grep -RhsE '^[[:space:]]*deb[[:space:]]+cdrom:' /etc/apt/sources.list /etc/apt/sources.list.d
 test -x /lib/live/config/0035-starlight-user
 grep -Fq '${LIVE_USERNAME}:${LIVE_USERNAME}' /lib/live/config/0035-starlight-user
 test -n "$(find /usr/share/fonts/truetype/nerd-fonts -type f -name '*.ttf' -print -quit)"
@@ -144,6 +151,18 @@ grep -Fxq "color-scheme='prefer-dark'" /etc/dconf/db/starlight.d/00-starlight
 grep -Fxq "gtk-theme='Adwaita-dark'" /etc/dconf/db/starlight.d/00-starlight
 grep -Fxq "icon-theme='Starlight-Colloid-Yellow-Dark'" /etc/dconf/db/starlight.d/00-starlight
 grep -Fq "'starlight-clock-right@starlightbrasil.com'" /etc/dconf/db/starlight.d/00-starlight
+grep -Fq "favorite-apps=['chromium.desktop'" /etc/dconf/db/starlight.d/00-starlight
+! grep -Eq "favorite-apps=.*firefox" /etc/dconf/db/starlight.d/00-starlight
+grep -Fxq 'text/html=chromium.desktop' /etc/xdg/mimeapps.list
+grep -Fxq 'x-scheme-handler/http=chromium.desktop' /etc/xdg/mimeapps.list
+grep -Fxq 'x-scheme-handler/https=chromium.desktop' /etc/xdg/mimeapps.list
+grep -Fxq 'application/vnd.debian.binary-package=gdebi.desktop' /etc/xdg/mimeapps.list
+grep -Fxq 'application/x-deb=gdebi.desktop' /etc/xdg/mimeapps.list
+grep -Fxq 'application/x-debian-package=gdebi.desktop' /etc/xdg/mimeapps.list
+! grep -Eq '^application/(vnd\.debian\.binary-package|x-deb|x-debian-package)=.*(file-roller|FileRoller)' /etc/xdg/mimeapps.list
+test -f /usr/share/applications/gdebi.desktop
+grep -Fxq "background-color='#07182b'" /etc/dconf/db/starlight.d/00-starlight
+grep -Fxq "background-opacity=0.74" /etc/dconf/db/starlight.d/00-starlight
 grep -q '^setRootPassword: false$' /etc/calamares/modules/users.conf
 grep -q '^allowWeakPasswords: true$' /etc/calamares/modules/users.conf
 grep -q '^allowWeakPasswordsDefault: true$' /etc/calamares/modules/users.conf

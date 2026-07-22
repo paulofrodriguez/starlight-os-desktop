@@ -69,10 +69,18 @@ fi
 
 for forbidden in ubuntu-desktop ubuntu-session gnome-shell-extension-ubuntu-dock \
     yaru-theme-gnome-shell yaru-theme-gtk yaru-theme-icon snapd casper \
-    ubuntu-drivers-common; do
+    ubuntu-drivers-common task-gnome-desktop libreoffice libreoffice-gtk3; do
     if rg -n "^[[:space:]]*${forbidden}[[:space:]]*$" \
         "${PROJECT_ROOT}/packages" --glob '*.list.chroot'; then
         echo "Forbidden package requested: ${forbidden}" >&2
+        ((errors += 1))
+    fi
+done
+
+for excluded_desktop_package in task-gnome-desktop libreoffice libreoffice-gtk3; do
+    if rg -n "^[[:space:]]*${excluded_desktop_package}[[:space:]]*$" \
+        "${PROJECT_ROOT}/metapackages/distro-desktop-gnome.depends"; then
+        echo "Excluded desktop package requested by metapackage: ${excluded_desktop_package}" >&2
         ((errors += 1))
     fi
 done
@@ -84,6 +92,31 @@ for package_name in "${required_build_packages[@]}"; do
         ((errors += 1))
     fi
 done
+
+if ! rg -Fxq 'deb https://deb.debian.org/debian trixie main contrib non-free non-free-firmware' \
+    "${PROJECT_ROOT}/config/apt/sources.list.chroot" || \
+    ! rg -Fxq 'deb https://deb.debian.org/debian trixie-updates main contrib non-free non-free-firmware' \
+        "${PROJECT_ROOT}/config/apt/sources.list.chroot" || \
+    ! rg -Fxq 'deb https://security.debian.org/debian-security trixie-security main contrib non-free non-free-firmware' \
+        "${PROJECT_ROOT}/config/apt/sources.list.chroot"; then
+    echo "The final Debian APT sources must point at active online Debian repositories." >&2
+    ((errors += 1))
+fi
+if rg -q '^[[:space:]]*deb[[:space:]]+cdrom:' \
+    "${PROJECT_ROOT}/config/apt/sources.list.chroot"; then
+    echo "The final Debian APT sources must not contain active cdrom repositories." >&2
+    ((errors += 1))
+fi
+if ! rg -Fq 'config/includes.chroot/etc/apt/sources.list' \
+    "${PROJECT_ROOT}/scripts/build.sh"; then
+    echo "The build does not copy online Debian APT sources into the final image." >&2
+    ((errors += 1))
+fi
+if ! rg -Fq '/usr/local/sbin/starlight-configure-debian-apt-sources' \
+    "${PROJECT_ROOT}/hooks/010-configure-system.hook.chroot"; then
+    echo "The chroot hook does not normalize final Debian APT sources." >&2
+    ((errors += 1))
+fi
 
 if ! rg -qx 'gnome-shell-extension-blur-my-shell' \
     "${PROJECT_ROOT}/packages/gnome.list.chroot"; then
@@ -118,6 +151,36 @@ if ! rg -Fq "'dash-to-dock@micxgx.gmail.com'" \
     echo "Dash to Dock is not enabled in the Starlight GNOME defaults." >&2
     ((errors += 1))
 fi
+if ! rg -Fq "favorite-apps=['chromium.desktop'" \
+    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"; then
+    echo "Chromium is not pinned as the first GNOME dock favourite." >&2
+    ((errors += 1))
+fi
+if rg -q "favorite-apps=.*firefox" \
+    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"; then
+    echo "Firefox must not be pinned to the GNOME dock by default." >&2
+    ((errors += 1))
+fi
+if ! rg -Fxq 'text/html=chromium.desktop' "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list" || \
+    ! rg -Fxq 'x-scheme-handler/http=chromium.desktop' "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list" || \
+    ! rg -Fxq 'x-scheme-handler/https=chromium.desktop' "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list"; then
+    echo "Chromium is not configured as the default browser." >&2
+    ((errors += 1))
+fi
+if ! rg -Fxq 'application/vnd.debian.binary-package=gdebi.desktop' \
+    "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list" || \
+    ! rg -Fxq 'application/x-deb=gdebi.desktop' \
+        "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list" || \
+    ! rg -Fxq 'application/x-debian-package=gdebi.desktop' \
+        "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list"; then
+    echo "Debian packages are not configured to open with GDebi by default." >&2
+    ((errors += 1))
+fi
+if rg -q '^application/(vnd\.debian\.binary-package|x-deb|x-debian-package)=.*(file-roller|FileRoller)' \
+    "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list"; then
+    echo "Debian packages must not open with File Roller by default." >&2
+    ((errors += 1))
+fi
 if ! rg -Fq "'starlight-clock-right@starlightbrasil.com'" \
     "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"; then
     echo "Starlight Clock Right is not enabled in the Starlight GNOME defaults." >&2
@@ -139,9 +202,23 @@ if ! rg -Fq 'Main.panel.statusArea.dateMenu' "${clock_right_root}/extension.js" 
     echo "Starlight Clock Right must move the native date menu into the right panel box." >&2
     ((errors += 1))
 fi
-if ! rg -Fq "background-color='#08111e'" \
+if ! rg -Fq "background-color='#07182b'" \
     "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"; then
     echo "The Starlight Dash to Dock colour is not configured." >&2
+    ((errors += 1))
+fi
+if ! rg -Fxq "background-opacity=0.74" \
+    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"; then
+    echo "The Starlight Dash to Dock translucency is not configured." >&2
+    ((errors += 1))
+fi
+if ! rg -Fq '#dashtodockContainer .dash-background' \
+    "${PROJECT_ROOT}/assets/gdm/starlight-os-vega/assets/starlight-os-vega-gdm.css" || \
+    ! rg -Fq 'background-gradient-start: rgba(19, 46, 74, 0.82);' \
+        "${PROJECT_ROOT}/assets/gdm/starlight-os-vega/assets/starlight-os-vega-gdm.css" || \
+    ! rg -Fq 'border: 1px solid rgba(147, 190, 235, 0.28);' \
+        "${PROJECT_ROOT}/assets/gdm/starlight-os-vega/assets/starlight-os-vega-gdm.css"; then
+    echo "The Starlight dock shell CSS is not configured for the translucent navy dock." >&2
     ((errors += 1))
 fi
 if ! rg -Fxq "icon-theme='Starlight-Colloid-Yellow-Dark'" \
@@ -268,6 +345,16 @@ require_package 'gnome-terminal' 'development.list.chroot' \
     'GNOME Terminal fallback is not requested by the development package list.'
 require_package 'starship' 'development.list.chroot' \
     'Starship fallback prompt is not requested by the development package list.'
+require_package 'build-essential' 'development.list.chroot' \
+    'Build toolchain is not requested by the development package list.'
+require_package 'dkms' 'development.list.chroot' \
+    'DKMS is not requested for VirtualBox Guest Additions module builds.'
+require_package 'linux-headers-amd64' 'development.list.chroot' \
+    'Kernel headers are not requested for VirtualBox Guest Additions module builds.'
+require_package 'perl' 'development.list.chroot' \
+    'Perl is not requested for VirtualBox Guest Additions installer scripts.'
+require_package 'bzip2' 'development.list.chroot' \
+    'bzip2 is not requested for VirtualBox Guest Additions installer assets.'
 require_package 'fonts-cascadia-code' 'terminal-fonts.list.chroot' \
     'Cascadia Code terminal font is not requested.'
 require_package 'fonts-noto-color-emoji' 'terminal-fonts.list.chroot' \

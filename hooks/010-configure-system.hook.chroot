@@ -4,6 +4,7 @@ set -Eeuo pipefail
 export DEBIAN_FRONTEND=noninteractive
 
 chmod 0755 /usr/local/sbin/starlight-firstboot
+chmod 0755 /usr/local/sbin/starlight-configure-debian-apt-sources
 chmod 0755 /usr/local/sbin/starlight-install-bundled-assets
 chmod 0755 /usr/local/sbin/starlight-run-installer
 chmod 0755 /usr/local/bin/starlight-launch-installer
@@ -24,9 +25,7 @@ apt-mark manual \
     grub-efi-amd64-bin \
     os-prober
 
-install -m 0644 /usr/share/starlight/sources.list /etc/apt/sources.list
-rm -f /etc/apt/sources.list.d/starlight.sources.list
-rm -f /etc/apt/sources.list.d/starlight-security.list
+/usr/local/sbin/starlight-configure-debian-apt-sources
 
 systemctl enable gdm3.service
 systemctl enable NetworkManager.service

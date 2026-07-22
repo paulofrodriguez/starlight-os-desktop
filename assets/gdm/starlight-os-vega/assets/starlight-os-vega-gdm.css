@@ -287,13 +287,15 @@
   box-shadow: inset 0 0 0 2px rgba(243, 198, 83, 0.70) !important;
 }
 
+#dashtodockContainer .dash-background,
 #dash .dash-background {
-  background-color: #08111e;
+  background-color: rgba(7, 24, 43, 0.74);
   background-gradient-direction: vertical;
-  background-gradient-start: #0d1726;
-  background-gradient-end: #050b16;
-  border: 1px solid rgba(200, 155, 60, 0.36);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.42);
+  background-gradient-start: rgba(19, 46, 74, 0.82);
+  background-gradient-end: rgba(3, 11, 24, 0.76);
+  border-radius: 24px;
+  border: 1px solid rgba(147, 190, 235, 0.28);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.50);
 }
 
 #dash .dash-separator {
@@ -303,7 +305,7 @@
 #dash .dash-item-container .show-apps .overview-icon,
 #dash .dash-item-container .overview-tile .overview-icon,
 #dash .dash-item-container .grid-search-result .overview-icon {
-  background-color: #0d1726;
+  background-color: rgba(9, 25, 43, 0.62);
   color: #f1eee6;
 }
 
@@ -311,7 +313,7 @@
 #dash .dash-item-container .overview-tile:hover .overview-icon,
 #dash .dash-item-container .grid-search-result:hover .overview-icon {
   color: #050b16;
-  background-color: #c89b3c;
+  background-color: rgba(200, 155, 60, 0.88);
   box-shadow: inset 0 0 0 1px rgba(5, 11, 22, 0.34);
 }
 
@@ -322,7 +324,7 @@
 #dash .dash-item-container .overview-tile:checked .overview-icon,
 #dash .dash-item-container .grid-search-result:checked .overview-icon {
   color: #050b16;
-  background-color: #c89b3c;
+  background-color: rgba(200, 155, 60, 0.94);
   box-shadow: inset 0 0 0 2px #f3c653 !important;
 }
 

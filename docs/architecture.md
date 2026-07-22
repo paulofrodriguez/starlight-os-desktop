@@ -30,6 +30,9 @@ versioned in `config/build.env`. Package names and all filesystem changes are
 tracked. Debian archive contents can still change between builds; release builds
 must additionally publish an artifact checksum and record the package manifest.
 A future production milestone should use dated Debian snapshot mirrors.
+The final image deliberately writes active online Debian APT sources to
+`/etc/apt/sources.list`, so the live and installed systems use `deb.debian.org`
+and `security.debian.org` instead of `cdrom:` entries after installation.
 
 `SOURCE_DATE_EPOCH` is also passed inside the chroot so SquashFS normalizes its
 filesystem timestamp, and `xorriso` receives fixed image and file dates.
@@ -44,9 +47,10 @@ Debian packages, dconf defaults, and small local GNOME Shell extensions instead
 of forking GNOME Shell.
 
 The upstream-oriented `gnome-core` application set supplies the normal desktop
-utilities without the Ubuntu Desktop metapackage. GNOME Web provides a small
-desktop browser fallback, while Chromium and Firefox ESR are installed from the
-Debian package archive. Snap is intentionally excluded from the image.
+utilities without the Ubuntu Desktop metapackage. Chromium is the default web
+browser and the browser pinned to the dock. Firefox ESR remains installed from
+the Debian package archive as a fallback/testing browser, and GNOME Web provides
+a small desktop browser fallback. Snap is intentionally excluded from the image.
 
 The live environment and installed system use systemd explicitly; legacy SysV
 live-config integration is neither selected nor required.

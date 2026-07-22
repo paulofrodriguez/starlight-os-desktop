@@ -6,13 +6,15 @@ Debian metapackages and post-install installers.
 
 ## Metapackage groups
 
-- `distro-desktop-gnome`: GNOME, Wayland, portals, PipeWire, office and common
-  desktop applications.
+- `distro-desktop-gnome`: GNOME, Wayland, portals, PipeWire, and common
+  desktop applications. LibreOffice is intentionally excluded because the image
+  bundles WPS Office.
 - `distro-codecs-media`: codecs, GStreamer plugin set, VLC, MPV, and GIMP.
 - `distro-gaming`: Steam, Vulkan, GameMode, MangoHud, GOverlay, and vkBasalt.
 - `distro-nvidia`: Debian NVIDIA driver stack with EGL Wayland and VA-API.
-- `distro-devtools`: developer tools, virtualization, containers, shells, and
-  terminal utilities.
+- `distro-devtools`: developer tools, virtualization, containers, shells,
+  terminal utilities, and the DKMS/kernel-header prerequisites needed to build
+  VirtualBox Guest Additions inside a VM.
 - `distro-shell-defaults`: shell utilities, Starship, terminal fonts, and
   prerequisites for Homebrew/SDKMAN/Oh My Bash.
 - `distro-system-polish`: firmware update, power, maintenance, and GUI package
@@ -31,7 +33,8 @@ source file only if the required components are missing.
 
 Thunderbird, Steam, Incus, GNOME/Wayland components, GNOME Tweaks, terminal
 tools, firmware, and common desktop applications are requested directly through
-`packages/*.list.chroot`.
+`packages/*.list.chroot`. LibreOffice is not requested in the GNOME package
+group; WPS Office is the bundled office suite.
 
 Steam requires `i386` on amd64 systems. The build enables the foreign `i386`
 architecture before `lb chroot` so `steam-installer` can resolve its i386
@@ -66,6 +69,10 @@ JetBrainsMono Nerd Font and Oh My Bash are installed in the live image. The
 default Bash profile uses the `agnoster` Oh My Bash theme with a Starship
 fallback. Homebrew and SDKMAN remain explicit user-level installers because
 they install into the target user's home or `/home/linuxbrew`.
+
+VirtualBox Guest Additions are not bundled as Oracle software, but the image
+ships `build-essential`, `dkms`, `linux-headers-amd64`, `perl`, and `bzip2` so
+the standard Guest Additions installer can build modules inside a VirtualBox VM.
 
 ## Known package notes
 
