@@ -53,7 +53,10 @@ artifacts are kept under `assets/third-party/` for redistribution traceability.
 WPS Office is bundled only when the local
 `assets/third-party/wps-office_12.1.2.26885_amd64.deb` vendor package is present.
 The file is intentionally ignored by Git because it is too large for a normal
-GitHub repository.
+GitHub repository. Its upstream `postinst` may fail in a live-build chroot after
+the package is unpacked; the bundled asset installer records the original
+maintainer script, marks the package configured, and refreshes desktop, MIME,
+icon, and font caches manually.
 
 Linux Mint WebApp Manager is bundled from the official Mint Debian package and
 source archive. Its Debian XApp/Python dependencies are declared in

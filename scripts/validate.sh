@@ -351,6 +351,15 @@ if ! rg -Fq 'flatpak install --system --noninteractive --or-update flathub' \
     echo "System Flatpak applications are not installed during image creation." >&2
     ((errors += 1))
 fi
+if ! rg -Fq 'install_wps_office' \
+    "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-install-bundled-assets" || \
+    ! rg -Fq 'postinst.starlight-original' \
+        "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-install-bundled-assets" || \
+    ! rg -Fq 'dpkg --configure wps-office' \
+        "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-install-bundled-assets"; then
+    echo "The bundled asset installer does not handle WPS postinst failures in chroot." >&2
+    ((errors += 1))
+fi
 if ! rg -Fq '/usr/local/sbin/starlight-install-bundled-assets' \
     "${PROJECT_ROOT}/hooks/010-configure-system.hook.chroot"; then
     echo "The chroot hook does not run the bundled asset installer." >&2

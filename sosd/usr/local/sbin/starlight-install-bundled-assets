@@ -28,8 +28,39 @@ mkdir -p "${tela_source}"
 tar -xzf "${TELA_ARCHIVE}" -C "${tela_source}" --strip-components=1
 bash "${tela_source}/install.sh" -d "${ICON_ROOT}" yellow
 
+install_wps_office() {
+    local postinst=/var/lib/dpkg/info/wps-office.postinst
+    local postinst_backup=/var/lib/dpkg/info/wps-office.postinst.starlight-original
+    local wps_status
+
+    if apt-get install -y --allow-downgrades "${WPS_PACKAGE}"; then
+        return
+    fi
+
+    wps_status="$(dpkg-query -W -f='${Status}' wps-office 2>/dev/null || true)"
+    if [[ "${wps_status}" != "install ok half-configured" ]]; then
+        echo "WPS Office installation failed before package configuration." >&2
+        return 1
+    fi
+
+    echo "WPS Office upstream postinst failed in the image chroot; applying Starlight chroot fallback." >&2
+    install -m 0755 "${postinst}" "${postinst_backup}"
+    cat >"${postinst}" <<'EOF'
+#!/bin/sh
+set -e
+exit 0
+EOF
+    chmod 0755 "${postinst}"
+    dpkg --configure wps-office
+
+    update-mime-database /usr/share/mime >/dev/null 2>&1 || true
+    update-desktop-database /usr/share/applications >/dev/null 2>&1 || true
+    gtk-update-icon-cache -f -t /usr/share/icons/hicolor >/dev/null 2>&1 || true
+    fc-cache -f >/dev/null 2>&1 || true
+}
+
+install_wps_office
 apt-get install -y --allow-downgrades \
-    "${WPS_PACKAGE}" \
     "${LINUXTOYS_PACKAGE}" \
     "${WEBAPP_MANAGER_PACKAGE}"
 

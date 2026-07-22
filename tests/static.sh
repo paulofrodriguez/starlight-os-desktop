@@ -125,6 +125,10 @@ rg -q 'AEEB94E9C5A3B54ECFA4A66AA684470CACCAF35C' \
     "${PROJECT_ROOT}/sosd/usr/local/bin/starlight-install-insync"
 rg -q 'package_name.*wps-office' \
     "${PROJECT_ROOT}/sosd/usr/local/bin/starlight-install-wps"
+rg -Fq 'wps-office-wps.desktop' \
+    "${PROJECT_ROOT}/hooks/1000-verify-image.hook.chroot"
+rg -Fq 'wps-office2023-wpsmain.svg' \
+    "${PROJECT_ROOT}/hooks/1000-verify-image.hook.chroot"
 rg -q 'com.mitchellh.ghostty' \
     "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-firstboot"
 rg -q 'nvidia-open-kernel-dkms' \
@@ -133,6 +137,12 @@ rg -q 'libnvidia-egl-wayland1' \
     "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-firstboot"
 rg -q '^com.rtosta.zapzap$' "${PROJECT_ROOT}/flatpaks/system-apps.txt"
 rg -Fq 'flatpak install --system --noninteractive --or-update flathub' \
+    "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-install-bundled-assets"
+rg -Fq 'install_wps_office' \
+    "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-install-bundled-assets"
+rg -Fq 'postinst.starlight-original' \
+    "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-install-bundled-assets"
+rg -Fq 'dpkg --configure wps-office' \
     "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-install-bundled-assets"
 rg -Fq '/usr/local/sbin/starlight-install-bundled-assets' \
     "${PROJECT_ROOT}/hooks/010-configure-system.hook.chroot"

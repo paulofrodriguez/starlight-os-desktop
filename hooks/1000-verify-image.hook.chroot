@@ -108,6 +108,10 @@ test -f /usr/share/applications/org.gnome.tweaks.desktop
 test -f /usr/share/icons/hicolor/scalable/apps/org.gnome.tweaks.svg
 grep -Fq 'Exec=gnome-tweaks' /usr/share/applications/org.gnome.tweaks.desktop
 grep -Fq 'Icon=org.gnome.tweaks' /usr/share/applications/org.gnome.tweaks.desktop
+test -x /usr/bin/wps
+test -f /usr/share/applications/wps-office-wps.desktop
+test -f /usr/share/applications/wps-office-prometheus.desktop
+test -f /usr/share/icons/hicolor/scalable/apps/wps-office2023-wpsmain.svg
 test -f /etc/polkit-1/rules.d/49-starlight-live-installer.rules
 test -f /usr/share/polkit-1/actions/com.starlight.install.policy
 test -x /usr/local/sbin/starlight-run-installer
