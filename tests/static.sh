@@ -12,6 +12,8 @@ test -f "${PROJECT_ROOT}/installer/modules/welcome.conf"
 test -f "${PROJECT_ROOT}/installer/modules/grubcfg.conf"
 test -f "${PROJECT_ROOT}/installer/modules/starlight-bootloader/module.desc"
 test -f "${PROJECT_ROOT}/installer/modules/starlight-bootloader/main.py"
+test -f "${PROJECT_ROOT}/installer/modules/starlight-user-avatar/module.desc"
+test -f "${PROJECT_ROOT}/installer/modules/starlight-user-avatar/main.py"
 test -f "${PROJECT_ROOT}/installer/modules/users.conf"
 test -s "${PROJECT_ROOT}/branding/starlight-calamares.png"
 test -s "${PROJECT_ROOT}/branding/starlight-calamares-light.png"
@@ -95,6 +97,11 @@ for bundled_asset in starlight-colloid-icon-theme.tar.gz tela-circle-icon-theme.
     oh-my-bash-627913b75855036cb5af2f3ad130c66a335e7382.tar.gz; do
     test -s "${PROJECT_ROOT}/assets/third-party/${bundled_asset}"
 done
+test "$(dpkg-deb -f "${PROJECT_ROOT}/assets/third-party/wps-office_12.1.2.26885_amd64.deb" Version)" = \
+    "12.1.2.26885.AK.preread.sw"
+sha256sum -c <<EOF
+55da5149467a1584b4b6d1280cb5ab04c061453974810fac9679b33bd8664e51  ${PROJECT_ROOT}/assets/third-party/wps-office_12.1.2.26885_amd64.deb
+EOF
 rg -q '^menu background splash.png$' \
     "${PROJECT_ROOT}/config/bootloaders/isolinux/stdmenu.cfg"
 test ! -e "${PROJECT_ROOT}/sosd/etc/dconf/db/gdm.d/00-starlight"
@@ -192,6 +199,7 @@ rg -Fq -- '-eltorito-alt-boot' "${PROJECT_ROOT}/scripts/build.sh"
 rg -Fq -- '-isohybrid-gpt-basdat' "${PROJECT_ROOT}/scripts/build.sh"
 rg -Fq '    - grubcfg' "${PROJECT_ROOT}/installer/settings.conf"
 rg -Fq '    - starlight-bootloader' "${PROJECT_ROOT}/installer/settings.conf"
+rg -Fq '    - starlight-user-avatar' "${PROJECT_ROOT}/installer/settings.conf"
 rg -Fq -- '--no-nvram' \
     "${PROJECT_ROOT}/installer/modules/starlight-bootloader/main.py"
 rg -Fq -- '--no-uefi-secure-boot' \
@@ -250,8 +258,14 @@ rg -Fq 'sync_calamares_config chroot' \
     "${PROJECT_ROOT}/scripts/build.sh"
 rg -Fq 'usr/lib/x86_64-linux-gnu/calamares/modules' \
     "${PROJECT_ROOT}/scripts/build.sh"
-rg -Fq 'installer/modules/starlight-bootloader/' \
+rg -Fq 'installer/modules/${local_module}/' \
     "${PROJECT_ROOT}/scripts/build.sh"
+rg -Fq 'starlight-user-avatar' \
+    "${PROJECT_ROOT}/scripts/build.sh"
+rg -Fq 'branding/starlight-calamares.png' \
+    "${PROJECT_ROOT}/scripts/build.sh"
+rg -Fq 'AccountsService/icons' \
+    "${PROJECT_ROOT}/installer/modules/starlight-user-avatar/main.py"
 rg -Fq '.sosd-package-lists.sha256' \
     "${PROJECT_ROOT}/scripts/build.sh"
 rg -Fq 'SidebarBackgroundCurrent: "#c89b3c"' \

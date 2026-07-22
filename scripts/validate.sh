@@ -187,6 +187,25 @@ for bundled_asset in \
         ((errors += 1))
     fi
 done
+if ! [[ "${WPS_PACKAGE_SHA256}" =~ ^[0-9a-f]{64}$ ]]; then
+    echo "Invalid SHA-256 for WPS Office asset: ${WPS_PACKAGE}" >&2
+    ((errors += 1))
+elif [[ -s "${PROJECT_ROOT}/assets/third-party/${WPS_PACKAGE}" ]]; then
+    if ! printf '%s  %s\n' "${WPS_PACKAGE_SHA256}" \
+        "${PROJECT_ROOT}/assets/third-party/${WPS_PACKAGE}" | sha256sum -c -
+    then
+        echo "WPS Office asset checksum mismatch: ${WPS_PACKAGE}" >&2
+        ((errors += 1))
+    fi
+    wps_package_version="$(
+        dpkg-deb -f "${PROJECT_ROOT}/assets/third-party/${WPS_PACKAGE}" Version \
+            2>/dev/null || true
+    )"
+    if [[ "${wps_package_version}" != "${WPS_PACKAGE_VERSION}" ]]; then
+        echo "WPS Office asset must contain package version ${WPS_PACKAGE_VERSION}." >&2
+        ((errors += 1))
+    fi
+fi
 verify_third_party_asset "${LINUXTOYS_PACKAGE}" "${LINUXTOYS_PACKAGE_SHA256}"
 verify_third_party_asset "${LINUXTOYS_SOURCE_ORIG}" "${LINUXTOYS_SOURCE_ORIG_SHA256}"
 verify_third_party_asset "${LINUXTOYS_SOURCE_DEBIAN}" "${LINUXTOYS_SOURCE_DEBIAN_SHA256}"
@@ -423,9 +442,9 @@ if ! rg -Fq 'usr/lib/x86_64-linux-gnu/calamares/modules' \
     echo "Custom Calamares modules must be copied to the Calamares runtime module path." >&2
     ((errors += 1))
 fi
-if ! rg -Fq 'installer/modules/starlight-bootloader/' \
+if ! rg -Fq 'installer/modules/${local_module}/' \
     "${PROJECT_ROOT}/scripts/build.sh"; then
-    echo "The Starlight Calamares bootloader module is not staged as a runtime module." >&2
+    echo "The Starlight Calamares modules are not staged as runtime modules." >&2
     ((errors += 1))
 fi
 if ! rg -Fq '.sosd-package-lists.sha256' "${PROJECT_ROOT}/scripts/build.sh"; then
@@ -445,9 +464,19 @@ if [[ ! -s "${PROJECT_ROOT}/installer/modules/starlight-bootloader/module.desc" 
     echo "Missing Starlight Calamares bootloader module." >&2
     ((errors += 1))
 fi
+if [[ ! -s "${PROJECT_ROOT}/installer/modules/starlight-user-avatar/module.desc" ]] || \
+    [[ ! -s "${PROJECT_ROOT}/installer/modules/starlight-user-avatar/main.py" ]]; then
+    echo "Missing Starlight Calamares user avatar module." >&2
+    ((errors += 1))
+fi
 if ! python3 -c 'import ast, pathlib, sys; ast.parse(pathlib.Path(sys.argv[1]).read_text())' \
     "${PROJECT_ROOT}/installer/modules/starlight-bootloader/main.py"; then
     echo "Starlight Calamares bootloader module has invalid Python syntax." >&2
+    ((errors += 1))
+fi
+if ! python3 -c 'import ast, pathlib, sys; ast.parse(pathlib.Path(sys.argv[1]).read_text())' \
+    "${PROJECT_ROOT}/installer/modules/starlight-user-avatar/main.py"; then
+    echo "Starlight Calamares user avatar module has invalid Python syntax." >&2
     ((errors += 1))
 fi
 if ! rg -Fq '    - grubcfg' "${PROJECT_ROOT}/installer/settings.conf"; then
@@ -457,6 +486,11 @@ fi
 if ! rg -Fq '    - starlight-bootloader' \
     "${PROJECT_ROOT}/installer/settings.conf"; then
     echo "Calamares must run the Starlight bootloader module." >&2
+    ((errors += 1))
+fi
+if ! rg -Fq '    - starlight-user-avatar' \
+    "${PROJECT_ROOT}/installer/settings.conf"; then
+    echo "Calamares must run the Starlight user avatar module." >&2
     ((errors += 1))
 fi
 if ! awk '
@@ -527,6 +561,10 @@ fi
 if ! rg -Fq 'welcome.conf' "${PROJECT_ROOT}/scripts/build.sh" && \
     ! rg -Fq 'installer/modules/' "${PROJECT_ROOT}/scripts/build.sh"; then
     echo "Calamares module configuration is not synced by the build." >&2
+    ((errors += 1))
+fi
+if ! rg -Fq 'starlight-user-avatar' "${PROJECT_ROOT}/scripts/build.sh"; then
+    echo "The Starlight user avatar module is not synced into the Calamares runtime path." >&2
     ((errors += 1))
 fi
 if [[ ! -s "${PROJECT_ROOT}/sosd/usr/share/polkit-1/actions/com.starlight.install.policy" ]]; then
@@ -662,6 +700,15 @@ fi
 
 if [[ ! -s "${PROJECT_ROOT}/branding/starlight-live-user.png" ]]; then
     echo "Missing Starlight live-user avatar." >&2
+    ((errors += 1))
+fi
+if ! rg -Fq 'branding/starlight-calamares.png' "${PROJECT_ROOT}/scripts/build.sh"; then
+    echo "The live-user avatar must be staged from the Calamares white empress asset." >&2
+    ((errors += 1))
+fi
+if ! rg -Fq 'AccountsService/icons' \
+    "${PROJECT_ROOT}/installer/modules/starlight-user-avatar/main.py"; then
+    echo "The installed user avatar module does not configure AccountsService." >&2
     ((errors += 1))
 fi
 if ! rg -Fq "logo=''" "${PROJECT_ROOT}/sosd/usr/share/gdm/dconf/99-starlight-login" || \

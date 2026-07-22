@@ -187,7 +187,7 @@ install -D -m 0644 "${PROJECT_ROOT}/branding/starlight-logo.png" \
     config/includes.chroot/usr/share/plymouth/themes/starlight/starlight-logo.png
 install -D -m 0644 "${PROJECT_ROOT}/branding/starlight-wallpaper.png" \
     config/includes.chroot/usr/share/backgrounds/starlight/starlight-wallpaper.png
-install -D -m 0644 "${PROJECT_ROOT}/branding/starlight-live-user.png" \
+install -D -m 0644 "${PROJECT_ROOT}/branding/starlight-calamares.png" \
     config/includes.chroot/usr/share/starlight/starlight-live-user.png
 install -D -m 0644 "${PROJECT_ROOT}/branding/starlight-gdm-logo.png" \
     config/includes.chroot/usr/share/starlight/starlight-gdm-logo.png
@@ -216,6 +216,7 @@ tar -xJf "${nerd_font_archive}" \
 sync_calamares_config() {
     local target_root="$1"
     local branding_root
+    local local_module
     local module_root
 
     install -D -m 0644 "${PROJECT_ROOT}/installer/settings.conf" \
@@ -228,12 +229,14 @@ sync_calamares_config() {
         "${target_root}/etc/calamares/modules/"
 
     module_root="${target_root}/usr/lib/x86_64-linux-gnu/calamares/modules"
-    install -d -m 0755 "${module_root}/starlight-bootloader"
-    rsync -a --delete \
-        --exclude '__pycache__/' \
-        --exclude '*.pyc' \
-        "${PROJECT_ROOT}/installer/modules/starlight-bootloader/" \
-        "${module_root}/starlight-bootloader/"
+    for local_module in starlight-bootloader starlight-user-avatar; do
+        install -d -m 0755 "${module_root}/${local_module}"
+        rsync -a --delete \
+            --exclude '__pycache__/' \
+            --exclude '*.pyc' \
+            "${PROJECT_ROOT}/installer/modules/${local_module}/" \
+            "${module_root}/${local_module}/"
+    done
 
     for branding_root in \
         "${target_root}/etc/calamares/branding/starlight" \

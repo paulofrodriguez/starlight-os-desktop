@@ -43,7 +43,8 @@ extensão de dock: a experiência permanece GNOME puro.
 No GDM, tanto a lista inicial de usuários quanto o prompt de senha recebem o
 painel azul-marinho, bordas douradas discretas, avatar com aro dourado e
 deslocamento relativo para a direita. O avatar e o nome exibidos vêm do
-AccountsService configurado pelo usuário live, não de uma imagem de mockup.
+AccountsService configurado pelo usuário live e pelo módulo Calamares
+`starlight-user-avatar` no sistema instalado, não de uma imagem de mockup.
 O perfil dconf do GDM também define `logo` e `fallback-logo` para o asset
 Starlight, substituindo o branding Debian específico da tela de login.
 

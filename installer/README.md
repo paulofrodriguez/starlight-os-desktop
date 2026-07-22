@@ -15,6 +15,10 @@ The user module intentionally accepts simple local passwords. Starlight does not
 enforce password complexity or an 8-character minimum during installation, so a
 numeric 6-digit password is valid when the user chooses that tradeoff.
 
+The `starlight-user-avatar` module runs after `displaymanager` and writes the
+Starlight AccountsService avatar for the installed user. The image is staged
+from the same white empress asset used by Calamares branding.
+
 The installer keeps the live system compatible with both BIOS and UEFI by
 shipping Debian's non-conflicting GRUB module packages. The `grubcfg` module
 creates `/etc/default/grub` in the target before the Starlight bootloader module

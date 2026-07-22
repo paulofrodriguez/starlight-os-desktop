@@ -58,6 +58,10 @@ test -f /etc/calamares/modules/starlight-bootloader/module.desc
 test -f /etc/calamares/modules/starlight-bootloader/main.py
 test -f /usr/lib/x86_64-linux-gnu/calamares/modules/starlight-bootloader/module.desc
 test -f /usr/lib/x86_64-linux-gnu/calamares/modules/starlight-bootloader/main.py
+test -f /etc/calamares/modules/starlight-user-avatar/module.desc
+test -f /etc/calamares/modules/starlight-user-avatar/main.py
+test -f /usr/lib/x86_64-linux-gnu/calamares/modules/starlight-user-avatar/module.desc
+test -f /usr/lib/x86_64-linux-gnu/calamares/modules/starlight-user-avatar/main.py
 test -f /etc/calamares/modules/users.conf
 test -f /etc/calamares/branding/starlight/starlight-calamares.png
 test -f /etc/calamares/branding/starlight/starlight-calamares-light.png
@@ -76,6 +80,7 @@ grep -Fq 'efiSystemPartition: /boot/efi' /etc/calamares/modules/partition.conf
 ! grep -Fq 'requiredPartitionTableType:' /etc/calamares/modules/partition.conf
 grep -Fq '    - grubcfg' /etc/calamares/settings.conf
 grep -Fq '    - starlight-bootloader' /etc/calamares/settings.conf
+grep -Fq '    - starlight-user-avatar' /etc/calamares/settings.conf
 grep -Fq -- '--no-nvram' /etc/calamares/modules/starlight-bootloader/main.py
 grep -Fq -- '--no-uefi-secure-boot' /etc/calamares/modules/starlight-bootloader/main.py
 grep -Fq 'grub-mkstandalone' /etc/calamares/modules/starlight-bootloader/main.py
@@ -112,6 +117,8 @@ test -d /usr/share/icons/Starlight-Colloid-Yellow-Dark
 test -d /usr/share/icons/Tela-circle-yellow-dark
 test -d /usr/share/icons/Papirus-Dark
 test -s /usr/share/starlight/starlight-live-user.png
+cmp -s /usr/share/starlight/starlight-live-user.png \
+    /etc/calamares/branding/starlight/starlight-calamares.png
 test -f /usr/share/gnome-background-properties/starlight.xml
 test -f /usr/share/gdm/dconf/99-starlight-login
 grep -Fq "logo=''" /usr/share/gdm/dconf/99-starlight-login
