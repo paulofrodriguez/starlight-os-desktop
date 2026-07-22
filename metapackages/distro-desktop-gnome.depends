@@ -3,6 +3,7 @@ gnome-core
 gnome-shell
 gnome-session
 gnome-control-center
+gnome-tweaks
 gnome-settings-daemon
 mutter
 nautilus

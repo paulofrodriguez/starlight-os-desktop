@@ -100,6 +100,10 @@ if ! rg -qx 'gnome-shell-extension-prefs' \
     echo "GNOME Extensions is not requested by the GNOME package list." >&2
     ((errors += 1))
 fi
+if ! rg -qx 'gnome-tweaks' "${PROJECT_ROOT}/packages/gnome.list.chroot"; then
+    echo "GNOME Tweaks is not requested by the GNOME package list." >&2
+    ((errors += 1))
+fi
 if ! rg -qx 'binutils' "${PROJECT_ROOT}/packages/gnome.list.chroot"; then
     echo "binutils is required to patch GNOME Shell JS resources." >&2
     ((errors += 1))
@@ -253,6 +257,8 @@ require_package 'xdg-desktop-portal' 'gnome.list.chroot' \
     'Wayland desktop portal is not requested by the GNOME package list.'
 require_package 'xdg-desktop-portal-gtk' 'gnome.list.chroot' \
     'GTK Wayland desktop portal is not requested by the GNOME package list.'
+require_package 'gnome-tweaks' 'gnome.list.chroot' \
+    'GNOME Tweaks is not requested by the GNOME package list.'
 require_package 'gir1.2-xapp-1.0' 'webapps-support.list.chroot' \
     'XApp introspection data is not requested for WebApp Manager.'
 require_package 'xapps-common' 'webapps-support.list.chroot' \

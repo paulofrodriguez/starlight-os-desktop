@@ -57,6 +57,9 @@ de compatibilidade fará o build falhar na resolução de pacotes, como deve ser
 O aplicativo oficial **Extensions** também é incluído pelo pacote
 `gnome-shell-extension-prefs`, para que extensões instaladas possam ser vistas
 e administradas pela interface padrão do GNOME.
+O aplicativo **Tweaks** vem do pacote Debian `gnome-tweaks`, não de Flatpak,
+para que o lançador `org.gnome.tweaks.desktop` e o ícone sejam registrados no
+menu do GNOME durante a construção da imagem.
 
 O script recusa outro major do GNOME Shell e falha claramente se o recurso,
 os seletores, os pacotes, a resolução ou a extração do CSS mudarem. Ao migrar

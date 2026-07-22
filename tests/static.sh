@@ -161,6 +161,7 @@ rg -q '^mangohud$' "${PROJECT_ROOT}/packages/gaming.list.chroot"
 rg -q '^incus$' "${PROJECT_ROOT}/packages/incus.list.chroot"
 rg -q '^incus-client$' "${PROJECT_ROOT}/packages/incus.list.chroot"
 rg -q '^incus-extra$' "${PROJECT_ROOT}/packages/incus.list.chroot"
+rg -q '^gnome-tweaks$' "${PROJECT_ROOT}/packages/gnome.list.chroot"
 rg -q '^ptyxis$' "${PROJECT_ROOT}/packages/development.list.chroot"
 rg -q '^gnome-terminal$' "${PROJECT_ROOT}/packages/development.list.chroot"
 rg -q '^starship$' "${PROJECT_ROOT}/packages/development.list.chroot"
@@ -175,6 +176,12 @@ rg -q '^python3-setproctitle$' "${PROJECT_ROOT}/packages/webapps-support.list.ch
 rg -q '^python3-tldextract$' "${PROJECT_ROOT}/packages/webapps-support.list.chroot"
 rg -q '^element-desktop$' \
     "${PROJECT_ROOT}/metapackages/distro-communication.depends"
+rg -q '^gnome-tweaks$' \
+    "${PROJECT_ROOT}/metapackages/distro-desktop-gnome.depends"
+rg -Fq 'org.gnome.tweaks.desktop' \
+    "${PROJECT_ROOT}/hooks/1000-verify-image.hook.chroot"
+rg -Fq 'Icon=org.gnome.tweaks' \
+    "${PROJECT_ROOT}/hooks/1000-verify-image.hook.chroot"
 rg -q '^chromium$' "${PROJECT_ROOT}/packages/build.list.chroot"
 rg -q '^firefox-esr$' "${PROJECT_ROOT}/packages/build.list.chroot"
 rg -q '^user-setup$' "${PROJECT_ROOT}/packages/base.list.chroot"

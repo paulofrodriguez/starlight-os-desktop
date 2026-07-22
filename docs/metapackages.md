@@ -29,8 +29,8 @@ Debian packages should come from `main contrib non-free non-free-firmware`
 whenever possible. `starlight-enable-debian-components` adds a managed Debian
 source file only if the required components are missing.
 
-Thunderbird, Steam, Incus, GNOME/Wayland components, terminal tools, firmware,
-and common desktop applications are requested directly through
+Thunderbird, Steam, Incus, GNOME/Wayland components, GNOME Tweaks, terminal
+tools, firmware, and common desktop applications are requested directly through
 `packages/*.list.chroot`.
 
 Steam requires `i386` on amd64 systems. The build enables the foreign `i386`

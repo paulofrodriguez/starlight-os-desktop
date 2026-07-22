@@ -4,7 +4,7 @@ trap 'echo "Starlight image verification failed at line ${LINENO}: ${BASH_COMMAN
 
 required_commands=(
     gnome-shell gnome-calculator gnome-calendar gnome-system-monitor epiphany
-    chromium firefox-esr ffmpeg pipewire wpctl flatpak git docker podman
+    gnome-tweaks chromium firefox-esr ffmpeg pipewire wpctl flatpak git docker podman
     qemu-system-x86_64 virsh virt-manager starlight-firstboot starlight-browser
     starlight-launch-installer webapp-manager unsquashfs rsync grub-install grub-mkconfig
     grub-mkstandalone grub-probe efibootmgr mkfs.vfat
@@ -23,7 +23,7 @@ require_installed_package() {
 
 for package_name in user-setup gnome-shell-extension-blur-my-shell \
     gnome-shell-extension-dashtodock gnome-shell-extension-prefs \
-    papirus-icon-theme wps-office webapp-manager dosfstools efibootmgr \
+    gnome-tweaks papirus-icon-theme wps-office webapp-manager dosfstools efibootmgr \
     grub2-common grub-pc-bin grub-efi-amd64-bin; do
     require_installed_package "${package_name}"
 done
@@ -98,6 +98,10 @@ test -f /usr/lib/grub/x86_64-efi/modinfo.sh
 test -f /usr/share/grub/unicode.pf2
 test -x /etc/kernel/postinst.d/zz-update-grub
 test -x /etc/kernel/postrm.d/zz-update-grub
+test -f /usr/share/applications/org.gnome.tweaks.desktop
+test -f /usr/share/icons/hicolor/scalable/apps/org.gnome.tweaks.svg
+grep -Fq 'Exec=gnome-tweaks' /usr/share/applications/org.gnome.tweaks.desktop
+grep -Fq 'Icon=org.gnome.tweaks' /usr/share/applications/org.gnome.tweaks.desktop
 test -f /etc/polkit-1/rules.d/49-starlight-live-installer.rules
 test -f /usr/share/polkit-1/actions/com.starlight.install.policy
 test -x /usr/local/sbin/starlight-run-installer
