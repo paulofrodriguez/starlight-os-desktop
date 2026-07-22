@@ -1,0 +1,10 @@
+label starlight-live-@FLAVOUR@
+    menu label ^Iniciar Starlight OS Vega
+    menu default
+    kernel @KERNEL@
+    append initrd=@INITRD@ boot=live config @LB_BOOTAPPEND_LIVE@
+
+label starlight-live-@FLAVOUR@-failsafe
+    menu label Starlight OS Vega (^modo seguro)
+    kernel @KERNEL@
+    append initrd=@INITRD@ boot=live config @LB_BOOTAPPEND_LIVE@ @LB_BOOTAPPEND_FAILSAFE@

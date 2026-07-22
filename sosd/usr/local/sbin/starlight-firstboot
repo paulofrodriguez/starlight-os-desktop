@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+readonly STATE_DIR=/var/lib/starlight
+readonly LOG_DIR=/var/log/starlight
+readonly DONE_FILE="${STATE_DIR}/firstboot-complete"
+readonly LOG_FILE="${LOG_DIR}/firstboot.log"
+
+install -d -m 0755 "${STATE_DIR}" "${LOG_DIR}"
+exec > >(tee -a "${LOG_FILE}") 2>&1
+
+if grep -Eq '(^| )(boot=live|boot=casper)( |$)' /proc/cmdline; then
+    echo "Live session detected; installed-system first boot is deferred."
+    exit 0
+fi
+
+if [[ -e "${DONE_FILE}" ]]; then
+    exit 0
+fi
+
+echo "Starlight first boot started at $(date --iso-8601=seconds)"
+
+{
+    echo "kernel=$(uname -r)"
+    echo "architecture=$(dpkg --print-architecture)"
+    lspci -nn || true
+    lsusb || true
+} >"${STATE_DIR}/hardware.txt"
+
+if command -v flatpak >/dev/null 2>&1; then
+    flatpak remote-add --system --if-not-exists flathub \
+        https://flathub.org/repo/flathub.flatpakrepo || true
+    flatpak update --system --appstream --noninteractive || true
+    for application in com.mitchellh.ghostty com.rtosta.zapzap; do
+        flatpak install --system --noninteractive --or-update flathub \
+            "${application}" || \
+            echo "Flatpak installation failed for ${application}; continuing."
+    done
+fi
+
+if lspci -nnd 10de: | grep -q .; then
+    echo "NVIDIA GPU detected; installing the Debian NVIDIA driver stack."
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update || true
+    apt-get install -y \
+        nvidia-driver \
+        nvidia-open-kernel-dkms \
+        libnvidia-egl-wayland1 \
+        nvidia-vaapi-driver \
+        nvidia-settings \
+        firmware-misc-nonfree || \
+        echo "NVIDIA driver installation failed; continuing."
+else
+    echo "No NVIDIA GPU detected."
+fi
+
+touch "${DONE_FILE}"
+systemctl disable starlight-firstboot.service || true
+echo "Starlight first boot completed at $(date --iso-8601=seconds)"

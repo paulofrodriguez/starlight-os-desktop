@@ -1,0 +1,8 @@
+/* Allow the disposable live user to start only the Calamares installer. */
+polkit.addRule(function(action, subject) {
+    if ((action.id == "com.starlight.install.pkexec.run" ||
+         action.id == "com.github.calamares.calamares.pkexec.run") &&
+        subject.user == "starlight" && subject.active && subject.local) {
+        return polkit.Result.YES;
+    }
+});

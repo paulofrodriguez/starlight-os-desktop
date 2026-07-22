@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+readonly KEY_URL="https://apt.insync.io/insynchq.gpg"
+readonly EXPECTED_FINGERPRINT="AEEB94E9C5A3B54ECFA4A66AA684470CACCAF35C"
+readonly KEYRING="/usr/share/keyrings/insynchq.gpg"
+readonly SOURCE_FILE="/etc/apt/sources.list.d/insync.list"
+
+if dpkg-query -W -f='${Status}' insync 2>/dev/null | grep -q 'install ok installed'; then
+    echo "Insync is already installed."
+    exit 0
+fi
+
+if [[ "${EUID}" -ne 0 ]]; then
+    echo "Insync is proprietary and paid software."
+    echo "This will add the vendor repository and install its binary package."
+    read -r -p "Continue and accept the vendor terms? [y/N] " answer
+    [[ "${answer}" =~ ^[Yy]$ ]] || exit 0
+    exec pkexec env STARLIGHT_INSYNC_CONSENT=1 "$0"
+fi
+
+[[ "${STARLIGHT_INSYNC_CONSENT:-}" == "1" ]] || {
+    echo "Explicit user consent is required." >&2
+    exit 1
+}
+
+temporary_key="$(mktemp)"
+trap 'rm -f "${temporary_key}"' EXIT
+curl --fail --location --silent --show-error "${KEY_URL}" --output "${temporary_key}"
+
+fingerprints="$(gpg --batch --show-keys --with-colons "${temporary_key}" |
+    awk -F: '$1 == "fpr" {print $10}')"
+if ! grep -qx "${EXPECTED_FINGERPRINT}" <<<"${fingerprints}"; then
+    echo "Insync repository key fingerprint verification failed." >&2
+    exit 1
+fi
+
+install -d -m 0755 /usr/share/keyrings /etc/apt/sources.list.d
+gpg --batch --yes --dearmor --output "${KEYRING}" "${temporary_key}"
+chmod 0644 "${KEYRING}"
+printf '%s\n' \
+    "deb [arch=amd64 signed-by=${KEYRING}] http://apt.insync.io/ubuntu resolute non-free contrib" \
+    >"${SOURCE_FILE}"
+chmod 0644 "${SOURCE_FILE}"
+
+apt-get update
+apt-get install -y insync
+

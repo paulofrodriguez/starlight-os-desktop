@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+readonly DOWNLOAD_PAGE="https://www.wps.com/office/linux/"
+
+if command -v wps >/dev/null 2>&1; then
+    echo "WPS Office is already installed."
+    exit 0
+fi
+
+download_dir="${XDG_DOWNLOAD_DIR:-${HOME}/Downloads}"
+if command -v xdg-user-dir >/dev/null 2>&1; then
+    download_dir="$(xdg-user-dir DOWNLOAD)"
+fi
+
+mapfile -t candidates < <(
+    find "${download_dir}" -maxdepth 1 -type f \
+        \( -iname 'wps-office*.deb' -o -iname 'wps-office_*_amd64.deb' \) \
+        -printf '%T@|%p\n' 2>/dev/null | sort -t '|' -k1,1nr | cut -d '|' -f2-
+)
+
+if ((${#candidates[@]} == 0)); then
+    echo "WPS Office is proprietary and is not included with Starlight OS."
+    echo "Download the Debian/amd64 .deb from: ${DOWNLOAD_PAGE}"
+    echo "Then run this installer again."
+    if command -v xdg-open >/dev/null 2>&1; then
+        xdg-open "${DOWNLOAD_PAGE}" >/dev/null 2>&1 || true
+    fi
+    exit 2
+fi
+
+package_file="${candidates[0]}"
+package_name="$(dpkg-deb -f "${package_file}" Package)"
+architecture="$(dpkg-deb -f "${package_file}" Architecture)"
+version="$(dpkg-deb -f "${package_file}" Version)"
+
+if [[ "${package_name}" != "wps-office" || "${architecture}" != "amd64" ]]; then
+    echo "The downloaded file is not an amd64 WPS Office package." >&2
+    exit 1
+fi
+
+echo "Package: ${package_name} ${version} (${architecture})"
+echo "File: ${package_file}"
+echo "WPS Office is proprietary. Installation means accepting its vendor terms."
+read -r -p "Install this package? [y/N] " answer
+[[ "${answer}" =~ ^[Yy]$ ]] || exit 0
+
+exec pkexec apt-get install -y "${package_file}"

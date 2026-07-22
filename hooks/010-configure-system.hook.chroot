@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+export DEBIAN_FRONTEND=noninteractive
+
+chmod 0755 /usr/local/sbin/starlight-firstboot
+chmod 0755 /usr/local/sbin/starlight-install-bundled-assets
+chmod 0755 /usr/local/sbin/starlight-run-installer
+chmod 0755 /usr/local/bin/starlight-launch-installer
+chmod 0755 /usr/local/bin/starlight-install-chrome
+chmod 0755 /usr/local/bin/starlight-install-wps
+chmod 0755 /usr/local/bin/starlight-install-insync
+chmod 0755 /usr/local/bin/starlight-browser
+chmod 0755 /usr/local/sbin/starlight-live-session
+chmod 0755 /lib/live/config/0035-starlight-user
+
+/usr/local/sbin/starlight-install-bundled-assets
+
+apt-mark manual \
+    dosfstools \
+    efibootmgr \
+    grub2-common \
+    grub-pc-bin \
+    grub-efi-amd64-bin \
+    os-prober
+
+install -m 0644 /usr/share/starlight/sources.list /etc/apt/sources.list
+rm -f /etc/apt/sources.list.d/starlight.sources.list
+rm -f /etc/apt/sources.list.d/starlight-security.list
+
+systemctl enable gdm3.service
+systemctl enable NetworkManager.service
+systemctl enable ssh.service
+systemctl enable libvirtd.service
+systemctl enable starlight-firstboot.service
+systemctl enable starlight-live-session.service
+
+systemctl set-default graphical.target
+
+dconf update
+# Debian's GDM builds its greeter dconf database from /usr/share/gdm/dconf.
+# Generate it now, after the Starlight override from sosd/ has been installed,
+# so the ISO is self-contained and the first GDM start has the correct logo.
+/usr/share/gdm/generate-config
+fc-cache -f
+
+plymouth-set-default-theme starlight
+update-initramfs -u

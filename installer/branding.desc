@@ -1,0 +1,33 @@
+---
+componentName: starlight
+welcomeStyleCalamares: true
+welcomeExpandingLogo: true
+windowExpanding: normal
+windowSize: 800px,520px
+windowPlacement: center
+sidebar: widget
+navigation: widget
+strings:
+  productName: Starlight OS Vega
+  shortProductName: SOSD
+  version: 1.0
+  shortVersion: "1.0"
+  versionedName: Starlight OS 1.0 (Vega)
+  shortVersionedName: SOSD 1.0
+  bootloaderEntryName: Starlight OS
+  productUrl: ""
+  supportUrl: ""
+  knownIssuesUrl: ""
+  releaseNotesUrl: ""
+  donateUrl: ""
+images:
+  productIcon: starlight-calamares.png
+  productLogo: starlight-calamares.png
+  productWelcome: starlight-calamares-dark.png
+slideshow: slideshow.qml
+slideshowAPI: 1
+style:
+  SidebarBackground: "#08111e"
+  SidebarText: "#f1eee6"
+  SidebarTextCurrent: "#050b16"
+  SidebarBackgroundCurrent: "#c89b3c"

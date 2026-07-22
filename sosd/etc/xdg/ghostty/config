@@ -1,0 +1,6 @@
+font-family = JetBrainsMono Nerd Font
+font-size = 11
+gtk-tabs-location = top
+window-decoration = auto
+shell-integration = detect
+

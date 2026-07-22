@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+if [[ ! -e /run/live/medium ]]; then
+    echo "Refusing to start Calamares outside the live environment." >&2
+    exit 1
+fi
+
+if [[ ! -x /usr/bin/calamares ]]; then
+    echo "Calamares is not installed at /usr/bin/calamares." >&2
+    exit 1
+fi
+
+export QT_QPA_PLATFORM=xcb
+exec /usr/bin/calamares -d

@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+readonly FONT_VERSION=3.4.0
+readonly FONT_ARCHIVE=JetBrainsMono.tar.xz
+readonly FONT_URL=https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/JetBrainsMono.tar.xz
+readonly FONT_SHA256=ef552a3e638f25125c6ad4c51176a6adcdce295ab1d2ffacf0db060caf8c1582
+readonly FONT_DIR=/usr/share/fonts/truetype/nerd-fonts
+readonly SENTINEL="${FONT_DIR}/.starlight-jetbrainsmono-${FONT_VERSION}"
+
+if [[ "${EUID}" -ne 0 ]]; then
+    echo "Run this script as root." >&2
+    exit 1
+fi
+
+export DEBIAN_FRONTEND=noninteractive
+for command_name in curl fc-cache sha256sum tar; do
+    if ! command -v "${command_name}" >/dev/null 2>&1; then
+        apt-get update
+        apt-get install -y ca-certificates curl fontconfig xz-utils
+        break
+    fi
+done
+
+if [[ -f "${SENTINEL}" ]] && fc-match -f '%{family}\n' \
+    "JetBrainsMono Nerd Font" | grep -qi "Nerd"
+then
+    echo "JetBrainsMono Nerd Font ${FONT_VERSION} is already installed."
+    exit 0
+fi
+
+work_dir="$(mktemp -d)"
+trap 'rm -rf "${work_dir}"' EXIT
+archive="${work_dir}/${FONT_ARCHIVE}"
+curl -fsSL -o "${archive}" "${FONT_URL}"
+printf '%s  %s\n' "${FONT_SHA256}" "${archive}" | sha256sum -c -
+
+install -d -m 0755 "${FONT_DIR}"
+tar -xJf "${archive}" -C "${FONT_DIR}" --no-same-owner --wildcards '*.ttf'
+find "${FONT_DIR}" -type f -name '*.ttf' -exec chmod 0644 {} +
+touch "${SENTINEL}"
+fc-cache -f "${FONT_DIR}"

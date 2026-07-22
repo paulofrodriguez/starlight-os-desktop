@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+if [[ "${EUID}" -eq 0 ]]; then
+    if [[ -n "${SUDO_USER:-}" && "${SUDO_USER}" != "root" ]]; then
+        exec runuser -u "${SUDO_USER}" -- "$0" "$@"
+    fi
+    echo "Run this script as the target desktop user, not as root." >&2
+    exit 1
+fi
+
+for command_name in bash curl file git; do
+    if ! command -v "${command_name}" >/dev/null 2>&1; then
+        echo "Missing command: ${command_name}" >&2
+        echo "Install distro-devtools or: sudo apt install build-essential procps curl file git" >&2
+        exit 1
+    fi
+done
+
+find_brew() {
+    if command -v brew >/dev/null 2>&1; then
+        command -v brew
+    elif [[ -x /home/linuxbrew/.linuxbrew/bin/brew ]]; then
+        printf '%s\n' /home/linuxbrew/.linuxbrew/bin/brew
+    elif [[ -x "${HOME}/.linuxbrew/bin/brew" ]]; then
+        printf '%s\n' "${HOME}/.linuxbrew/bin/brew"
+    fi
+}
+
+brew_bin="$(find_brew || true)"
+if [[ -z "${brew_bin}" ]]; then
+    installer="$(mktemp)"
+    trap 'rm -f "${installer}"' EXIT
+    curl -fsSL -o "${installer}" \
+        https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh
+    NONINTERACTIVE=1 /bin/bash "${installer}"
+    brew_bin="$(find_brew || true)"
+fi
+
+if [[ -z "${brew_bin}" ]]; then
+    echo "Homebrew installation did not produce a brew binary." >&2
+    exit 1
+fi
+
+brew_prefix="$("${brew_bin}" --prefix)"
+readonly MARKER_BEGIN="# >>> starlight homebrew >>>"
+readonly MARKER_END="# <<< starlight homebrew <<<"
+for rc_file in "${HOME}/.profile" "${HOME}/.bashrc"; do
+    touch "${rc_file}"
+    if ! grep -Fq "${MARKER_BEGIN}" "${rc_file}"; then
+        {
+            printf '\n%s\n' "${MARKER_BEGIN}"
+            printf 'eval "$(%s/bin/brew shellenv)"\n' "${brew_prefix}"
+            printf '%s\n' "${MARKER_END}"
+        } >>"${rc_file}"
+    fi
+done

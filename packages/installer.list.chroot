@@ -1,0 +1,12 @@
+calamares
+qt6-wayland
+squashfs-tools
+rsync
+parted
+gparted
+os-prober
+dosfstools
+efibootmgr
+grub2-common
+grub-pc-bin
+grub-efi-amd64-bin

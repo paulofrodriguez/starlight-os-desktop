@@ -1,0 +1,4 @@
+[Default Applications]
+text/html=starlight-browser.desktop
+x-scheme-handler/http=starlight-browser.desktop
+x-scheme-handler/https=starlight-browser.desktop

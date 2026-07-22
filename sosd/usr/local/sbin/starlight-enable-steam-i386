@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+run_update=true
+if [[ "${1:-}" == "--no-update" ]]; then
+    run_update=false
+fi
+
+if [[ "${EUID}" -ne 0 ]]; then
+    echo "Run this script as root." >&2
+    exit 1
+fi
+
+if [[ "$(dpkg --print-architecture)" != "amd64" ]]; then
+    echo "Steam i386 support is only expected on amd64 systems."
+    exit 0
+fi
+
+if [[ -x /usr/local/sbin/starlight-enable-debian-components ]]; then
+    /usr/local/sbin/starlight-enable-debian-components --no-update
+fi
+
+changed=false
+if dpkg --print-foreign-architectures | grep -qx i386; then
+    echo "i386 architecture is already enabled."
+else
+    dpkg --add-architecture i386
+    changed=true
+fi
+
+if [[ "${changed}" == true && "${run_update}" == true ]]; then
+    apt-get update
+fi

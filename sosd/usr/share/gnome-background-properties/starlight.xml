@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">
+<wallpapers>
+  <wallpaper deleted="false">
+    <name>Starlight OS Vega</name>
+    <filename>/usr/share/backgrounds/starlight/starlight-wallpaper.png</filename>
+    <filename-dark>/usr/share/backgrounds/starlight/starlight-wallpaper.png</filename-dark>
+    <options>zoom</options>
+    <shade_type>solid</shade_type>
+    <pcolor>#050b16</pcolor>
+    <scolor>#08111e</scolor>
+  </wallpaper>
+</wallpapers>

@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+readonly GDM_CONFIG=/etc/gdm3/custom.conf
+readonly LIVE_CONFIG=/etc/starlight/live.conf
+
+[[ -e /run/live/medium ]] || exit 0
+if [[ ! -r "${LIVE_CONFIG}" ]] || \
+    ! grep -qx 'STARLIGHT_LIVE_AUTOLOGIN=true' "${LIVE_CONFIG}"
+then
+    exit 0
+fi
+
+if ! id starlight >/dev/null 2>&1; then
+    echo "Live user 'starlight' does not exist." >&2
+    exit 1
+fi
+
+echo 'starlight:starlight' | chpasswd
+
+for gtk_version in 3.0 4.0; do
+    install -d -m 0755 -o starlight -g starlight \
+        "/home/starlight/.config/gtk-${gtk_version}"
+    install -m 0644 -o starlight -g starlight \
+        "/etc/gtk-${gtk_version}/gtk.css" \
+        "/home/starlight/.config/gtk-${gtk_version}/gtk.css"
+    install -m 0644 -o starlight -g starlight \
+        "/etc/gtk-${gtk_version}/settings.ini" \
+        "/home/starlight/.config/gtk-${gtk_version}/settings.ini"
+done
+
+if ! grep -q '^\[daemon\]$' "${GDM_CONFIG}"; then
+    printf '\n[daemon]\n' >>"${GDM_CONFIG}"
+fi
+
+sed -i \
+    -e '/^[[:space:]]*AutomaticLogin[[:space:]]*=/d' \
+    -e '/^[[:space:]]*AutomaticLoginEnable[[:space:]]*=/d' \
+    "${GDM_CONFIG}"
+sed -i '/^\[daemon\]$/a AutomaticLogin=starlight\nAutomaticLoginEnable=true' \
+    "${GDM_CONFIG}"

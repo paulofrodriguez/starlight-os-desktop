@@ -1,0 +1,6 @@
+nvidia-driver
+nvidia-open-kernel-dkms
+libnvidia-egl-wayland1
+nvidia-vaapi-driver
+nvidia-settings
+firmware-misc-nonfree

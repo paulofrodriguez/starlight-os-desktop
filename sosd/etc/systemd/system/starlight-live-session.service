@@ -1,0 +1,13 @@
+[Unit]
+Description=Configure the Starlight live desktop session
+Requires=live-config.service
+After=live-config.service
+Before=display-manager.service gdm3.service
+ConditionKernelCommandLine=boot=live
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/starlight-live-session
+
+[Install]
+WantedBy=graphical.target

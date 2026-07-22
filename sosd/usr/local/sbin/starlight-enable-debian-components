@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+readonly COMPONENTS="main contrib non-free non-free-firmware"
+readonly SOURCE_FILE=/etc/apt/sources.list.d/starlight-debian.sources
+
+run_update=true
+if [[ "${1:-}" == "--no-update" ]]; then
+    run_update=false
+    shift
+fi
+
+if [[ "${EUID}" -ne 0 ]]; then
+    echo "Run this script as root." >&2
+    exit 1
+fi
+
+codename="${1:-}"
+if [[ -z "${codename}" ]]; then
+    # shellcheck source=/dev/null
+    . /etc/os-release
+    codename="${VERSION_CODENAME:-}"
+fi
+if [[ -z "${codename}" ]]; then
+    echo "Could not determine Debian codename." >&2
+    exit 1
+fi
+
+component_present() {
+    local component="$1"
+    grep -RhsE \
+        "^[[:space:]]*Components:.*(^|[[:space:]])${component}($|[[:space:]])|^[[:space:]]*deb[[:space:]].*[[:space:]]${component}([[:space:]]|$)" \
+        /etc/apt/sources.list /etc/apt/sources.list.d 2>/dev/null | grep -q .
+}
+
+changed=false
+if component_present contrib && component_present non-free && \
+    component_present non-free-firmware
+then
+    echo "Debian archive components are already enabled."
+else
+    install -d -m 0755 /etc/apt/sources.list.d
+    tmp_file="$(mktemp)"
+    trap 'rm -f "${tmp_file}"' EXIT
+    cat >"${tmp_file}" <<EOF
+Types: deb
+URIs: https://deb.debian.org/debian
+Suites: ${codename} ${codename}-updates
+Components: ${COMPONENTS}
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+Types: deb
+URIs: https://security.debian.org/debian-security
+Suites: ${codename}-security
+Components: ${COMPONENTS}
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+EOF
+    if [[ ! -f "${SOURCE_FILE}" ]] || ! cmp -s "${tmp_file}" "${SOURCE_FILE}"; then
+        install -m 0644 "${tmp_file}" "${SOURCE_FILE}"
+        changed=true
+    fi
+fi
+
+if [[ "${changed}" == true && "${run_update}" == true ]]; then
+    apt-get update
+fi

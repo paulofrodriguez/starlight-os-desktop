@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Google Chrome Setup
+Comment=Optional Google Chrome installation infrastructure
+Exec=/usr/local/bin/starlight-install-chrome
+Icon=web-browser
+Terminal=true
+NoDisplay=true
+Categories=Network;WebBrowser;
+

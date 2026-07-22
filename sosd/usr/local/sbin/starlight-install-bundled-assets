@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+readonly ASSET_ROOT=/opt/starlight-os/third-party
+readonly ICON_ROOT=/usr/share/icons
+readonly COLLOID_ARCHIVE="${ASSET_ROOT}/starlight-colloid-icon-theme.tar.gz"
+readonly TELA_ARCHIVE="${ASSET_ROOT}/tela-circle-icon-theme.tar.gz"
+readonly WPS_PACKAGE="${ASSET_ROOT}/wps-office_12.1.2.26885_amd64.deb"
+readonly LINUXTOYS_PACKAGE="${ASSET_ROOT}/linuxtoys_6.4.8-1_amd64.deb"
+readonly WEBAPP_MANAGER_PACKAGE="${ASSET_ROOT}/webapp-manager_1.4.6_all.deb"
+readonly OH_MY_BASH_ARCHIVE="${ASSET_ROOT}/oh-my-bash-627913b75855036cb5af2f3ad130c66a335e7382.tar.gz"
+readonly FLATPAK_APP_LIST=/usr/share/starlight/flatpaks/system-apps.txt
+
+install -d -m 0755 /usr/local/src/starlight-os
+
+colloid_source=/usr/local/src/starlight-os/colloid
+rm -rf "${colloid_source}"
+mkdir -p "${colloid_source}"
+tar -xzf "${COLLOID_ARCHIVE}" -C "${colloid_source}" --strip-components=1
+bash "${colloid_source}/install.sh" \
+    --dest "${ICON_ROOT}" \
+    --name Starlight-Colloid \
+    --theme yellow
+
+tela_source=/usr/local/src/starlight-os/tela-circle
+rm -rf "${tela_source}"
+mkdir -p "${tela_source}"
+tar -xzf "${TELA_ARCHIVE}" -C "${tela_source}" --strip-components=1
+bash "${tela_source}/install.sh" -d "${ICON_ROOT}" yellow
+
+apt-get install -y --allow-downgrades \
+    "${WPS_PACKAGE}" \
+    "${LINUXTOYS_PACKAGE}" \
+    "${WEBAPP_MANAGER_PACKAGE}"
+
+rm -rf /usr/share/oh-my-bash
+install -d -m 0755 /usr/share/oh-my-bash
+tar -xzf "${OH_MY_BASH_ARCHIVE}" \
+    -C /usr/share/oh-my-bash \
+    --strip-components=1 \
+    --exclude '.git*' \
+    --exclude '.github'
+find /usr/share/oh-my-bash -type d -exec chmod 0755 {} +
+find /usr/share/oh-my-bash -type f -exec chmod 0644 {} +
+chmod 0755 /usr/share/oh-my-bash/oh-my-bash.sh
+
+if [[ -s "${FLATPAK_APP_LIST}" ]]; then
+    flatpak remote-add --system --if-not-exists flathub \
+        https://flathub.org/repo/flathub.flatpakrepo
+    while IFS= read -r application; do
+        [[ -n "${application}" && "${application}" != \#* ]] || continue
+        flatpak install --system --noninteractive --or-update flathub \
+            "${application}"
+    done <"${FLATPAK_APP_LIST}"
+fi
+
+rm -rf "${colloid_source}" "${tela_source}"
+rm -rf "${ASSET_ROOT}"
+gtk-update-icon-cache -f -t "${ICON_ROOT}/Starlight-Colloid-Yellow-Dark"
+gtk-update-icon-cache -f -t "${ICON_ROOT}/Tela-circle-yellow-dark"

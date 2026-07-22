@@ -1,0 +1,8 @@
+firmware-linux
+firmware-linux-free
+firmware-misc-nonfree
+firmware-realtek
+firmware-mediatek
+firmware-iwlwifi
+intel-microcode
+amd64-microcode

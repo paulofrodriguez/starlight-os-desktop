@@ -1,0 +1,15 @@
+[Unit]
+Description=Starlight OS first-boot configuration
+Documentation=file:/usr/share/doc/starlight-os-desktop/firstboot.md
+Wants=network-online.target
+After=network-online.target
+ConditionPathExists=!/var/lib/starlight/firstboot-complete
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/starlight-firstboot
+RemainAfterExit=yes
+TimeoutStartSec=0
+
+[Install]
+WantedBy=multi-user.target

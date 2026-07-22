@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+readonly KEYRING=/usr/share/keyrings/element-io-archive-keyring.gpg
+readonly SOURCE_FILE=/etc/apt/sources.list.d/element-io.list
+readonly KEY_URL=https://packages.element.io/debian/element-io-archive-keyring.gpg
+
+run_update=true
+if [[ "${1:-}" == "--no-update" ]]; then
+    run_update=false
+fi
+
+if [[ "${EUID}" -ne 0 ]]; then
+    echo "Run this script as root." >&2
+    exit 1
+fi
+
+arch="$(dpkg --print-architecture)"
+case "${arch}" in
+    amd64|arm64) ;;
+    *)
+        echo "Element Desktop repository is not enabled for architecture: ${arch}" >&2
+        exit 1
+        ;;
+esac
+
+export DEBIAN_FRONTEND=noninteractive
+if ! command -v wget >/dev/null 2>&1; then
+    apt-get update
+    apt-get install -y ca-certificates wget apt-transport-https
+fi
+
+install -d -m 0755 /usr/share/keyrings /etc/apt/sources.list.d
+tmp_key="$(mktemp)"
+trap 'rm -f "${tmp_key}"' EXIT
+wget -qO "${tmp_key}" "${KEY_URL}"
+if [[ ! -f "${KEYRING}" ]] || ! cmp -s "${tmp_key}" "${KEYRING}"; then
+    install -m 0644 "${tmp_key}" "${KEYRING}"
+fi
+
+source_line="deb [arch=${arch} signed-by=${KEYRING}] https://packages.element.io/debian/ default main"
+if [[ ! -f "${SOURCE_FILE}" ]] || \
+    ! grep -Fxq "${source_line}" "${SOURCE_FILE}"
+then
+    printf '%s\n' "${source_line}" >"${SOURCE_FILE}"
+fi
+
+if [[ "${run_update}" == true ]]; then
+    apt-get update
+fi

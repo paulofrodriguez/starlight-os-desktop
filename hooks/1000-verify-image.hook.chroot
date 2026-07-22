@@ -1,0 +1,132 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+trap 'echo "Starlight image verification failed at line ${LINENO}: ${BASH_COMMAND}" >&2' ERR
+
+required_commands=(
+    gnome-shell gnome-calculator gnome-calendar gnome-system-monitor epiphany
+    chromium firefox-esr ffmpeg pipewire wpctl flatpak git docker podman
+    qemu-system-x86_64 virsh virt-manager starlight-firstboot starlight-browser
+    starlight-launch-installer webapp-manager unsquashfs rsync grub-install grub-mkconfig
+    grub-mkstandalone grub-probe efibootmgr mkfs.vfat
+)
+
+require_installed_package() {
+    local package_name="$1"
+    local package_status
+
+    package_status="$(dpkg-query -W -f='${Status}\n' "${package_name}")"
+    if [[ "${package_status}" != "install ok installed" ]]; then
+        echo "Required package missing: ${package_name}" >&2
+        exit 1
+    fi
+}
+
+for package_name in user-setup gnome-shell-extension-blur-my-shell \
+    gnome-shell-extension-dashtodock gnome-shell-extension-prefs \
+    papirus-icon-theme wps-office webapp-manager dosfstools efibootmgr \
+    grub2-common grub-pc-bin grub-efi-amd64-bin; do
+    require_installed_package "${package_name}"
+done
+
+manual_packages="$(apt-mark showmanual)"
+for manual_package in dosfstools efibootmgr grub2-common grub-pc-bin \
+    grub-efi-amd64-bin os-prober; do
+    if ! grep -qx "${manual_package}" <<<"${manual_packages}"; then
+        echo "Required manual package marker missing: ${manual_package}" >&2
+        exit 1
+    fi
+done
+
+for command_name in "${required_commands[@]}"; do
+    command -v "${command_name}" >/dev/null || {
+        echo "Required command missing: ${command_name}" >&2
+        exit 1
+    }
+done
+
+test -f /etc/systemd/system/starlight-firstboot.service
+test -f /etc/systemd/system/starlight-live-session.service
+test -x /lib/live/config/0035-starlight-user
+grep -Fq '${LIVE_USERNAME}:${LIVE_USERNAME}' /lib/live/config/0035-starlight-user
+test -n "$(find /usr/share/fonts/truetype/nerd-fonts -type f -name '*.ttf' -print -quit)"
+test -f /usr/share/fonts/truetype/nerd-fonts/README.md
+test -f /etc/calamares/modules/unpackfs.conf
+test -f /etc/calamares/modules/welcome.conf
+test -f /etc/calamares/modules/partition.conf
+test -f /etc/calamares/modules/grubcfg.conf
+test -f /etc/calamares/modules/starlight-bootloader/module.desc
+test -f /etc/calamares/modules/starlight-bootloader/main.py
+test -f /usr/lib/x86_64-linux-gnu/calamares/modules/starlight-bootloader/module.desc
+test -f /usr/lib/x86_64-linux-gnu/calamares/modules/starlight-bootloader/main.py
+test -f /etc/calamares/modules/users.conf
+test -f /etc/calamares/branding/starlight/starlight-calamares.png
+test -f /etc/calamares/branding/starlight/starlight-calamares-light.png
+test -f /etc/calamares/branding/starlight/starlight-calamares-dark.png
+test -f /usr/share/calamares/branding/starlight/starlight-calamares.png
+test -f /usr/share/calamares/branding/starlight/starlight-calamares-dark.png
+grep -Fq 'productIcon: starlight-calamares.png' /etc/calamares/branding/starlight/branding.desc
+grep -Fq 'productLogo: starlight-calamares.png' /etc/calamares/branding/starlight/branding.desc
+grep -Fq 'productWelcome: starlight-calamares-dark.png' /etc/calamares/branding/starlight/branding.desc
+grep -Fq 'SidebarBackgroundCurrent: "#c89b3c"' /etc/calamares/branding/starlight/branding.desc
+grep -Fq 'destination: "/"' /etc/calamares/modules/unpackfs.conf
+grep -Fq 'requiredStorage: 30' /etc/calamares/modules/welcome.conf
+grep -Fq 'requiredRam: 2.0' /etc/calamares/modules/welcome.conf
+grep -Fq 'mountPoint: /boot/efi' /etc/calamares/modules/partition.conf
+grep -Fq 'efiSystemPartition: /boot/efi' /etc/calamares/modules/partition.conf
+! grep -Fq 'requiredPartitionTableType:' /etc/calamares/modules/partition.conf
+grep -Fq '    - grubcfg' /etc/calamares/settings.conf
+grep -Fq '    - starlight-bootloader' /etc/calamares/settings.conf
+grep -Fq -- '--no-nvram' /etc/calamares/modules/starlight-bootloader/main.py
+grep -Fq -- '--no-uefi-secure-boot' /etc/calamares/modules/starlight-bootloader/main.py
+grep -Fq 'grub-mkstandalone' /etc/calamares/modules/starlight-bootloader/main.py
+grep -Fq 'BOOTX64.EFI' /etc/calamares/modules/starlight-bootloader/main.py
+grep -Fq 'root=UUID=' /etc/calamares/modules/starlight-bootloader/main.py
+! grep -Fq 'could not find /boot/grub/grub.cfg' /etc/calamares/modules/starlight-bootloader/main.py
+grep -Fq 'always_use_defaults: true' /etc/calamares/modules/grubcfg.conf
+grep -Fq 'GRUB_DEFAULT: "0"' /etc/calamares/modules/grubcfg.conf
+grep -Fq 'GRUB_DISABLE_OS_PROBER: false' /etc/calamares/modules/grubcfg.conf
+grep -Fq 'grubProbe: grub-probe' /etc/calamares/modules/bootloader.conf
+grep -Fq 'efiBootMgr: efibootmgr' /etc/calamares/modules/bootloader.conf
+grep -Fq 'installEFIFallback: true' /etc/calamares/modules/bootloader.conf
+test -f /usr/lib/grub/i386-pc/modinfo.sh
+test -f /usr/lib/grub/x86_64-efi/modinfo.sh
+test -f /usr/share/grub/unicode.pf2
+test -x /etc/kernel/postinst.d/zz-update-grub
+test -x /etc/kernel/postrm.d/zz-update-grub
+test -f /etc/polkit-1/rules.d/49-starlight-live-installer.rules
+test -f /usr/share/polkit-1/actions/com.starlight.install.policy
+test -x /usr/local/sbin/starlight-run-installer
+grep -Fq 'com.github.calamares.calamares.pkexec.run' /etc/polkit-1/rules.d/49-starlight-live-installer.rules
+grep -Fq 'com.starlight.install.pkexec.run' /etc/polkit-1/rules.d/49-starlight-live-installer.rules
+grep -Fq '/usr/local/sbin/starlight-run-installer' /usr/share/polkit-1/actions/com.starlight.install.policy
+grep -Fq 'Exec=/usr/local/bin/starlight-launch-installer' /usr/share/applications/starlight-install.desktop
+grep -Fq 'NoDisplay=true' /usr/share/applications/calamares.desktop
+test -s /usr/share/backgrounds/starlight/starlight-wallpaper.png
+test -s /etc/gtk-3.0/gtk.css
+test -s /etc/gtk-4.0/gtk.css
+test -s /etc/skel/.config/gtk-3.0/gtk.css
+test -s /etc/skel/.config/gtk-4.0/gtk.css
+grep -Fq 'headerbar.titlebar' /etc/gtk-4.0/gtk.css
+grep -Fq '@define-color headerbar_bg_color #08111e;' /etc/gtk-4.0/gtk.css
+test -d /usr/share/icons/Starlight-Colloid-Yellow-Dark
+test -d /usr/share/icons/Tela-circle-yellow-dark
+test -d /usr/share/icons/Papirus-Dark
+test -s /usr/share/starlight/starlight-live-user.png
+test -f /usr/share/gnome-background-properties/starlight.xml
+test -f /usr/share/gdm/dconf/99-starlight-login
+grep -Fq "logo=''" /usr/share/gdm/dconf/99-starlight-login
+grep -Fq "fallback-logo=''" /usr/share/gdm/dconf/99-starlight-login
+test -s /var/lib/gdm3/greeter-dconf-defaults
+grep -Fq '/usr/share/backgrounds/starlight/starlight-wallpaper.png' /usr/share/gnome-background-properties/starlight.xml
+grep -Fxq "accent-color='yellow'" /etc/dconf/db/starlight.d/00-starlight
+grep -Fxq "color-scheme='prefer-dark'" /etc/dconf/db/starlight.d/00-starlight
+grep -Fxq "gtk-theme='Adwaita-dark'" /etc/dconf/db/starlight.d/00-starlight
+grep -Fxq "icon-theme='Starlight-Colloid-Yellow-Dark'" /etc/dconf/db/starlight.d/00-starlight
+grep -q '^setRootPassword: false$' /etc/calamares/modules/users.conf
+grep -q '^allowWeakPasswords: true$' /etc/calamares/modules/users.conf
+grep -q '^allowWeakPasswordsDefault: true$' /etc/calamares/modules/users.conf
+grep -q '^  minLength: 1$' /etc/calamares/modules/users.conf
+grep -q 'name: sudo' /etc/calamares/modules/users.conf
+test -L /etc/systemd/system/multi-user.target.wants/starlight-firstboot.service
+test -L /etc/systemd/system/graphical.target.wants/starlight-live-session.service
+test ! -e /etc/ssh/ssh_host_rsa_key

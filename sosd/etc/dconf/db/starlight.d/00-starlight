@@ -1,0 +1,38 @@
+[org/gnome/desktop/interface]
+accent-color='yellow'
+color-scheme='prefer-dark'
+gtk-theme='Adwaita-dark'
+icon-theme='Starlight-Colloid-Yellow-Dark'
+monospace-font-name='JetBrainsMono Nerd Font 11'
+
+[org/gnome/desktop/background]
+picture-uri='file:///usr/share/backgrounds/starlight/starlight-wallpaper.png'
+picture-uri-dark='file:///usr/share/backgrounds/starlight/starlight-wallpaper.png'
+picture-options='zoom'
+
+[org/gnome/desktop/screensaver]
+picture-uri='file:///usr/share/backgrounds/starlight/starlight-wallpaper.png'
+picture-options='zoom'
+
+[org/gnome/desktop/default-applications/terminal]
+exec='ptyxis'
+exec-arg=''
+
+[org/gnome/shell]
+disable-user-extensions=false
+enabled-extensions=['blur-my-shell@aunetx', 'dash-to-dock@micxgx.gmail.com']
+
+# Dash to Dock owns the desktop dock appearance. Keep its colour explicit so
+# it does not inherit the grey fallback from the upstream GNOME theme.
+[org/gnome/shell/extensions/dash-to-dock]
+dock-position='BOTTOM'
+extend-height=false
+dash-max-icon-size=48
+custom-background-color=true
+background-color='#08111e'
+transparency-mode='FIXED'
+background-opacity=0.96
+custom-theme-customize-running-dots=true
+custom-theme-running-dots-color='#f3c653'
+custom-theme-running-dots-border-color='#c89b3c'
+running-indicator-style='DASHES'

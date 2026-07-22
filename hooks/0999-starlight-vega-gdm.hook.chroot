@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+readonly KIT_ROOT=/opt/starlight-os/gdm/starlight-os-vega
+
+"${KIT_ROOT}/scripts/install-gdm-theme.sh"
+"${KIT_ROOT}/scripts/validate-gdm-theme.sh"

@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+if [[ "${EUID}" -eq 0 ]]; then
+    if [[ -n "${SUDO_USER:-}" && "${SUDO_USER}" != "root" ]]; then
+        exec runuser -u "${SUDO_USER}" -- "$0" "$@"
+    fi
+    echo "Run this script as the target desktop user, not as root." >&2
+    exit 1
+fi
+
+if ! command -v git >/dev/null 2>&1; then
+    echo "Missing command: git" >&2
+    echo "Install distro-devtools or: sudo apt install git" >&2
+    exit 1
+fi
+
+osh_dir="${OSH:-${HOME}/.oh-my-bash}"
+if [[ ! -d "${osh_dir}" ]]; then
+    git clone --depth 1 https://github.com/ohmybash/oh-my-bash.git "${osh_dir}"
+fi
+if [[ ! -s "${osh_dir}/oh-my-bash.sh" ]]; then
+    echo "Oh My Bash is incomplete at ${osh_dir}" >&2
+    exit 1
+fi
+
+readonly MARKER_BEGIN="# >>> starlight oh-my-bash >>>"
+readonly MARKER_END="# <<< starlight oh-my-bash <<<"
+touch "${HOME}/.bashrc"
+if ! grep -Fq "${MARKER_BEGIN}" "${HOME}/.bashrc"; then
+    {
+        printf '\n%s\n' "${MARKER_BEGIN}"
+        printf 'export OSH="${HOME}/.oh-my-bash"\n'
+        printf 'OSH_THEME="${STARLIGHT_OMB_THEME:-agnoster}"\n'
+        printf 'plugins=(git sudo history bashmarks)\n'
+        printf 'aliases=(general)\n'
+        printf '[[ -s "${OSH}/oh-my-bash.sh" ]] && source "${OSH}/oh-my-bash.sh"\n'
+        printf '%s\n' "${MARKER_END}"
+    } >>"${HOME}/.bashrc"
+fi

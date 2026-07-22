@@ -1,0 +1,113 @@
+/* STARLIGHT_VEGA_GTK_BEGIN */
+@define-color starlight_bg #050b16;
+@define-color starlight_surface #08111e;
+@define-color starlight_surface_high #0d1726;
+@define-color starlight_selected #c89b3c;
+@define-color starlight_selected_top #f3c653;
+@define-color starlight_text #f1eee6;
+@define-color starlight_muted #8f949d;
+@define-color starlight_yellow #f3c653;
+@define-color starlight_gold #c89b3c;
+@define-color accent_color #f3c653;
+@define-color accent_bg_color #c89b3c;
+@define-color accent_fg_color #050b16;
+@define-color window_bg_color #08111e;
+@define-color window_fg_color #f1eee6;
+@define-color view_bg_color #050b16;
+@define-color view_fg_color #f1eee6;
+@define-color headerbar_bg_color #08111e;
+@define-color headerbar_fg_color #f1eee6;
+@define-color popover_bg_color #08111e;
+@define-color popover_fg_color #f1eee6;
+@define-color card_bg_color #0d1726;
+@define-color card_fg_color #f1eee6;
+
+window,
+dialog,
+popover,
+.popover,
+.card,
+.view,
+.background {
+  background-color: @starlight_surface;
+  color: @starlight_text;
+}
+
+headerbar,
+headerbar.titlebar,
+.titlebar,
+windowhandle {
+  background-color: @starlight_surface;
+  background-image: linear-gradient(to bottom, @starlight_surface_high, @starlight_bg);
+  color: @starlight_text;
+  border-bottom: 1px solid alpha(@starlight_yellow, 0.34);
+  box-shadow: inset 0 -1px alpha(@starlight_gold, 0.20);
+}
+
+headerbar:backdrop,
+headerbar.titlebar:backdrop,
+.titlebar:backdrop {
+  background-color: @starlight_bg;
+  background-image: linear-gradient(to bottom, #0a1320, #050b16);
+  color: alpha(@starlight_text, 0.72);
+  border-bottom-color: alpha(@starlight_yellow, 0.20);
+}
+
+headerbar button,
+.titlebar button,
+windowhandle button {
+  color: @starlight_text;
+  background-color: transparent;
+  background-image: none;
+  border-color: transparent;
+}
+
+headerbar button:hover,
+.titlebar button:hover,
+windowhandle button:hover,
+button:hover {
+  color: @accent_fg_color;
+  background-color: alpha(@starlight_selected, 0.82);
+  background-image: linear-gradient(to bottom, @starlight_selected_top, @starlight_selected);
+  border-color: alpha(@starlight_yellow, 0.50);
+}
+
+headerbar button:checked,
+headerbar button:active,
+.titlebar button:checked,
+.titlebar button:active,
+windowhandle button:checked,
+windowhandle button:active,
+button:checked,
+button:active,
+row:selected,
+calendar.view label.today {
+  color: @accent_fg_color;
+  background-color: @starlight_selected;
+  background-image: linear-gradient(to bottom, @starlight_selected_top, @starlight_selected);
+  box-shadow: inset 0 0 0 1px alpha(@starlight_gold, 0.72);
+}
+
+entry,
+spinbutton,
+combobox,
+dropdown,
+calendar.view {
+  color: @starlight_text;
+  background-color: @starlight_bg;
+  border-color: alpha(@starlight_yellow, 0.38);
+}
+
+calendar.view header {
+  background-color: @starlight_surface_high;
+  background-image: linear-gradient(to bottom, @starlight_surface_high, @starlight_surface);
+  color: @starlight_text;
+}
+
+calendar.view label.day-number:hover,
+calendar.view label.day-number:selected {
+  color: @accent_fg_color;
+  background-color: @starlight_selected;
+  background-image: linear-gradient(to bottom, @starlight_selected_top, @starlight_selected);
+}
+/* STARLIGHT_VEGA_GTK_END */

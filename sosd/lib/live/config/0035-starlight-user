@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+readonly STATE_FILE=/var/lib/live/config/starlight-user
+readonly LIVE_USERNAME=starlight
+readonly LIVE_FULL_NAME='Starlight'
+readonly LIVE_AVATAR=/usr/share/starlight/starlight-live-user.png
+
+[[ -e "${STATE_FILE}" ]] && exit 0
+
+if ! id "${LIVE_USERNAME}" >/dev/null 2>&1; then
+    echo "Starlight live user was not created by live-config." >&2
+    exit 1
+fi
+
+echo "${LIVE_USERNAME}:${LIVE_USERNAME}" | chpasswd
+usermod -c "${LIVE_FULL_NAME}" "${LIVE_USERNAME}"
+
+install -d -m 0755 /var/lib/AccountsService/icons /var/lib/AccountsService/users
+install -m 0644 "${LIVE_AVATAR}" \
+    "/var/lib/AccountsService/icons/${LIVE_USERNAME}"
+cat >"/var/lib/AccountsService/users/${LIVE_USERNAME}" <<EOF
+[User]
+Icon=/var/lib/AccountsService/icons/${LIVE_USERNAME}
+SystemAccount=false
+EOF
+
+install -d -m 0755 /var/lib/live/config
+touch "${STATE_FILE}"

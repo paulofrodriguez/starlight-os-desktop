@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+echo "Google Chrome is not included with Starlight OS."
+echo "The optional installer is intentionally disabled until its repository,"
+echo "license presentation, signature verification, and consent flow are defined."
+exit 2

@@ -1,0 +1,8 @@
+# SPDX-FileCopyrightText: 2026 Starlight Brasil
+# SPDX-License-Identifier: GPL-3.0-or-later
+---
+type:       "job"
+name:       "starlight-bootloader"
+interface:  "python"
+script:     "main.py"
+noconfig:   true

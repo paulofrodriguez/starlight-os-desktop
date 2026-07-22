@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+rm -f /etc/machine-id
+install -m 0444 /dev/null /etc/machine-id
+rm -f /var/lib/dbus/machine-id
+ln -s /etc/machine-id /var/lib/dbus/machine-id
+
+rm -f /etc/ssh/ssh_host_*
+rm -rf /root/.ssh /root/.cache /root/.local/share/recently-used.xbel
+rm -f /root/.bash_history
+
+find /home -mindepth 1 -maxdepth 3 \
+    \( -name .bash_history -o -name .ssh -o -name .cache \) \
+    -exec rm -rf {} +
+
+journalctl --rotate || true
+journalctl --vacuum-time=1s || true
+rm -rf /var/log/journal/*
+find /var/log -type f -exec truncate -s 0 {} +
+
+apt-get clean
+rm -rf /var/lib/apt/lists/*
+rm -rf /tmp/* /var/tmp/*
+rm -rf /var/cache/apt/archives/*
+rm -rf /var/cache/man/*
+rm -rf /var/cache/fontconfig/*

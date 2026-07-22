@@ -1,0 +1,355 @@
+Quero criar uma distribuição Linux chamada **Starlight OS Desktop (SOSD)**.
+
+O objetivo é criar uma distribuição profissional baseada em Ubuntu LTS, totalmente reproduzível, que possa futuramente ser distribuída comercialmente.
+
+IMPORTANTE
+
+Não quero uma instalação manual modificada.
+
+Não quero um script que altere um Ubuntu já instalado.
+
+Quero um sistema de build que gere uma ISO própria.
+
+Toda customização deve ser reproduzível através do Git.
+
+==========================
+BASE
+==========================
+
+Base:
+Ubuntu LTS amd64
+
+Sistema de build:
+
+- live-build ou outra ferramenta equivalente recomendada para Ubuntu
+- sem modificações manuais
+- tudo versionado
+
+==========================
+OBJETIVO
+==========================
+
+Gerar uma ISO bootável chamada
+
+Starlight OS Desktop
+
+com identidade própria.
+
+==========================
+ARQUITETURA
+==========================
+
+Organize o projeto assim:
+
+sosd/
+
+build/
+
+branding/
+
+packages/
+
+hooks/
+
+scripts/
+
+config/
+
+docs/
+
+tests/
+
+installer/
+
+Makefile
+
+README.md
+
+==========================
+DESKTOP
+==========================
+
+Não utilizar Ubuntu Desktop.
+
+Utilizar Ubuntu LTS mínimo como base.
+
+Instalar GNOME praticamente puro.
+
+Quero uma experiência extremamente próxima do GNOME upstream.
+
+Não instalar:
+
+- Ubuntu Dock
+- Yaru
+- Ubuntu Session
+- extensões desnecessárias
+- aplicações Ubuntu específicas
+
+Utilizar:
+
+- GNOME Shell
+- GNOME Session
+- GDM
+- Adwaita
+- Wayland por padrão
+- Pipewire
+- NetworkManager
+
+O desktop deve parecer um GNOME puro.
+
+==========================
+VISUAL
+==========================
+
+Aplicar identidade Starlight:
+
+- splash
+- wallpaper
+- GDM
+- Plymouth
+- logo
+- ícones próprios futuramente
+- nome Starlight OS Desktop
+- motd
+- os-release
+
+Não alterar o visual padrão do GNOME além do branding.
+
+==========================
+NAVEGADOR
+==========================
+
+Instalar Chromium.
+
+Criar infraestrutura para futuramente oferecer instalação automática do Google Chrome.
+
+Não incluir Chrome na ISO.
+
+==========================
+DRIVERS
+==========================
+
+Instalar automaticamente:
+
+- firmware linux
+- microcodes Intel
+- microcodes AMD
+
+Preparar suporte para NVIDIA.
+
+Não instalar driver proprietário na ISO.
+
+Criar mecanismo que detecte GPU NVIDIA no primeiro boot e instale automaticamente o driver proprietário recomendado utilizando os repositórios oficiais do Ubuntu.
+
+Registrar logs.
+
+Caso falhe, continuar normalmente.
+
+==========================
+PACOTES
+==========================
+
+Instalar:
+
+Flatpak
+
+Flathub
+
+Git
+
+curl
+
+wget
+
+vim
+
+htop
+
+openssh-server
+
+build-essential
+
+python3
+
+nodejs
+
+npm
+
+Docker
+
+Podman
+
+QEMU
+
+libvirt
+
+virt-manager
+
+Firefox
+
+Chromium (como padrão)
+
+GNOME Software
+
+==========================
+DESENVOLVIMENTO
+==========================
+
+Quero que este desktop seja excelente para programadores.
+
+Instalar:
+
+VSCode NÃO.
+
+Criar estrutura para instalação posterior.
+
+Instalar somente ferramentas livres.
+
+==========================
+SERVIÇOS
+==========================
+
+Criar um serviço
+
+starlight-firstboot.service
+
+Executado somente uma vez.
+
+Responsável por:
+
+detectar hardware
+
+registrar informações
+
+instalar drivers NVIDIA quando necessário
+
+configurar Flatpak
+
+habilitar Flathub
+
+executar futuras tarefas
+
+Depois desabilitar a si próprio.
+
+inclua suporte ao flathub na loja oficial.
+
+==========================
+SEGURANÇA
+==========================
+
+Nunca incluir:
+
+machine-id
+
+SSH Keys
+
+logs
+
+históricos
+
+tokens
+
+IDs únicos
+
+dados pessoais
+
+==========================
+QUALIDADE
+==========================
+
+Criar scripts:
+
+build.sh
+
+clean.sh
+
+test.sh
+
+validate.sh
+
+Todos utilizando:
+
+set -Eeuo pipefail
+
+==========================
+TESTES
+==========================
+
+Criar:
+
+make build
+
+make test
+
+make clean
+
+O teste deve iniciar automaticamente a ISO no QEMU.
+
+==========================
+DOCUMENTAÇÃO
+==========================
+
+Escrever documentação completa explicando:
+
+arquitetura
+
+fluxo de build
+
+como adicionar pacotes
+
+como trocar branding
+
+como criar novos serviços
+
+como adicionar drivers
+
+como gerar novas ISOs
+
+como publicar novas versões
+
+==========================
+CI/CD
+==========================
+
+Preparar estrutura para GitHub Actions.
+
+No futuro quero que um commit gere automaticamente uma ISO.
+
+==========================
+OBJETIVO FUTURO
+==========================
+
+O projeto deverá suportar futuramente:
+
+Starlight Cloud
+
+backup
+
+sincronização
+
+instalação de aplicativos
+
+telemetria opcional
+
+loja de aplicativos
+
+conta Starlight
+
+sem necessidade de alterar a arquitetura.
+
+==========================
+FORMA DE TRABALHO
+==========================
+
+Antes de modificar qualquer arquivo:
+
+1. analisar o sistema
+2. apresentar um plano
+3. executar em pequenas etapas
+4. validar cada etapa
+5. corrigir problemas encontrados
+6. somente terminar quando conseguir gerar uma ISO bootável.
+
+Nunca modificar arquivos fora do repositório sem perguntar.
+Nunca utilizar hacks temporários.
+Priorizar simplicidade, manutenção e arquitetura limpa.

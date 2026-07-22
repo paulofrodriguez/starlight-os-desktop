@@ -1,0 +1,9 @@
+# The wallpaper already contains the Starlight OS brand.  Suppress Debian's
+# vendor logo and do not add a second logo above the real GDM controls.
+#
+# /usr/share/gdm/generate-config compiles this directory into
+# /var/lib/gdm3/greeter-dconf-defaults before GDM starts.  A higher numeric
+# prefix intentionally overrides Debian's vendor logo setting.
+[org/gnome/login-screen]
+logo=''
+fallback-logo=''

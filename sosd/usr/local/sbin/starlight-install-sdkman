@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+if [[ "${EUID}" -eq 0 ]]; then
+    if [[ -n "${SUDO_USER:-}" && "${SUDO_USER}" != "root" ]]; then
+        exec runuser -u "${SUDO_USER}" -- "$0" "$@"
+    fi
+    echo "Run this script as the target desktop user, not as root." >&2
+    exit 1
+fi
+
+for command_name in bash curl unzip zip; do
+    if ! command -v "${command_name}" >/dev/null 2>&1; then
+        echo "Missing command: ${command_name}" >&2
+        echo "Install distro-devtools or: sudo apt install curl zip unzip" >&2
+        exit 1
+    fi
+done
+
+export SDKMAN_DIR="${SDKMAN_DIR:-${HOME}/.sdkman}"
+if [[ ! -s "${SDKMAN_DIR}/bin/sdkman-init.sh" ]]; then
+    installer="$(mktemp)"
+    trap 'rm -f "${installer}"' EXIT
+    curl -fsSL -o "${installer}" "https://get.sdkman.io?ci=true&rcupdate=false"
+    bash "${installer}"
+fi
+
+readonly MARKER_BEGIN="# >>> starlight sdkman >>>"
+readonly MARKER_END="# <<< starlight sdkman <<<"
+touch "${HOME}/.bashrc"
+if ! grep -Fq "${MARKER_BEGIN}" "${HOME}/.bashrc"; then
+    {
+        printf '\n%s\n' "${MARKER_BEGIN}"
+        printf 'export SDKMAN_DIR="${HOME}/.sdkman"\n'
+        printf '[[ -s "${SDKMAN_DIR}/bin/sdkman-init.sh" ]] && source "${SDKMAN_DIR}/bin/sdkman-init.sh"\n'
+        printf '%s\n' "${MARKER_END}"
+    } >>"${HOME}/.bashrc"
+fi

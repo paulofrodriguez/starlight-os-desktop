@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=Starlight OS
+Description=Starlight OS boot splash
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/starlight
+ScriptFile=/usr/share/plymouth/themes/starlight/starlight.script

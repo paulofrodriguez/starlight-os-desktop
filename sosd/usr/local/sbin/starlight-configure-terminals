@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+if [[ "${EUID}" -eq 0 ]]; then
+    if [[ -n "${SUDO_USER:-}" && "${SUDO_USER}" != "root" ]]; then
+        exec runuser -u "${SUDO_USER}" -- "$0" "$@"
+    fi
+    echo "Run this script inside the target user's GNOME session." >&2
+    exit 1
+fi
+
+font_name="${STARLIGHT_TERMINAL_FONT:-JetBrainsMono Nerd Font 11}"
+if ! command -v gsettings >/dev/null 2>&1; then
+    echo "gsettings is required to configure GNOME terminal profiles." >&2
+    exit 1
+fi
+
+if gsettings list-schemas | grep -qx org.gnome.Terminal.ProfilesList; then
+    profile_id="$(gsettings get org.gnome.Terminal.ProfilesList default | tr -d "'")"
+    if [[ -n "${profile_id}" && "${profile_id}" != "@as" ]]; then
+        profile_schema="org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:${profile_id}/"
+        gsettings set "${profile_schema}" use-system-font false
+        gsettings set "${profile_schema}" font "${font_name}"
+    fi
+fi
+
+if gsettings list-schemas | grep -qx org.gnome.Ptyxis; then
+    if gsettings writable org.gnome.Ptyxis use-system-font >/dev/null 2>&1; then
+        gsettings set org.gnome.Ptyxis use-system-font false
+    fi
+    for key in font-name font; do
+        if gsettings writable org.gnome.Ptyxis "${key}" >/dev/null 2>&1; then
+            gsettings set org.gnome.Ptyxis "${key}" "${font_name}"
+            break
+        fi
+    done
+fi

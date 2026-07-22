@@ -1,0 +1,7 @@
+{
+  "name": "Starlight OS Vega GDM Kit",
+  "target": "Debian 13 Trixie / GNOME Shell 48",
+  "wallpaper": "3840x2160",
+  "login_position": "right",
+  "version": "1.0.0"
+}

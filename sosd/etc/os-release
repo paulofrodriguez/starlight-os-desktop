@@ -1,0 +1,13 @@
+PRETTY_NAME="Starlight OS Vega"
+NAME="Starlight OS"
+VERSION="1.0 (Vega)"
+VERSION_ID="1.0"
+VERSION_CODENAME=vega
+ID=starlight
+ID_LIKE=debian
+HOME_URL="https://starlightbrasil.com/"
+SUPPORT_URL="https://starlightbrasil.com/"
+BUG_REPORT_URL="https://starlightbrasil.com/"
+PRIVACY_POLICY_URL="https://starlightbrasil.com/"
+LOGO=computer
+DEBIAN_CODENAME=trixie

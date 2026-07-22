@@ -1,0 +1,332 @@
+/* STARLIGHT_OS_VEGA_GDM_BEGIN */
+/* Debian 13 / GNOME Shell 48 selectors verified during the image build. */
+.screen-shield-background,
+#lockDialogGroup {
+  background: #050b16 url("resource:///org/gnome/shell/theme/starlight-os-vega-4k.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.login-dialog {
+  color: #f1eee6;
+}
+
+.login-dialog-user-selection-box {
+  width: 25em;
+  padding: 2em 1.25em;
+  border: 1px solid rgba(200, 155, 60, 0.40);
+  border-radius: 14px;
+  background-color: rgba(8, 17, 30, 0.94);
+  background-gradient-direction: vertical;
+  background-gradient-start: rgba(13, 23, 38, 0.98);
+  background-gradient-end: rgba(5, 11, 22, 0.96);
+}
+
+.login-dialog-user-list-view {
+  width: 100%;
+}
+
+.login-dialog-user-list-view .login-dialog-user-list .login-dialog-user-list-item,
+.login-dialog .login-dialog-auth-list-item,
+.login-dialog-not-listed-button {
+  color: #f1eee6;
+  background-color: #0d1726;
+  border: 1px solid rgba(200, 155, 60, 0.28);
+}
+
+.login-dialog-user-list-view .login-dialog-user-list .login-dialog-user-list-item:hover,
+.login-dialog-user-list-view .login-dialog-user-list .login-dialog-user-list-item:selected,
+.login-dialog-user-list-view .login-dialog-user-list .login-dialog-user-list-item:focus,
+.login-dialog .login-dialog-auth-list-item:hover,
+.login-dialog .login-dialog-auth-list-item:selected,
+.login-dialog .login-dialog-auth-list-item:focus {
+  color: #050b16;
+  background-color: #c89b3c;
+  background-gradient-direction: vertical;
+  background-gradient-start: #f3c653;
+  background-gradient-end: #c89b3c;
+  box-shadow: inset 0 0 0 2px rgba(5, 11, 22, 0.38) !important;
+}
+
+.login-dialog-user-list-view .login-dialog-user-list .login-dialog-user-list-item .user-icon,
+.login-dialog .user-widget .user-icon {
+  border: 2px solid rgba(200, 155, 60, 0.74);
+  background-color: #08111e;
+}
+
+.login-dialog .user-widget .user-widget-label {
+  color: #f1eee6;
+}
+
+.login-dialog .login-dialog-prompt-layout {
+  width: 25em;
+  padding: 1.25em;
+  border: 1px solid rgba(200, 155, 60, 0.40);
+  border-radius: 14px;
+  background-color: rgba(8, 17, 30, 0.94);
+  background-gradient-direction: vertical;
+  background-gradient-start: rgba(13, 23, 38, 0.98);
+  background-gradient-end: rgba(5, 11, 22, 0.96);
+}
+
+.login-dialog .login-dialog-prompt-entry {
+  color: #f1eee6;
+  background-color: rgba(5, 11, 22, 0.98);
+  border: 1px solid rgba(200, 155, 60, 0.68);
+  box-shadow: inset 0 0 0 1px rgba(200, 155, 60, 0.28);
+}
+
+.login-dialog .button,
+.login-dialog .login-dialog-not-listed-button {
+  color: #f6d47a;
+  background-color: rgba(8, 17, 30, 0.92);
+  border: 1px solid rgba(200, 155, 60, 0.48);
+}
+
+.login-dialog .button:hover,
+.login-dialog .button:focus,
+.login-dialog .login-dialog-not-listed-button:hover,
+.login-dialog .login-dialog-not-listed-button:focus {
+  color: #050b16;
+  background-color: rgba(200, 155, 60, 0.98);
+  border-color: #f3c653;
+  box-shadow: inset 0 0 0 2px rgba(200, 155, 60, 0.66);
+}
+
+.login-dialog-message,
+.login-dialog-message-hint,
+.login-dialog .caps-lock-warning-label,
+.login-dialog .login-dialog-message-warning,
+.login-dialog-user-list-view,
+.login-dialog-not-listed-label,
+.login-dialog-session-list-button {
+  color: #f1eee6;
+}
+
+/* Starlight desktop shell: navy surfaces with golden accent states. */
+#panel {
+  background-color: #08111e;
+  background-gradient-direction: vertical;
+  background-gradient-start: #0d1726;
+  background-gradient-end: #050b16;
+  border-bottom: 1px solid rgba(200, 155, 60, 0.30);
+}
+
+#panel .panel-button {
+  color: #f1eee6;
+}
+
+#panel .panel-button .system-status-icon,
+#panel .panel-button.clock-display .clock,
+#panel .panel-button#panelActivities .workspace-dot {
+  color: #f1eee6;
+  background-color: transparent;
+}
+
+#panel .panel-button#panelActivities .workspace-dot {
+  background-color: #f3c653;
+}
+
+#panel .panel-button:focus,
+#panel .panel-button:hover {
+  color: #ffffff;
+  box-shadow: inset 0 0 0 100px rgba(200, 155, 60, 0.30);
+}
+
+#panel .panel-button:active,
+#panel .panel-button:checked {
+  color: #ffffff;
+  box-shadow: inset 0 0 0 2px #f3c653, inset 0 0 0 100px rgba(200, 155, 60, 0.36);
+}
+
+#panel .panel-button.clock-display:focus .clock,
+#panel .panel-button.clock-display:hover .clock,
+#panel .panel-button.clock-display:active .clock,
+#panel .panel-button.clock-display:checked .clock {
+  color: #ffffff;
+  box-shadow: inset 0 0 0 2px #f3c653;
+}
+
+/* Starlight accent: GNOME quick settings, network and selected menu states. */
+.keyboard-brightness-level .button:checked,
+.quick-toggle:checked,
+.quick-toggle-has-menu .quick-toggle:checked,
+.quick-toggle-has-menu .quick-toggle-menu-button:checked,
+.quick-toggle-menu .header .icon.active,
+.icon-button.default,
+.button.default {
+  color: #050b16;
+  background-color: #c89b3c;
+  background-gradient-direction: vertical;
+  background-gradient-start: #f3c653;
+  background-gradient-end: #c89b3c;
+}
+
+.keyboard-brightness-level .button:hover:checked,
+.quick-toggle:hover:checked,
+.quick-toggle-has-menu .quick-toggle:hover:checked,
+.quick-toggle-has-menu .quick-toggle-menu-button:hover:checked,
+.icon-button.default:hover,
+.button.default:hover {
+  color: #050b16;
+  background-color: #c89b3c;
+  background-gradient-direction: vertical;
+  background-gradient-start: #ffe082;
+  background-gradient-end: #c89b3c;
+}
+
+.keyboard-brightness-level .button:focus:checked,
+.quick-toggle:focus:checked,
+.quick-toggle-has-menu .quick-toggle:focus:checked,
+.quick-toggle-has-menu .quick-toggle-menu-button:focus:checked,
+.icon-button.default:focus,
+.button.default:focus {
+  color: #050b16;
+  background-color: #c89b3c;
+  box-shadow: inset 0 0 0 2px rgba(5, 11, 22, 0.42) !important;
+}
+
+.quick-toggle-has-menu:checked .quick-toggle-separator {
+  background-color: rgba(8, 17, 30, 0.42);
+}
+
+.popup-menu,
+.popup-menu-content,
+.popup-sub-menu,
+.popup-menu-boxpointer,
+.datemenu-popover,
+.datemenu-calendar-column,
+.datemenu-displays-section,
+.datemenu-displays-box,
+.datemenu-today-button,
+.datemenu-date-label,
+.datemenu-weather-section,
+.datemenu-world-clocks-section,
+.calendar,
+.calendar-month-header,
+.calendar-month-label,
+.message-list,
+.message,
+.notification-banner,
+.events-button,
+.world-clocks-button,
+.weather-button {
+  color: #f1eee6;
+  background-color: #08111e;
+  background-gradient-direction: vertical;
+  background-gradient-start: #0d1726;
+  background-gradient-end: #050b16;
+  border-color: rgba(200, 155, 60, 0.32);
+}
+
+.popup-menu-item:hover,
+.popup-menu-item:focus {
+  color: #ffffff;
+  background-color: rgba(200, 155, 60, 0.28);
+}
+
+.calendar .calendar-day,
+.calendar-day,
+.calendar-day-base,
+.calendar-day-heading,
+.calendar-day-top,
+.calendar-day-left,
+.calendar-week-number {
+  color: #f1eee6;
+  background-color: transparent;
+}
+
+.calendar .calendar-day:hover,
+.calendar .calendar-day:focus,
+.calendar .calendar-day:selected,
+.calendar-day:hover,
+.calendar-day:focus,
+.calendar-day:selected,
+.calendar-day-base:hover,
+.calendar-day-base:focus,
+.calendar-day-base:selected,
+.calendar-day-selected {
+  color: #050b16;
+  background-color: #c89b3c;
+  background-gradient-direction: vertical;
+  background-gradient-start: #f3c653;
+  background-gradient-end: #c89b3c;
+  box-shadow: inset 0 0 0 1px rgba(5, 11, 22, 0.34);
+}
+
+.calendar .calendar-day.calendar-today,
+.calendar .calendar-day.calendar-today:hover,
+.calendar .calendar-day.calendar-today:focus,
+.calendar-today,
+.calendar-today:hover,
+.calendar-today:focus,
+.calendar-today:selected,
+.calendar-day-base.calendar-today,
+.calendar-day-base.calendar-today:hover,
+.calendar-day-base.calendar-today:focus {
+  color: #050b16;
+  background-color: #c89b3c;
+  background-gradient-direction: vertical;
+  background-gradient-start: #ffe082;
+  background-gradient-end: #c89b3c;
+  box-shadow: inset 0 0 0 2px rgba(5, 11, 22, 0.42) !important;
+}
+
+.quick-toggle-menu .popup-menu-item:checked,
+.quick-toggle-menu .popup-menu-item:selected,
+.popup-menu-item:checked,
+.popup-menu-item:selected {
+  color: #050b16;
+  background-color: rgba(200, 155, 60, 0.72);
+  box-shadow: inset 0 0 0 1px rgba(5, 11, 22, 0.34);
+}
+
+.quick-toggle-menu .popup-menu-item:focus,
+.popup-menu-item:focus {
+  box-shadow: inset 0 0 0 2px rgba(243, 198, 83, 0.70) !important;
+}
+
+#dash .dash-background {
+  background-color: #08111e;
+  background-gradient-direction: vertical;
+  background-gradient-start: #0d1726;
+  background-gradient-end: #050b16;
+  border: 1px solid rgba(200, 155, 60, 0.36);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.42);
+}
+
+#dash .dash-separator {
+  background-color: rgba(200, 155, 60, 0.48);
+}
+
+#dash .dash-item-container .show-apps .overview-icon,
+#dash .dash-item-container .overview-tile .overview-icon,
+#dash .dash-item-container .grid-search-result .overview-icon {
+  background-color: #0d1726;
+  color: #f1eee6;
+}
+
+#dash .dash-item-container .show-apps:hover .overview-icon,
+#dash .dash-item-container .overview-tile:hover .overview-icon,
+#dash .dash-item-container .grid-search-result:hover .overview-icon {
+  color: #050b16;
+  background-color: #c89b3c;
+  box-shadow: inset 0 0 0 1px rgba(5, 11, 22, 0.34);
+}
+
+#dash .dash-item-container .show-apps:focus .overview-icon,
+#dash .dash-item-container .overview-tile:focus .overview-icon,
+#dash .dash-item-container .grid-search-result:focus .overview-icon,
+#dash .dash-item-container .show-apps:checked .overview-icon,
+#dash .dash-item-container .overview-tile:checked .overview-icon,
+#dash .dash-item-container .grid-search-result:checked .overview-icon {
+  color: #050b16;
+  background-color: #c89b3c;
+  box-shadow: inset 0 0 0 2px #f3c653 !important;
+}
+
+#dash .dash-item-container .app-grid-running-dot {
+  background-color: #f3c653;
+}
+/* STARLIGHT_OS_VEGA_GDM_END */

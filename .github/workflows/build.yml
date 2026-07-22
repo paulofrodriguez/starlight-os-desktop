@@ -1,0 +1,40 @@
+name: Build SOSD ISO
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "docs/**"
+      - "**.md"
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install validation dependencies
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+      - name: Validate
+        run: make validate
+      - name: Static tests
+        run: ./tests/static.sh
+
+  build:
+    if: github.event_name == 'workflow_dispatch'
+    needs: validate
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y live-build debootstrap squashfs-tools xorriso \
+            isolinux syslinux-common qemu-system-x86 ovmf shellcheck rsync cpio
+      - name: Build ISO
+        run: sudo make build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: starlight-os-desktop
+          path: build/artifacts/*
+          retention-days: 7

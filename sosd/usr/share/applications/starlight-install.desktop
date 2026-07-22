@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Install Starlight OS
+Comment=Install Starlight OS on this computer
+TryExec=/usr/local/bin/starlight-launch-installer
+Exec=/usr/local/bin/starlight-launch-installer
+Icon=system-software-install
+Terminal=false
+StartupNotify=true
+Categories=System;

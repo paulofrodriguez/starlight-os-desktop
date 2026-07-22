@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+if getent group libvirt >/dev/null; then
+    install -d -m 0755 /etc/skel/.config
+fi
+
+install -d -m 0755 /etc/skel
+cat >/etc/skel/.profile-starlight <<'EOF'
+# Starlight OS user defaults are managed through system dconf.
+EOF
