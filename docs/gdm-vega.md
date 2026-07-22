@@ -37,8 +37,9 @@ Trixie.
 
 O mesmo recurso é usado pelo GNOME Shell da sessão. Por isso, o override Vega
 também deixa o painel superior azul-marinho, o dash da Visão Geral escuro e
-os estados de foco, seleção e aplicações em execução dourados. Não instala uma
-extensão de dock: a experiência permanece GNOME puro.
+os estados de foco, seleção e aplicações em execução dourados. Dash to Dock,
+Blur my Shell e a extensão local `starlight-clock-right@starlightbrasil.com`
+compõem os ajustes padrão da sessão.
 
 No GDM, tanto a lista inicial de usuários quanto o prompt de senha recebem o
 painel azul-marinho, bordas douradas discretas, avatar com aro dourado e
@@ -60,6 +61,9 @@ e administradas pela interface padrão do GNOME.
 O aplicativo **Tweaks** vem do pacote Debian `gnome-tweaks`, não de Flatpak,
 para que o lançador `org.gnome.tweaks.desktop` e o ícone sejam registrados no
 menu do GNOME durante a construção da imagem.
+A extensão local **Starlight Clock Right** move o menu nativo de data, calendário
+e notificações para o lado direito do painel superior, em estilo semelhante ao
+macOS, sem substituir o menu original do GNOME.
 
 O script recusa outro major do GNOME Shell e falha claramente se o recurso,
 os seletores, os pacotes, a resolução ou a extração do CSS mudarem. Ao migrar

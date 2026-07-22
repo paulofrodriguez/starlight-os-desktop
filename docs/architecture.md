@@ -39,8 +39,9 @@ filesystem timestamp, and `xorriso` receives fixed image and file dates.
 SOSD installs individual GNOME packages, not the Ubuntu Desktop metapackage.
 The GNOME session, GDM, Adwaita, Wayland, PipeWire, WirePlumber, and
 NetworkManager are selected explicitly. Ubuntu Dock, Ubuntu Session, and Yaru
-themes are excluded. Starlight changes identity assets and defaults but does not
-fork GNOME Shell behavior.
+themes are excluded. Starlight changes identity assets and defaults through
+Debian packages, dconf defaults, and small local GNOME Shell extensions instead
+of forking GNOME Shell.
 
 The upstream-oriented `gnome-core` application set supplies the normal desktop
 utilities without the Ubuntu Desktop metapackage. GNOME Web provides a small

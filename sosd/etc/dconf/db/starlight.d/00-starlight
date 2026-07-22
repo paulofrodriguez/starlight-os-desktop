@@ -20,7 +20,7 @@ exec-arg=''
 
 [org/gnome/shell]
 disable-user-extensions=false
-enabled-extensions=['blur-my-shell@aunetx', 'dash-to-dock@micxgx.gmail.com']
+enabled-extensions=['blur-my-shell@aunetx', 'dash-to-dock@micxgx.gmail.com', 'starlight-clock-right@starlightbrasil.com']
 
 # Dash to Dock owns the desktop dock appearance. Keep its colour explicit so
 # it does not inherit the grey fallback from the upstream GNOME theme.

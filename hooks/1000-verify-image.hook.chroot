@@ -98,6 +98,12 @@ test -f /usr/lib/grub/x86_64-efi/modinfo.sh
 test -f /usr/share/grub/unicode.pf2
 test -x /etc/kernel/postinst.d/zz-update-grub
 test -x /etc/kernel/postrm.d/zz-update-grub
+test -f /usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/metadata.json
+test -f /usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/extension.js
+grep -Fq '"48"' /usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/metadata.json
+grep -Fq 'Main.panel.statusArea.dateMenu' /usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/extension.js
+grep -Fq 'Main.panel._rightBox' /usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/extension.js
+grep -Fq 'insert_child_at_index' /usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/extension.js
 test -f /usr/share/applications/org.gnome.tweaks.desktop
 test -f /usr/share/icons/hicolor/scalable/apps/org.gnome.tweaks.svg
 grep -Fq 'Exec=gnome-tweaks' /usr/share/applications/org.gnome.tweaks.desktop
@@ -133,6 +139,7 @@ grep -Fxq "accent-color='yellow'" /etc/dconf/db/starlight.d/00-starlight
 grep -Fxq "color-scheme='prefer-dark'" /etc/dconf/db/starlight.d/00-starlight
 grep -Fxq "gtk-theme='Adwaita-dark'" /etc/dconf/db/starlight.d/00-starlight
 grep -Fxq "icon-theme='Starlight-Colloid-Yellow-Dark'" /etc/dconf/db/starlight.d/00-starlight
+grep -Fq "'starlight-clock-right@starlightbrasil.com'" /etc/dconf/db/starlight.d/00-starlight
 grep -q '^setRootPassword: false$' /etc/calamares/modules/users.conf
 grep -q '^allowWeakPasswords: true$' /etc/calamares/modules/users.conf
 grep -q '^allowWeakPasswordsDefault: true$' /etc/calamares/modules/users.conf

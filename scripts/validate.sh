@@ -118,6 +118,27 @@ if ! rg -Fq "'dash-to-dock@micxgx.gmail.com'" \
     echo "Dash to Dock is not enabled in the Starlight GNOME defaults." >&2
     ((errors += 1))
 fi
+if ! rg -Fq "'starlight-clock-right@starlightbrasil.com'" \
+    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"; then
+    echo "Starlight Clock Right is not enabled in the Starlight GNOME defaults." >&2
+    ((errors += 1))
+fi
+clock_right_root="${PROJECT_ROOT}/sosd/usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com"
+if [[ ! -s "${clock_right_root}/metadata.json" ]] || \
+    [[ ! -s "${clock_right_root}/extension.js" ]]; then
+    echo "Missing Starlight Clock Right GNOME Shell extension." >&2
+    ((errors += 1))
+elif ! python3 -c 'import json, pathlib, sys; data = json.loads(pathlib.Path(sys.argv[1]).read_text()); assert data["uuid"] == "starlight-clock-right@starlightbrasil.com"; assert "48" in data["shell-version"]' \
+    "${clock_right_root}/metadata.json"; then
+    echo "Starlight Clock Right metadata is invalid." >&2
+    ((errors += 1))
+fi
+if ! rg -Fq 'Main.panel.statusArea.dateMenu' "${clock_right_root}/extension.js" || \
+    ! rg -Fq 'Main.panel._rightBox' "${clock_right_root}/extension.js" || \
+    ! rg -Fq 'insert_child_at_index' "${clock_right_root}/extension.js"; then
+    echo "Starlight Clock Right must move the native date menu into the right panel box." >&2
+    ((errors += 1))
+fi
 if ! rg -Fq "background-color='#08111e'" \
     "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"; then
     echo "The Starlight Dash to Dock colour is not configured." >&2

@@ -27,6 +27,8 @@ test -f "${PROJECT_ROOT}/metapackages/distro-desktop-gnome.depends"
 test -f "${PROJECT_ROOT}/flatpaks/system-apps.txt"
 test -f "${PROJECT_ROOT}/sosd/etc/skel/.bashrc"
 test -f "${PROJECT_ROOT}/sosd/etc/skel/.profile"
+test -f "${PROJECT_ROOT}/sosd/usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/metadata.json"
+test -f "${PROJECT_ROOT}/sosd/usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/extension.js"
 for helper_script in \
     starlight-enable-debian-components \
     starlight-enable-steam-i386 \
@@ -67,6 +69,16 @@ rg -Fxq "monospace-font-name='JetBrainsMono Nerd Font 11'" \
     "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
 rg -Fxq "exec='ptyxis'" \
     "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
+rg -Fq "'starlight-clock-right@starlightbrasil.com'" \
+    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
+rg -Fq 'Main.panel.statusArea.dateMenu' \
+    "${PROJECT_ROOT}/sosd/usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/extension.js"
+rg -Fq 'Main.panel._rightBox' \
+    "${PROJECT_ROOT}/sosd/usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/extension.js"
+rg -Fq 'insert_child_at_index' \
+    "${PROJECT_ROOT}/sosd/usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/extension.js"
+python3 -c 'import json, pathlib, sys; data = json.loads(pathlib.Path(sys.argv[1]).read_text()); assert data["uuid"] == "starlight-clock-right@starlightbrasil.com"; assert "48" in data["shell-version"]' \
+    "${PROJECT_ROOT}/sosd/usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/metadata.json"
 ! rg -q 'padding-left: 42%;' \
     "${PROJECT_ROOT}/assets/gdm/starlight-os-vega/assets/starlight-os-vega-gdm.css"
 rg -q '//RIGHT' \
