@@ -5,6 +5,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 chmod 0755 /usr/local/sbin/starlight-firstboot
 chmod 0755 /usr/local/sbin/starlight-configure-debian-apt-sources
+chmod 0755 /usr/local/sbin/starlight-remove-debian-wallpapers
 chmod 0755 /usr/local/sbin/starlight-install-bundled-assets
 chmod 0755 /usr/local/sbin/starlight-run-installer
 chmod 0755 /usr/local/bin/starlight-launch-installer
@@ -26,6 +27,7 @@ apt-mark manual \
     os-prober
 
 /usr/local/sbin/starlight-configure-debian-apt-sources
+/usr/local/sbin/starlight-remove-debian-wallpapers
 
 systemctl enable gdm3.service
 systemctl enable NetworkManager.service

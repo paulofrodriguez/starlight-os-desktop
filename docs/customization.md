@@ -11,6 +11,13 @@ enabled.
 Do not patch GDM Shell resources. GDM should retain upstream GNOME behavior;
 only supported logo/background mechanisms should be used.
 
+Starlight registers its own wallpaper as the GNOME default and as the
+`desktop-base` wallpaper and lock-screen fallback. During image configuration,
+`starlight-remove-debian-wallpapers` removes Debian `desktop-base` background
+entries from the GNOME wallpaper picker and deletes the explicit
+`wallpaper-withlogo` variants, while preserving upstream GNOME wallpapers and
+leaving bootloader assets untouched.
+
 ## Services
 
 Place system services in `sosd/etc/systemd/system/`, executables in

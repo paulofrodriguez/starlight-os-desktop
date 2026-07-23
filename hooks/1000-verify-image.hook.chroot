@@ -74,11 +74,15 @@ test -f /etc/systemd/system/starlight-live-session.service
 systemctl is-enabled switcheroo-control.service
 test -f /usr/share/dbus-1/system-services/org.freedesktop.PackageKit.service
 test -x /usr/local/sbin/starlight-configure-debian-apt-sources
+test -x /usr/local/sbin/starlight-remove-debian-wallpapers
 grep -Fxq 'deb https://deb.debian.org/debian trixie main contrib non-free non-free-firmware' /etc/apt/sources.list
 grep -Fxq 'deb https://deb.debian.org/debian trixie-updates main contrib non-free non-free-firmware' /etc/apt/sources.list
 grep -Fxq 'deb https://security.debian.org/debian-security trixie-security main contrib non-free non-free-firmware' /etc/apt/sources.list
-! grep -RhsE '^[[:space:]]*deb[[:space:]]+cdrom:' /etc/apt/sources.list /etc/apt/sources.list.d
+if grep -RhsE '^[[:space:]]*deb[[:space:]]+cdrom:' /etc/apt/sources.list /etc/apt/sources.list.d; then
+    exit 1
+fi
 test -x /lib/live/config/0035-starlight-user
+# shellcheck disable=SC2016
 grep -Fq '${LIVE_USERNAME}:${LIVE_USERNAME}' /lib/live/config/0035-starlight-user
 test -n "$(find /usr/share/fonts/truetype/nerd-fonts -type f -name '*.ttf' -print -quit)"
 test -f /usr/share/fonts/truetype/nerd-fonts/README.md
@@ -113,7 +117,9 @@ grep -Fq 'requiredStorage: 30' /etc/calamares/modules/welcome.conf
 grep -Fq 'requiredRam: 2.0' /etc/calamares/modules/welcome.conf
 grep -Fq 'mountPoint: /boot/efi' /etc/calamares/modules/partition.conf
 grep -Fq 'efiSystemPartition: /boot/efi' /etc/calamares/modules/partition.conf
-! grep -Fq 'requiredPartitionTableType:' /etc/calamares/modules/partition.conf
+if grep -Fq 'requiredPartitionTableType:' /etc/calamares/modules/partition.conf; then
+    exit 1
+fi
 grep -Fq '    - grubcfg' /etc/calamares/settings.conf
 grep -Fq '    - starlight-bootloader' /etc/calamares/settings.conf
 grep -Fq '    - starlight-clean-installed-system' /etc/calamares/settings.conf
@@ -123,7 +129,9 @@ grep -Fq -- '--no-uefi-secure-boot' /etc/calamares/modules/starlight-bootloader/
 grep -Fq 'grub-mkstandalone' /etc/calamares/modules/starlight-bootloader/main.py
 grep -Fq 'BOOTX64.EFI' /etc/calamares/modules/starlight-bootloader/main.py
 grep -Fq 'root=UUID=' /etc/calamares/modules/starlight-bootloader/main.py
-! grep -Fq 'could not find /boot/grub/grub.cfg' /etc/calamares/modules/starlight-bootloader/main.py
+if grep -Fq 'could not find /boot/grub/grub.cfg' /etc/calamares/modules/starlight-bootloader/main.py; then
+    exit 1
+fi
 grep -Fq 'always_use_defaults: true' /etc/calamares/modules/grubcfg.conf
 grep -Fq 'GRUB_DEFAULT: "0"' /etc/calamares/modules/grubcfg.conf
 grep -Fq 'GRUB_DISABLE_OS_PROBER: false' /etc/calamares/modules/grubcfg.conf
@@ -190,6 +198,22 @@ grep -Fq "logo=''" /usr/share/gdm/dconf/99-starlight-login
 grep -Fq "fallback-logo=''" /usr/share/gdm/dconf/99-starlight-login
 test -s /var/lib/gdm3/greeter-dconf-defaults
 grep -Fq '/usr/share/backgrounds/starlight/starlight-wallpaper.png' /usr/share/gnome-background-properties/starlight.xml
+test -s /usr/share/desktop-base/starlight-theme/wallpaper/gnome-background.xml
+test -s /usr/share/desktop-base/starlight-theme/lockscreen/gnome-background.xml
+[[ "$(readlink -f /usr/share/images/desktop-base/desktop-background)" == \
+    "/usr/share/backgrounds/starlight/starlight-wallpaper.png" ]]
+[[ "$(readlink -f /usr/share/images/desktop-base/desktop-background.xml)" == \
+    "/usr/share/desktop-base/starlight-theme/wallpaper/gnome-background.xml" ]]
+[[ "$(readlink -f /usr/share/images/desktop-base/desktop-lockscreen.xml)" == \
+    "/usr/share/desktop-base/starlight-theme/lockscreen/gnome-background.xml" ]]
+if find /usr/share/gnome-background-properties -maxdepth 1 -type f \
+    -name 'debian-*.xml' | grep -q .; then
+    exit 1
+fi
+if grep -Rqs '/usr/share/desktop-base/' /usr/share/gnome-background-properties; then
+    exit 1
+fi
+test ! -e /usr/share/desktop-base/futureprototype-theme/wallpaper-withlogo
 grep -Fxq "accent-color='yellow'" /etc/dconf/db/starlight.d/00-starlight
 grep -Fxq "color-scheme='prefer-dark'" /etc/dconf/db/starlight.d/00-starlight
 grep -Fxq "gtk-theme='Adwaita-dark'" /etc/dconf/db/starlight.d/00-starlight
@@ -202,10 +226,14 @@ grep -Fxq "pipeline='pipeline_default'" /etc/dconf/db/starlight.d/00-starlight
 grep -Fxq "pipeline='pipeline_default_rounded'" /etc/dconf/db/starlight.d/00-starlight
 grep -Fq "'ubuntu-appindicators@ubuntu.com'" /etc/dconf/db/starlight.d/00-starlight
 grep -Fq "'caffeine@patapon.info'" /etc/dconf/db/starlight.d/00-starlight
-! grep -Fq "'ding@rastersoft.com'" /etc/dconf/db/starlight.d/00-starlight
+if grep -Fq "'ding@rastersoft.com'" /etc/dconf/db/starlight.d/00-starlight; then
+    exit 1
+fi
 grep -Fq "'tiling-assistant@leleat-on-github'" /etc/dconf/db/starlight.d/00-starlight
 grep -Fq "favorite-apps=['chromium.desktop'" /etc/dconf/db/starlight.d/00-starlight
-! grep -Eq "favorite-apps=.*firefox" /etc/dconf/db/starlight.d/00-starlight
+if grep -Eq "favorite-apps=.*firefox" /etc/dconf/db/starlight.d/00-starlight; then
+    exit 1
+fi
 grep -Fxq "show-weekdate=true" /etc/dconf/db/starlight.d/00-starlight
 grep -Fxq 'text/html=chromium.desktop' /etc/xdg/mimeapps.list
 grep -Fxq 'x-scheme-handler/http=chromium.desktop' /etc/xdg/mimeapps.list
@@ -213,13 +241,17 @@ grep -Fxq 'x-scheme-handler/https=chromium.desktop' /etc/xdg/mimeapps.list
 grep -Fxq 'application/vnd.debian.binary-package=gdebi.desktop' /etc/xdg/mimeapps.list
 grep -Fxq 'application/x-deb=gdebi.desktop' /etc/xdg/mimeapps.list
 grep -Fxq 'application/x-debian-package=gdebi.desktop' /etc/xdg/mimeapps.list
-! grep -Eq '^application/(vnd\.debian\.binary-package|x-deb|x-debian-package)=.*(file-roller|FileRoller)' /etc/xdg/mimeapps.list
+if grep -Eq '^application/(vnd\.debian\.binary-package|x-deb|x-debian-package)=.*(file-roller|FileRoller)' /etc/xdg/mimeapps.list; then
+    exit 1
+fi
 test -f /usr/share/applications/gdebi.desktop
 test -f /usr/share/firefox-esr/distribution/policies.json
 python3 -c 'import json, pathlib, sys; policies = json.loads(pathlib.Path(sys.argv[1]).read_text())["policies"]; assert policies["NoDefaultBookmarks"] is True; assert "Debian packages" in policies["SearchEngines"]["Remove"]' \
     /usr/share/firefox-esr/distribution/policies.json
 test -f /usr/share/starlight/easyeffects/presets/README.md
-! find /usr/share/starlight/easyeffects/presets -maxdepth 1 -type f -name '*.json' | grep -q .
+if find /usr/share/starlight/easyeffects/presets -maxdepth 1 -type f -name '*.json' | grep -q .; then
+    exit 1
+fi
 grep -Fxq "background-color='#07182b'" /etc/dconf/db/starlight.d/00-starlight
 grep -Fxq "background-opacity=0.74" /etc/dconf/db/starlight.d/00-starlight
 grep -q '^setRootPassword: false$' /etc/calamares/modules/users.conf
@@ -228,7 +260,9 @@ grep -q '^allowWeakPasswordsDefault: true$' /etc/calamares/modules/users.conf
 grep -q '^  minLength: 1$' /etc/calamares/modules/users.conf
 grep -q 'name: sudo' /etc/calamares/modules/users.conf
 grep -Fq 'plugins=(git sudo bashmarks colored-man-pages)' /etc/skel/.bashrc
-! grep -Fq 'plugins=(git sudo history bashmarks)' /etc/skel/.bashrc
+if grep -Fq 'plugins=(git sudo history bashmarks)' /etc/skel/.bashrc; then
+    exit 1
+fi
 test -L /etc/systemd/system/multi-user.target.wants/starlight-firstboot.service
 test -L /etc/systemd/system/graphical.target.wants/starlight-live-session.service
 test ! -e /etc/ssh/ssh_host_rsa_key

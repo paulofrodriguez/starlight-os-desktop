@@ -14,13 +14,14 @@ if [[ "${BUILD_MODE}" != "full" && "${BUILD_MODE}" != "--fast" ]]; then
     exit 2
 fi
 
-readonly PACKAGE_LIST_FINGERPRINT="$(
+PACKAGE_LIST_FINGERPRINT="$(
     find "${PROJECT_ROOT}/packages" -type f -name '*.list.*' -print0 |
         sort -z |
         xargs -0 sha256sum |
         sha256sum |
         awk '{print $1}'
 )"
+readonly PACKAGE_LIST_FINGERPRINT
 
 if [[ "${EUID}" -ne 0 ]]; then
     echo "The ISO build requires root for debootstrap and chroot mounts." >&2

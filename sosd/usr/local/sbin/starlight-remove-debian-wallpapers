@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+readonly STARLIGHT_WALLPAPER=/usr/share/backgrounds/starlight/starlight-wallpaper.png
+readonly DESKTOP_BASE_IMAGE_DIR=/usr/share/images/desktop-base
+readonly STARLIGHT_DESKTOP_BASE_DIR=/usr/share/desktop-base/starlight-theme
+readonly STARLIGHT_DESKTOP_BACKGROUND_XML="${STARLIGHT_DESKTOP_BASE_DIR}/wallpaper/gnome-background.xml"
+readonly STARLIGHT_LOCKSCREEN_XML="${STARLIGHT_DESKTOP_BASE_DIR}/lockscreen/gnome-background.xml"
+
+if [[ ! -s "${STARLIGHT_WALLPAPER}" ]]; then
+    echo "Missing Starlight wallpaper: ${STARLIGHT_WALLPAPER}" >&2
+    exit 1
+fi
+
+write_desktop_base_background() {
+    local target="$1"
+
+    install -d -m 0755 "$(dirname -- "${target}")"
+    cat >"${target}" <<EOF
+<background>
+  <static>
+    <duration>8640000.0</duration>
+    <file>${STARLIGHT_WALLPAPER}</file>
+  </static>
+</background>
+EOF
+    chmod 0644 "${target}"
+}
+
+set_background_alternative() {
+    local name="$1"
+    local master_link="$2"
+    local target="$3"
+
+    update-alternatives --install "${master_link}" "${name}" "${target}" 90
+    update-alternatives --set "${name}" "${target}"
+}
+
+remove_debian_background_properties() {
+    local property_file
+    local properties_dir=/usr/share/gnome-background-properties
+
+    [[ -d "${properties_dir}" ]] || return 0
+
+    find "${properties_dir}" -maxdepth 1 -type f -name 'debian-*.xml' -delete
+    find "${properties_dir}" -maxdepth 1 -type f -name '*.xml' -print0 |
+        while IFS= read -r -d '' property_file; do
+            if grep -Fq '/usr/share/desktop-base/' "${property_file}"; then
+                rm -f -- "${property_file}"
+            fi
+        done
+}
+
+remove_explicit_logo_wallpapers() {
+    local desktop_base_dir=/usr/share/desktop-base
+
+    [[ -d "${desktop_base_dir}" ]] || return 0
+
+    find "${desktop_base_dir}" -maxdepth 3 -type d \
+        -name 'wallpaper-withlogo' -prune -exec rm -rf -- {} +
+}
+
+install -d -m 0755 "${DESKTOP_BASE_IMAGE_DIR}"
+write_desktop_base_background "${STARLIGHT_DESKTOP_BACKGROUND_XML}"
+write_desktop_base_background "${STARLIGHT_LOCKSCREEN_XML}"
+
+set_background_alternative \
+    desktop-background \
+    "${DESKTOP_BASE_IMAGE_DIR}/desktop-background" \
+    "${STARLIGHT_WALLPAPER}"
+set_background_alternative \
+    desktop-background.xml \
+    "${DESKTOP_BASE_IMAGE_DIR}/desktop-background.xml" \
+    "${STARLIGHT_DESKTOP_BACKGROUND_XML}"
+set_background_alternative \
+    desktop-lockscreen.xml \
+    "${DESKTOP_BASE_IMAGE_DIR}/desktop-lockscreen.xml" \
+    "${STARLIGHT_LOCKSCREEN_XML}"
+
+remove_debian_background_properties
+remove_explicit_logo_wallpapers

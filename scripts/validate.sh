@@ -62,7 +62,10 @@ if command -v shellcheck >/dev/null 2>&1; then
     mapfile -t shell_files < <(find "${PROJECT_ROOT}/scripts" \
         "${PROJECT_ROOT}/hooks" "${PROJECT_ROOT}/sosd/usr/local" \
         -type f -print | sort)
-    shellcheck "${shell_files[@]}" || ((errors += 1))
+    shellcheck -x \
+        -P "${PROJECT_ROOT}/scripts" \
+        -P "${PROJECT_ROOT}/config" \
+        "${shell_files[@]}" || ((errors += 1))
 else
     echo "Warning: shellcheck is not installed." >&2
 fi
@@ -116,6 +119,23 @@ fi
 if ! rg -Fq '/usr/local/sbin/starlight-configure-debian-apt-sources' \
     "${PROJECT_ROOT}/hooks/010-configure-system.hook.chroot"; then
     echo "The chroot hook does not normalize final Debian APT sources." >&2
+    ((errors += 1))
+fi
+if [[ ! -x "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-remove-debian-wallpapers" ]]; then
+    echo "Missing executable Debian wallpaper cleanup helper." >&2
+    ((errors += 1))
+elif ! rg -Fq '/usr/local/sbin/starlight-remove-debian-wallpapers' \
+    "${PROJECT_ROOT}/hooks/010-configure-system.hook.chroot"; then
+    echo "The chroot hook does not remove Debian-branded wallpaper entries." >&2
+    ((errors += 1))
+fi
+if ! rg -Fq "name 'wallpaper-withlogo'" \
+    "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-remove-debian-wallpapers" || \
+    ! rg -Fq "name 'debian-*.xml'" \
+        "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-remove-debian-wallpapers" || \
+    ! rg -Fq "update-alternatives --set" \
+        "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-remove-debian-wallpapers"; then
+    echo "Debian wallpaper cleanup must remove logo entries and point desktop-base fallbacks at Starlight." >&2
     ((errors += 1))
 fi
 
@@ -1103,6 +1123,15 @@ if ! rg -Fq "logo=''" "${PROJECT_ROOT}/sosd/usr/share/gdm/dconf/99-starlight-log
 fi
 if [[ ! -s "${PROJECT_ROOT}/sosd/usr/share/gnome-background-properties/starlight.xml" ]]; then
     echo "Missing GNOME wallpaper registration for Starlight." >&2
+    ((errors += 1))
+fi
+if ! rg -Fq 'debian-*.xml' \
+    "${PROJECT_ROOT}/hooks/1000-verify-image.hook.chroot" || \
+    ! rg -Fq '/usr/share/desktop-base/starlight-theme/wallpaper/gnome-background.xml' \
+        "${PROJECT_ROOT}/hooks/1000-verify-image.hook.chroot" || \
+    ! rg -Fq 'wallpaper-withlogo' \
+        "${PROJECT_ROOT}/hooks/1000-verify-image.hook.chroot"; then
+    echo "The final image verifier does not assert Debian wallpaper cleanup." >&2
     ((errors += 1))
 fi
 if [[ ! -s "${PROJECT_ROOT}/sosd/usr/share/gdm/dconf/99-starlight-login" ]]; then

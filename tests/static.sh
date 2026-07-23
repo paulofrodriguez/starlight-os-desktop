@@ -37,6 +37,7 @@ test -f "${PROJECT_ROOT}/sosd/usr/share/gnome-shell/extensions/starlight-clock-r
 test -f "${PROJECT_ROOT}/sosd/usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/extension.js"
 for helper_script in \
     starlight-configure-debian-apt-sources \
+    starlight-remove-debian-wallpapers \
     starlight-enable-debian-components \
     starlight-enable-steam-i386 \
     starlight-configure-flathub \
@@ -74,6 +75,14 @@ rg -Fq 'config/includes.chroot/etc/apt/sources.list' \
     "${PROJECT_ROOT}/scripts/build.sh"
 rg -Fq '/usr/local/sbin/starlight-configure-debian-apt-sources' \
     "${PROJECT_ROOT}/hooks/010-configure-system.hook.chroot"
+rg -Fq '/usr/local/sbin/starlight-remove-debian-wallpapers' \
+    "${PROJECT_ROOT}/hooks/010-configure-system.hook.chroot"
+rg -Fq "name 'debian-*.xml'" \
+    "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-remove-debian-wallpapers"
+rg -Fq "name 'wallpaper-withlogo'" \
+    "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-remove-debian-wallpapers"
+rg -Fq 'update-alternatives --set' \
+    "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-remove-debian-wallpapers"
 rg -Fq "picture-uri='file:///usr/share/backgrounds/starlight/starlight-wallpaper.png'" \
     "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
 rg -Fxq "accent-color='yellow'" \

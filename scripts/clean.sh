@@ -4,8 +4,6 @@ set -Eeuo pipefail
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib.sh
 source "${SCRIPT_DIR}/lib.sh"
-load_build_env
-readonly CACHE_ROOT="${CACHE_BASE}/${SOSD_DISTRIBUTION}-${SOSD_ARCHITECTURE}"
 
 if mountpoint -q "${BUILD_ROOT}/chroot/dev" 2>/dev/null; then
     echo "A build chroot is mounted; run this command as root." >&2

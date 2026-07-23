@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2034
 set -Eeuo pipefail
 
-readonly PROJECT_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+PROJECT_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+readonly PROJECT_ROOT
 readonly BUILD_ROOT="${PROJECT_ROOT}/build/live-build"
 readonly ARTIFACT_DIR="${PROJECT_ROOT}/build/artifacts"
 readonly CACHE_BASE="${PROJECT_ROOT}/build/cache"
