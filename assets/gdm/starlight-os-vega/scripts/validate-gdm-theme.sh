@@ -74,6 +74,23 @@ for name in gnome-shell-dark.css gnome-shell-light.css gnome-shell-high-contrast
         fail "Starlight calendar accent rule absent from ${name}"
     grep -Fq '.calendar-day-base' <<<"${css}" || \
         fail "Starlight broad calendar selector absent from ${name}"
+    for shell_selector in \
+        '.unlock-dialog' \
+        '.modal-dialog' \
+        '.end-session-dialog' \
+        '.message-dialog-content' \
+        '.prompt-dialog' \
+        '.run-dialog' \
+        '.polkit-dialog-user-layout' \
+        '.access-dialog' \
+        '.audio-device-selection-dialog' \
+        '.screenshot-ui-panel' \
+        '.switcher-list' \
+        '.osd-window' \
+        '#LookingGlassDialog'; do
+        grep -Fq "${shell_selector}" <<<"${css}" || \
+            fail "Starlight GNOME Shell surface rule ${shell_selector} absent from ${name}"
+    done
     grep -Fq 'background-gradient-start: #f3c653;' <<<"${css}" || \
         fail "yellow gradient accent rule absent from ${name}"
     grep -Fq '.login-dialog-user-selection-box' <<<"${css}" || \

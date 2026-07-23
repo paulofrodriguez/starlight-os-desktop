@@ -1,4 +1,6 @@
 fwupd
+gnome-firmware
+flatseal
 switcheroo-control
 thermald
 timeshift

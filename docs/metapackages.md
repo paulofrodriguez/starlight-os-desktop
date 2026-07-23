@@ -7,9 +7,11 @@ Debian metapackages and post-install installers.
 ## Metapackage groups
 
 - `distro-desktop-gnome`: GNOME, Wayland, portals, PipeWire, and common
-  desktop applications. LibreOffice is intentionally excluded because the image
-  bundles WPS Office.
+  desktop applications plus the Debian-packaged default GNOME Shell extensions.
+  LibreOffice is intentionally excluded because the image bundles WPS Office.
 - `distro-codecs-media`: codecs, GStreamer plugin set, VLC, MPV, and GIMP.
+- `distro-files-devices`: network discovery, Windows share clients, exFAT,
+  NTFS, MTP, and 7-Zip support for the file manager and command-line tools.
 - `distro-gaming`: Steam, Vulkan, GameMode, MangoHud, GOverlay, and vkBasalt.
 - `distro-nvidia`: Debian NVIDIA driver stack with EGL Wayland and VA-API.
 - `distro-devtools`: developer tools, virtualization, containers, shells,
@@ -17,8 +19,8 @@ Debian metapackages and post-install installers.
   VirtualBox Guest Additions inside a VM.
 - `distro-shell-defaults`: shell utilities, Starship, terminal fonts, and
   prerequisites for Homebrew/SDKMAN/Oh My Bash.
-- `distro-system-polish`: firmware update, power, maintenance, and GUI package
-  management helpers.
+- `distro-system-polish`: firmware update, Flatpak permission review, power,
+  maintenance, and GUI package management helpers.
 - `distro-incus`: Incus runtime, client, extra tools, and common storage/network
   helpers.
 - `distro-firmware`: firmware and CPU microcode packages.
@@ -70,6 +72,25 @@ default Bash profile uses the `agnoster` Oh My Bash theme with a Starship
 fallback. Homebrew and SDKMAN remain explicit user-level installers because
 they install into the target user's home or `/home/linuxbrew`.
 
+File and device integration is kept in `packages/files-devices.list.chroot`.
+GNOME's `gvfs-backends` remains the desktop integration layer from
+`gnome-core`; the explicit file/device list adds mDNS discovery, `.local` name
+resolution, CIFS/SMB tools, exFAT, NTFS, MTP runtime/tools, and 7-Zip support
+without replacing Nautilus or File Roller.
+
+GNOME Shell extension defaults are kept in `packages/gnome.list.chroot` and the
+Starlight dconf database. AppIndicator support, Caffeine, and Tiling Assistant
+are Debian packages and are enabled by default. Desktop Icons NG is not shipped
+because it can hide the Starlight wallpaper with a solid desktop-colour surface.
+Clipboard Indicator and Quick Settings Audio Panel are not added yet because
+the local Debian 13 indices do not provide direct packages for those exact
+extensions.
+
+GNOME Software includes both Flatpak and Debian/APT support. The Debian backend
+is explicit (`gnome-software-plugin-deb`, PackageKit, AppStream, and APT icon
+metadata) because package recommendations are disabled during live-build and the
+Flatpak plugin alone can satisfy GNOME Software's generic plugin dependency.
+
 VirtualBox Guest Additions are not bundled as Oracle software, but the image
 ships `build-essential`, `dkms`, `linux-headers-amd64`, `perl`, and `bzip2` so
 the standard Guest Additions installer can build modules inside a VirtualBox VM.
@@ -83,6 +104,16 @@ the standard Guest Additions installer can build modules inside a VirtualBox VM.
 - `linuxtoys` is installed from a bundled upstream `.deb`, not from Debian.
 - `webapp-manager` is installed from a bundled Linux Mint `.deb`, not from
   Debian.
+- `timeshift` is the current installed-system backup/restore tool. Pika Backup
+  is not present in the Debian 13 package indices used by this build, and
+  Deja Dup is not added while Timeshift remains the selected solution.
+- EasyEffects is installed for optional PipeWire effects, but Starlight ships
+  only an empty preset directory and does not enable or publish audio presets by
+  default.
+- `switcheroo-control` is installed and enabled for GNOME's native dedicated
+  GPU launch menu. Starlight does not add launcher wrappers or global
+  `PrefersNonDefaultGPU=true` entries. The menu is expected to be absent in
+  VirtualBox and other single-GPU environments.
 - `nvidia-open-kernel-dkms` resolved with `nvidia-driver` in Debian trixie
   during local APT simulation, but legacy NVIDIA GPUs may still need a different
   branch selected by Debian's NVIDIA packages.

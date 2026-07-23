@@ -7,7 +7,7 @@ esac
 
 export OSH=${OSH:-/usr/share/oh-my-bash}
 OSH_THEME=${STARLIGHT_OMB_THEME:-agnoster}
-plugins=(git sudo history bashmarks)
+plugins=(git sudo bashmarks colored-man-pages)
 aliases=(general)
 
 if [[ -s "${OSH}/oh-my-bash.sh" ]]; then

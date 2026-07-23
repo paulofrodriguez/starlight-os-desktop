@@ -76,8 +76,10 @@ line. Do not add desktop metapackages. Run validation, build the ISO, then
 inspect the package manifest and boot-test it.
 
 Chromium and Firefox ESR are installed from Debian packages. Chromium is the
-default browser and dock favourite. No Snap, Google repository, or Chrome binary
-is included.
+default browser and dock favourite. GNOME Web/Epiphany and the generic `Web
+Browser` launcher are excluded. Firefox ESR uses a Starlight `policies.json`
+file to disable default bookmarks and remove the Debian package search shortcut
+for new profiles. No Snap, Google repository, or Chrome binary is included.
 
 ## Cleaning
 

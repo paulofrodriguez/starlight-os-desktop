@@ -19,6 +19,12 @@ The `starlight-user-avatar` module runs after `displaymanager` and writes the
 Starlight AccountsService avatar for the installed user. The image is staged
 from the same white empress asset used by Calamares branding.
 
+The `starlight-clean-installed-system` module runs after the bootloader job and
+before `umount`. The installer launcher, Calamares package/configuration,
+polkit action, live-only browser helper, GNOME Web/Epiphany leftovers, and
+installer dock favourite are removed from the target system. The live ISO still
+keeps `Install Starlight OS` available while running from USB.
+
 The installer keeps the live system compatible with both BIOS and UEFI by
 shipping Debian's non-conflicting GRUB module packages. The `grubcfg` module
 creates `/etc/default/grub` in the target before the Starlight bootloader module

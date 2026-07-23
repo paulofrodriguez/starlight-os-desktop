@@ -49,8 +49,15 @@ of forking GNOME Shell.
 The upstream-oriented `gnome-core` application set supplies the normal desktop
 utilities without the Ubuntu Desktop metapackage. Chromium is the default web
 browser and the browser pinned to the dock. Firefox ESR remains installed from
-the Debian package archive as a fallback/testing browser, and GNOME Web provides
-a small desktop browser fallback. Snap is intentionally excluded from the image.
+the Debian package archive as a fallback/testing browser, with Starlight
+policies that suppress default bookmarks and the Debian package search shortcut
+for new profiles. GNOME Web/Epiphany and the generic `Web Browser` desktop
+launcher are excluded so the app grid exposes only the real default browser.
+Snap is intentionally excluded from the image.
+
+Nautilus and File Roller remain the file workflow. Additional Debian packages
+extend the existing GNOME/GVFS path for network discovery, Windows shares, MTP,
+exFAT, NTFS, and 7-Zip instead of adding a competing file manager.
 
 The live environment and installed system use systemd explicitly; legacy SysV
 live-config integration is neither selected nor required.

@@ -3,8 +3,12 @@ set -Eeuo pipefail
 trap 'echo "Starlight image verification failed at line ${LINENO}: ${BASH_COMMAND}" >&2' ERR
 
 required_commands=(
-    gnome-shell gnome-calculator gnome-calendar gnome-system-monitor epiphany
-    gnome-tweaks chromium firefox-esr ffmpeg pipewire wpctl flatpak git docker podman
+    gnome-shell gnome-calculator gnome-calendar gnome-system-monitor
+    gnome-tweaks chromium firefox-esr ffmpeg gst-inspect-1.0 gst-launch-1.0
+    lame unrar vlc pipewire wpctl flatpak git docker podman python3
+    pkcon appstreamcli
+    seahorse gnome-firmware com.github.tchx84.Flatseal easyeffects vainfo avahi-daemon
+    smbclient mount.cifs ntfs-3g mkfs.exfat fsck.exfat mtp-detect switcherooctl
     gdebi-gtk
     qemu-system-x86_64 virsh virt-manager starlight-firstboot starlight-browser
     starlight-launch-installer webapp-manager unsquashfs rsync grub-install grub-mkconfig
@@ -24,11 +28,30 @@ require_installed_package() {
 
 for package_name in user-setup gnome-shell-extension-blur-my-shell \
     gnome-shell-extension-dashtodock gnome-shell-extension-prefs \
+    gnome-shell-extension-appindicator gnome-shell-extension-caffeine \
+    gnome-shell-extension-tiling-assistant \
     gnome-tweaks papirus-icon-theme wps-office webapp-manager dosfstools efibootmgr \
     grub2-common grub-pc-bin grub-efi-amd64-bin build-essential dkms \
-    linux-headers-amd64 perl bzip2; do
+    linux-headers-amd64 perl bzip2 ffmpeg libavcodec-extra gstreamer1.0-libav \
+    gnome-software-plugin-deb gnome-software-plugin-fwupd packagekit \
+    packagekit-tools appstream apt-config-icons \
+    gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad \
+    gstreamer1.0-plugins-ugly gstreamer1.0-vaapi lame libdvdnav4 libdvdread8t64 \
+    unrar vlc easyeffects va-driver-all vdpau-driver-all vainfo mesa-va-drivers \
+    intel-media-va-driver mesa-vdpau-drivers libvdpau-va-gl1 seahorse \
+    gnome-firmware flatseal avahi-daemon libnss-mdns cifs-utils smbclient \
+    exfatprogs ntfs-3g libmtp-runtime mtp-tools 7zip switcheroo-control; do
     require_installed_package "${package_name}"
 done
+
+if [[ "$(dpkg-query -W -f='${db:Status-Status}' epiphany-browser 2>/dev/null || true)" == installed ]]; then
+    echo "GNOME Web/Epiphany must not be installed in the Starlight image." >&2
+    exit 1
+fi
+if [[ "$(dpkg-query -W -f='${db:Status-Status}' gnome-shell-extension-desktop-icons-ng 2>/dev/null || true)" == installed ]]; then
+    echo "Desktop Icons NG must not be installed in the Starlight image." >&2
+    exit 1
+fi
 
 manual_packages="$(apt-mark showmanual)"
 for manual_package in dosfstools efibootmgr grub2-common grub-pc-bin \
@@ -48,6 +71,8 @@ done
 
 test -f /etc/systemd/system/starlight-firstboot.service
 test -f /etc/systemd/system/starlight-live-session.service
+systemctl is-enabled switcheroo-control.service
+test -f /usr/share/dbus-1/system-services/org.freedesktop.PackageKit.service
 test -x /usr/local/sbin/starlight-configure-debian-apt-sources
 grep -Fxq 'deb https://deb.debian.org/debian trixie main contrib non-free non-free-firmware' /etc/apt/sources.list
 grep -Fxq 'deb https://deb.debian.org/debian trixie-updates main contrib non-free non-free-firmware' /etc/apt/sources.list
@@ -69,6 +94,10 @@ test -f /etc/calamares/modules/starlight-user-avatar/module.desc
 test -f /etc/calamares/modules/starlight-user-avatar/main.py
 test -f /usr/lib/x86_64-linux-gnu/calamares/modules/starlight-user-avatar/module.desc
 test -f /usr/lib/x86_64-linux-gnu/calamares/modules/starlight-user-avatar/main.py
+test -f /etc/calamares/modules/starlight-clean-installed-system/module.desc
+test -f /etc/calamares/modules/starlight-clean-installed-system/main.py
+test -f /usr/lib/x86_64-linux-gnu/calamares/modules/starlight-clean-installed-system/module.desc
+test -f /usr/lib/x86_64-linux-gnu/calamares/modules/starlight-clean-installed-system/main.py
 test -f /etc/calamares/modules/users.conf
 test -f /etc/calamares/branding/starlight/starlight-calamares.png
 test -f /etc/calamares/branding/starlight/starlight-calamares-light.png
@@ -87,6 +116,7 @@ grep -Fq 'efiSystemPartition: /boot/efi' /etc/calamares/modules/partition.conf
 ! grep -Fq 'requiredPartitionTableType:' /etc/calamares/modules/partition.conf
 grep -Fq '    - grubcfg' /etc/calamares/settings.conf
 grep -Fq '    - starlight-bootloader' /etc/calamares/settings.conf
+grep -Fq '    - starlight-clean-installed-system' /etc/calamares/settings.conf
 grep -Fq '    - starlight-user-avatar' /etc/calamares/settings.conf
 grep -Fq -- '--no-nvram' /etc/calamares/modules/starlight-bootloader/main.py
 grep -Fq -- '--no-uefi-secure-boot' /etc/calamares/modules/starlight-bootloader/main.py
@@ -107,6 +137,10 @@ test -x /etc/kernel/postinst.d/zz-update-grub
 test -x /etc/kernel/postrm.d/zz-update-grub
 test -f /usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/metadata.json
 test -f /usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/extension.js
+test -f /usr/share/gnome-shell/extensions/ubuntu-appindicators@ubuntu.com/metadata.json
+test -f /usr/share/gnome-shell/extensions/caffeine@patapon.info/metadata.json
+test ! -e /usr/share/gnome-shell/extensions/ding@rastersoft.com
+test -f /usr/share/gnome-shell/extensions/tiling-assistant@leleat-on-github/metadata.json
 grep -Fq '"48"' /usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/metadata.json
 grep -Fq 'Main.panel.statusArea.dateMenu' /usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/extension.js
 grep -Fq 'Main.panel._rightBox' /usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/extension.js
@@ -115,6 +149,14 @@ test -f /usr/share/applications/org.gnome.tweaks.desktop
 test -f /usr/share/icons/hicolor/scalable/apps/org.gnome.tweaks.svg
 grep -Fq 'Exec=gnome-tweaks' /usr/share/applications/org.gnome.tweaks.desktop
 grep -Fq 'Icon=org.gnome.tweaks' /usr/share/applications/org.gnome.tweaks.desktop
+test -f /usr/lib/x86_64-linux-gnu/gnome-software/plugins-22/libgs_plugin_appstream.so
+test -f /usr/lib/x86_64-linux-gnu/gnome-software/plugins-22/libgs_plugin_packagekit.so
+test -f /usr/lib/x86_64-linux-gnu/gnome-software/plugins-22/libgs_plugin_fwupd.so
+test -f /usr/share/applications/gnome-software-local-file-packagekit.desktop
+test -x /usr/bin/com.github.tchx84.Flatseal
+test -f /usr/share/applications/com.github.tchx84.Flatseal.desktop
+grep -Fq 'Exec=com.github.tchx84.Flatseal' \
+    /usr/share/applications/com.github.tchx84.Flatseal.desktop
 test -x /usr/bin/wps
 test -f /usr/share/applications/wps-office-wps.desktop
 test -f /usr/share/applications/wps-office-prometheus.desktop
@@ -127,6 +169,8 @@ grep -Fq 'com.starlight.install.pkexec.run' /etc/polkit-1/rules.d/49-starlight-l
 grep -Fq '/usr/local/sbin/starlight-run-installer' /usr/share/polkit-1/actions/com.starlight.install.policy
 grep -Fq 'Exec=/usr/local/bin/starlight-launch-installer' /usr/share/applications/starlight-install.desktop
 grep -Fq 'NoDisplay=true' /usr/share/applications/calamares.desktop
+test ! -e /usr/share/applications/org.gnome.Epiphany.desktop
+test ! -e /usr/share/applications/starlight-browser.desktop
 test -s /usr/share/backgrounds/starlight/starlight-wallpaper.png
 test -s /etc/gtk-3.0/gtk.css
 test -s /etc/gtk-4.0/gtk.css
@@ -151,8 +195,18 @@ grep -Fxq "color-scheme='prefer-dark'" /etc/dconf/db/starlight.d/00-starlight
 grep -Fxq "gtk-theme='Adwaita-dark'" /etc/dconf/db/starlight.d/00-starlight
 grep -Fxq "icon-theme='Starlight-Colloid-Yellow-Dark'" /etc/dconf/db/starlight.d/00-starlight
 grep -Fq "'starlight-clock-right@starlightbrasil.com'" /etc/dconf/db/starlight.d/00-starlight
+grep -Fq "pipeline_starlight_app_grid" /etc/dconf/db/starlight.d/00-starlight
+grep -Fq "'color': <(0.054901960784313725, 0.12156862745098039, 0.29411764705882354, 0.05)>" /etc/dconf/db/starlight.d/00-starlight
+grep -Fxq "pipeline='pipeline_starlight_app_grid'" /etc/dconf/db/starlight.d/00-starlight
+grep -Fxq "pipeline='pipeline_default'" /etc/dconf/db/starlight.d/00-starlight
+grep -Fxq "pipeline='pipeline_default_rounded'" /etc/dconf/db/starlight.d/00-starlight
+grep -Fq "'ubuntu-appindicators@ubuntu.com'" /etc/dconf/db/starlight.d/00-starlight
+grep -Fq "'caffeine@patapon.info'" /etc/dconf/db/starlight.d/00-starlight
+! grep -Fq "'ding@rastersoft.com'" /etc/dconf/db/starlight.d/00-starlight
+grep -Fq "'tiling-assistant@leleat-on-github'" /etc/dconf/db/starlight.d/00-starlight
 grep -Fq "favorite-apps=['chromium.desktop'" /etc/dconf/db/starlight.d/00-starlight
 ! grep -Eq "favorite-apps=.*firefox" /etc/dconf/db/starlight.d/00-starlight
+grep -Fxq "show-weekdate=true" /etc/dconf/db/starlight.d/00-starlight
 grep -Fxq 'text/html=chromium.desktop' /etc/xdg/mimeapps.list
 grep -Fxq 'x-scheme-handler/http=chromium.desktop' /etc/xdg/mimeapps.list
 grep -Fxq 'x-scheme-handler/https=chromium.desktop' /etc/xdg/mimeapps.list
@@ -161,6 +215,11 @@ grep -Fxq 'application/x-deb=gdebi.desktop' /etc/xdg/mimeapps.list
 grep -Fxq 'application/x-debian-package=gdebi.desktop' /etc/xdg/mimeapps.list
 ! grep -Eq '^application/(vnd\.debian\.binary-package|x-deb|x-debian-package)=.*(file-roller|FileRoller)' /etc/xdg/mimeapps.list
 test -f /usr/share/applications/gdebi.desktop
+test -f /usr/share/firefox-esr/distribution/policies.json
+python3 -c 'import json, pathlib, sys; policies = json.loads(pathlib.Path(sys.argv[1]).read_text())["policies"]; assert policies["NoDefaultBookmarks"] is True; assert "Debian packages" in policies["SearchEngines"]["Remove"]' \
+    /usr/share/firefox-esr/distribution/policies.json
+test -f /usr/share/starlight/easyeffects/presets/README.md
+! find /usr/share/starlight/easyeffects/presets -maxdepth 1 -type f -name '*.json' | grep -q .
 grep -Fxq "background-color='#07182b'" /etc/dconf/db/starlight.d/00-starlight
 grep -Fxq "background-opacity=0.74" /etc/dconf/db/starlight.d/00-starlight
 grep -q '^setRootPassword: false$' /etc/calamares/modules/users.conf
@@ -168,6 +227,8 @@ grep -q '^allowWeakPasswords: true$' /etc/calamares/modules/users.conf
 grep -q '^allowWeakPasswordsDefault: true$' /etc/calamares/modules/users.conf
 grep -q '^  minLength: 1$' /etc/calamares/modules/users.conf
 grep -q 'name: sudo' /etc/calamares/modules/users.conf
+grep -Fq 'plugins=(git sudo bashmarks colored-man-pages)' /etc/skel/.bashrc
+! grep -Fq 'plugins=(git sudo history bashmarks)' /etc/skel/.bashrc
 test -L /etc/systemd/system/multi-user.target.wants/starlight-firstboot.service
 test -L /etc/systemd/system/graphical.target.wants/starlight-live-session.service
 test ! -e /etc/ssh/ssh_host_rsa_key

@@ -1,5 +1,7 @@
 flatpak
 fwupd
+gnome-firmware
+flatseal
 power-profiles-daemon
 switcheroo-control
 thermald

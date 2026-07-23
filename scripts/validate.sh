@@ -69,7 +69,8 @@ fi
 
 for forbidden in ubuntu-desktop ubuntu-session gnome-shell-extension-ubuntu-dock \
     yaru-theme-gnome-shell yaru-theme-gtk yaru-theme-icon snapd casper \
-    ubuntu-drivers-common task-gnome-desktop libreoffice libreoffice-gtk3; do
+    ubuntu-drivers-common task-gnome-desktop libreoffice libreoffice-gtk3 \
+    epiphany-browser; do
     if rg -n "^[[:space:]]*${forbidden}[[:space:]]*$" \
         "${PROJECT_ROOT}/packages" --glob '*.list.chroot'; then
         echo "Forbidden package requested: ${forbidden}" >&2
@@ -133,6 +134,27 @@ if ! rg -qx 'gnome-shell-extension-prefs' \
     echo "GNOME Extensions is not requested by the GNOME package list." >&2
     ((errors += 1))
 fi
+for gnome_extension_package in \
+    gnome-shell-extension-appindicator \
+    gnome-shell-extension-caffeine \
+    gnome-shell-extension-tiling-assistant; do
+    if ! rg -qx "${gnome_extension_package}" \
+        "${PROJECT_ROOT}/packages/gnome.list.chroot"; then
+        echo "GNOME extension package is not requested: ${gnome_extension_package}" >&2
+        ((errors += 1))
+    fi
+    if ! rg -qx "${gnome_extension_package}" \
+        "${PROJECT_ROOT}/metapackages/distro-desktop-gnome.depends"; then
+        echo "GNOME extension package is missing from distro-desktop-gnome: ${gnome_extension_package}" >&2
+        ((errors += 1))
+    fi
+done
+if rg -qx 'gnome-shell-extension-desktop-icons-ng' \
+    "${PROJECT_ROOT}/packages/gnome.list.chroot" \
+    "${PROJECT_ROOT}/metapackages/distro-desktop-gnome.depends"; then
+    echo "Desktop Icons NG must not be requested because it hides the wallpaper on this image." >&2
+    ((errors += 1))
+fi
 if ! rg -qx 'gnome-tweaks' "${PROJECT_ROOT}/packages/gnome.list.chroot"; then
     echo "GNOME Tweaks is not requested by the GNOME package list." >&2
     ((errors += 1))
@@ -146,9 +168,43 @@ if ! rg -Fq "'blur-my-shell@aunetx'" \
     echo "Blur my Shell is not enabled in the Starlight GNOME defaults." >&2
     ((errors += 1))
 fi
+if ! rg -Fq "pipeline_starlight_app_grid" \
+    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight" || \
+    ! rg -Fq "'color': <(0.054901960784313725, 0.12156862745098039, 0.29411764705882354, 0.05)>" \
+        "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"; then
+    echo "Blur my Shell must define the Starlight app-grid-only blue tint pipeline." >&2
+    ((errors += 1))
+fi
+if ! rg -Fxq "pipeline='pipeline_starlight_app_grid'" \
+    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"; then
+    echo "Blur my Shell overview must use the Starlight app-grid tint pipeline." >&2
+    ((errors += 1))
+fi
+if ! rg -Fxq "pipeline='pipeline_default'" \
+    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight" || \
+    ! rg -Fxq "pipeline='pipeline_default_rounded'" \
+        "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"; then
+    echo "Blur my Shell panel and dock must stay on untinted pipelines." >&2
+    ((errors += 1))
+fi
 if ! rg -Fq "'dash-to-dock@micxgx.gmail.com'" \
     "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"; then
     echo "Dash to Dock is not enabled in the Starlight GNOME defaults." >&2
+    ((errors += 1))
+fi
+for enabled_extension in \
+    "'ubuntu-appindicators@ubuntu.com'" \
+    "'caffeine@patapon.info'" \
+    "'tiling-assistant@leleat-on-github'"; do
+    if ! rg -Fq "${enabled_extension}" \
+        "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"; then
+        echo "Requested GNOME extension is not enabled by default: ${enabled_extension}" >&2
+        ((errors += 1))
+    fi
+done
+if rg -Fq "'ding@rastersoft.com'" \
+    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"; then
+    echo "Desktop Icons NG must not be enabled because it hides the wallpaper on this image." >&2
     ((errors += 1))
 fi
 if ! rg -Fq "favorite-apps=['chromium.desktop'" \
@@ -159,6 +215,11 @@ fi
 if rg -q "favorite-apps=.*firefox" \
     "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"; then
     echo "Firefox must not be pinned to the GNOME dock by default." >&2
+    ((errors += 1))
+fi
+if ! rg -Fxq "show-weekdate=true" \
+    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"; then
+    echo "GNOME calendar week numbers are not enabled by default." >&2
     ((errors += 1))
 fi
 if ! rg -Fxq 'text/html=chromium.desktop' "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list" || \
@@ -179,6 +240,23 @@ fi
 if rg -q '^application/(vnd\.debian\.binary-package|x-deb|x-debian-package)=.*(file-roller|FileRoller)' \
     "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list"; then
     echo "Debian packages must not open with File Roller by default." >&2
+    ((errors += 1))
+fi
+firefox_policies="${PROJECT_ROOT}/sosd/usr/share/firefox-esr/distribution/policies.json"
+if [[ ! -f "${firefox_policies}" ]]; then
+    echo "Firefox ESR policies are missing." >&2
+    ((errors += 1))
+elif ! python3 -c 'import json, pathlib, sys; policies = json.loads(pathlib.Path(sys.argv[1]).read_text())["policies"]; assert policies["NoDefaultBookmarks"] is True; assert "Debian packages" in policies["SearchEngines"]["Remove"]' \
+    "${firefox_policies}"; then
+    echo "Firefox ESR policies must disable default bookmarks and the Debian package search engine." >&2
+    ((errors += 1))
+fi
+if [[ -e "${PROJECT_ROOT}/sosd/usr/share/applications/starlight-browser.desktop" ]]; then
+    echo "The redundant generic Web Browser desktop launcher must not be installed." >&2
+    ((errors += 1))
+fi
+if rg -q 'epiphany' "${PROJECT_ROOT}/sosd/usr/local/bin/starlight-browser"; then
+    echo "starlight-browser must not retain an Epiphany fallback after GNOME Web removal." >&2
     ((errors += 1))
 fi
 if ! rg -Fq "'starlight-clock-right@starlightbrasil.com'" \
@@ -256,6 +334,26 @@ if ! rg -Fq '.calendar-day-base' \
     echo "The GNOME Shell broad calendar selector override is missing." >&2
     ((errors += 1))
 fi
+for shell_selector in \
+    '.unlock-dialog' \
+    '.modal-dialog' \
+    '.end-session-dialog' \
+    '.message-dialog-content' \
+    '.prompt-dialog' \
+    '.run-dialog' \
+    '.polkit-dialog-user-layout' \
+    '.access-dialog' \
+    '.audio-device-selection-dialog' \
+    '.screenshot-ui-panel' \
+    '.switcher-list' \
+    '.osd-window' \
+    '#LookingGlassDialog'; do
+    if ! rg -Fq "${shell_selector}" \
+        "${PROJECT_ROOT}/assets/gdm/starlight-os-vega/assets/starlight-os-vega-gdm.css"; then
+        echo "The GNOME Shell Starlight surface override is missing: ${shell_selector}" >&2
+        ((errors += 1))
+    fi
+done
 for gtk_css in \
     sosd/etc/gtk-3.0/gtk.css \
     sosd/etc/gtk-4.0/gtk.css \
@@ -339,6 +437,40 @@ require_package 'incus-client' 'incus.list.chroot' \
     'Incus client is not requested by the Incus package list.'
 require_package 'incus-extra' 'incus.list.chroot' \
     'Incus extras are not requested by the Incus package list.'
+require_package 'ffmpeg' 'audio-codecs.list.chroot' \
+    'FFmpeg is not requested by the audio/video codec package list.'
+require_package 'libavcodec-extra' 'audio-codecs.list.chroot' \
+    'libavcodec-extra is not requested by the audio/video codec package list.'
+require_package 'gstreamer1.0-plugins-base' 'audio-codecs.list.chroot' \
+    'GStreamer base plugins are not requested by the codec package list.'
+require_package 'gstreamer1.0-plugins-good' 'audio-codecs.list.chroot' \
+    'GStreamer good plugins are not requested by the codec package list.'
+require_package 'gstreamer1.0-plugins-bad' 'audio-codecs.list.chroot' \
+    'GStreamer bad plugins are not requested by the codec package list.'
+require_package 'gstreamer1.0-plugins-ugly' 'audio-codecs.list.chroot' \
+    'GStreamer ugly plugins are not requested by the codec package list.'
+require_package 'gstreamer1.0-libav' 'audio-codecs.list.chroot' \
+    'GStreamer libav plugin is not requested by the codec package list.'
+require_package 'gstreamer1.0-vaapi' 'audio-codecs.list.chroot' \
+    'GStreamer VA-API plugin is not requested by the codec package list.'
+require_package 'va-driver-all' 'audio-codecs.list.chroot' \
+    'VA-API driver metapackage is not requested by the codec package list.'
+require_package 'vdpau-driver-all' 'audio-codecs.list.chroot' \
+    'VDPAU driver metapackage is not requested by the codec package list.'
+require_package 'vainfo' 'audio-codecs.list.chroot' \
+    'VA-API inspection tool is not requested by the codec package list.'
+require_package 'easyeffects' 'audio-codecs.list.chroot' \
+    'EasyEffects is not requested by the codec/audio package list.'
+require_package 'lame' 'audio-codecs.list.chroot' \
+    'LAME MP3 encoder is not requested by the codec package list.'
+require_package 'libdvdnav4' 'audio-codecs.list.chroot' \
+    'DVD navigation support is not requested by the codec package list.'
+require_package 'libdvdread8t64' 'audio-codecs.list.chroot' \
+    'DVD read support is not requested by the codec package list.'
+require_package 'unrar' 'audio-codecs.list.chroot' \
+    'RAR support from the restricted-extras set is not requested.'
+require_package 'vlc' 'audio-codecs.list.chroot' \
+    'VLC is not requested by the audio/video codec package list.'
 require_package 'ptyxis' 'development.list.chroot' \
     'Ptyxis is not requested by the development package list.'
 require_package 'gnome-terminal' 'development.list.chroot' \
@@ -365,8 +497,86 @@ require_package 'xdg-desktop-portal' 'gnome.list.chroot' \
     'Wayland desktop portal is not requested by the GNOME package list.'
 require_package 'xdg-desktop-portal-gtk' 'gnome.list.chroot' \
     'GTK Wayland desktop portal is not requested by the GNOME package list.'
+for gnome_software_deb_package in \
+    gnome-software-plugin-deb \
+    gnome-software-plugin-fwupd \
+    packagekit \
+    packagekit-tools \
+    appstream \
+    apt-config-icons; do
+    require_package "${gnome_software_deb_package}" 'gnome.list.chroot' \
+        "GNOME Software APT backend package is not requested: ${gnome_software_deb_package}"
+    if ! rg -qx "${gnome_software_deb_package}" \
+        "${PROJECT_ROOT}/metapackages/distro-desktop-gnome.depends"; then
+        echo "GNOME Software APT backend package is missing from distro-desktop-gnome: ${gnome_software_deb_package}" >&2
+        ((errors += 1))
+    fi
+done
+if ! rg -Fq 'libgs_plugin_packagekit.so' \
+    "${PROJECT_ROOT}/hooks/1000-verify-image.hook.chroot"; then
+    echo "The image verification hook must check GNOME Software PackageKit plugin files." >&2
+    ((errors += 1))
+fi
+if ! rg -Fq 'org.freedesktop.PackageKit.service' \
+    "${PROJECT_ROOT}/hooks/1000-verify-image.hook.chroot"; then
+    echo "The image verification hook must check PackageKit D-Bus activation." >&2
+    ((errors += 1))
+fi
 require_package 'gnome-tweaks' 'gnome.list.chroot' \
     'GNOME Tweaks is not requested by the GNOME package list.'
+require_package 'seahorse' 'gnome.list.chroot' \
+    'Seahorse is not requested by the GNOME package list.'
+require_package 'gnome-firmware' 'system-polish.list.chroot' \
+    'GNOME Firmware is not requested by the system polish package list.'
+require_package 'flatseal' 'system-polish.list.chroot' \
+    'Flatseal is not requested by the system polish package list.'
+require_package 'switcheroo-control' 'system-polish.list.chroot' \
+    'switcheroo-control is not requested for GNOME discrete GPU integration.'
+if ! rg -Fq 'systemctl enable switcheroo-control.service' \
+    "${PROJECT_ROOT}/hooks/010-configure-system.hook.chroot"; then
+    echo "switcheroo-control.service is not enabled during image configuration." >&2
+    ((errors += 1))
+fi
+for files_device_package in \
+    avahi-daemon \
+    libnss-mdns \
+    cifs-utils \
+    smbclient \
+    exfatprogs \
+    ntfs-3g \
+    libmtp-runtime \
+    mtp-tools \
+    7zip; do
+    require_package "${files_device_package}" 'files-devices.list.chroot' \
+        "File/device integration package is not requested: ${files_device_package}"
+    if ! rg -qx "${files_device_package}" \
+        "${PROJECT_ROOT}/metapackages/distro-files-devices.depends"; then
+        echo "File/device package is missing from distro-files-devices: ${files_device_package}" >&2
+        ((errors += 1))
+    fi
+done
+for metapackage_media_entry in easyeffects va-driver-all vdpau-driver-all vainfo; do
+    if ! rg -qx "${metapackage_media_entry}" \
+        "${PROJECT_ROOT}/metapackages/distro-codecs-media.depends"; then
+        echo "Media package is missing from distro-codecs-media: ${metapackage_media_entry}" >&2
+        ((errors += 1))
+    fi
+done
+for metapackage_polish_entry in gnome-firmware flatseal switcheroo-control; do
+    if ! rg -qx "${metapackage_polish_entry}" \
+        "${PROJECT_ROOT}/metapackages/distro-system-polish.depends"; then
+        echo "System polish package is missing from distro-system-polish: ${metapackage_polish_entry}" >&2
+        ((errors += 1))
+    fi
+done
+easyeffects_presets="${PROJECT_ROOT}/sosd/usr/share/starlight/easyeffects/presets"
+if [[ ! -f "${easyeffects_presets}/README.md" ]]; then
+    echo "EasyEffects preset directory must contain a README placeholder." >&2
+    ((errors += 1))
+elif find "${easyeffects_presets}" -maxdepth 1 -type f -name '*.json' | grep -q .; then
+    echo "EasyEffects preset JSON files must not ship before technical validation." >&2
+    ((errors += 1))
+fi
 require_package 'gir1.2-xapp-1.0' 'webapps-support.list.chroot' \
     'XApp introspection data is not requested for WebApp Manager.'
 require_package 'xapps-common' 'webapps-support.list.chroot' \
@@ -491,6 +701,19 @@ if ! rg -Fq 'OSH_THEME=${STARLIGHT_OMB_THEME:-agnoster}' \
     echo "The default Bash prompt is not configured with the Starlight Oh My Bash theme." >&2
     ((errors += 1))
 fi
+if ! rg -Fq 'plugins=(git sudo bashmarks colored-man-pages)' \
+    "${PROJECT_ROOT}/sosd/etc/skel/.bashrc" || \
+    ! rg -Fq 'plugins=(git sudo bashmarks colored-man-pages)' \
+        "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-install-oh-my-bash"; then
+    echo "Oh My Bash must use only bundled plugin names." >&2
+    ((errors += 1))
+fi
+if rg -Fq 'plugins=(git sudo history bashmarks)' \
+    "${PROJECT_ROOT}/sosd/etc/skel/.bashrc" \
+    "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-install-oh-my-bash"; then
+    echo "Oh My Bash must not enable the missing history plugin." >&2
+    ((errors += 1))
+fi
 if ! rg -Fq 'JetBrainsMono Nerd Font 11' \
     "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"; then
     echo "The GNOME monospace font is not set to JetBrainsMono Nerd Font." >&2
@@ -570,6 +793,10 @@ if ! rg -Fq 'installer/modules/${local_module}/' \
     echo "The Starlight Calamares modules are not staged as runtime modules." >&2
     ((errors += 1))
 fi
+if ! rg -Fq 'starlight-clean-installed-system' "${PROJECT_ROOT}/scripts/build.sh"; then
+    echo "The installed-system cleanup module is not synced into the Calamares runtime path." >&2
+    ((errors += 1))
+fi
 if ! rg -Fq '.sosd-package-lists.sha256' "${PROJECT_ROOT}/scripts/build.sh"; then
     echo "Fast builds must invalidate the chroot cache when package lists change." >&2
     ((errors += 1))
@@ -592,6 +819,11 @@ if [[ ! -s "${PROJECT_ROOT}/installer/modules/starlight-user-avatar/module.desc"
     echo "Missing Starlight Calamares user avatar module." >&2
     ((errors += 1))
 fi
+if [[ ! -s "${PROJECT_ROOT}/installer/modules/starlight-clean-installed-system/module.desc" ]] || \
+    [[ ! -s "${PROJECT_ROOT}/installer/modules/starlight-clean-installed-system/main.py" ]]; then
+    echo "Missing Starlight installed-system cleanup Calamares module." >&2
+    ((errors += 1))
+fi
 if ! python3 -c 'import ast, pathlib, sys; ast.parse(pathlib.Path(sys.argv[1]).read_text())' \
     "${PROJECT_ROOT}/installer/modules/starlight-bootloader/main.py"; then
     echo "Starlight Calamares bootloader module has invalid Python syntax." >&2
@@ -600,6 +832,11 @@ fi
 if ! python3 -c 'import ast, pathlib, sys; ast.parse(pathlib.Path(sys.argv[1]).read_text())' \
     "${PROJECT_ROOT}/installer/modules/starlight-user-avatar/main.py"; then
     echo "Starlight Calamares user avatar module has invalid Python syntax." >&2
+    ((errors += 1))
+fi
+if ! python3 -c 'import ast, pathlib, sys; ast.parse(pathlib.Path(sys.argv[1]).read_text())' \
+    "${PROJECT_ROOT}/installer/modules/starlight-clean-installed-system/main.py"; then
+    echo "Starlight installed-system cleanup module has invalid Python syntax." >&2
     ((errors += 1))
 fi
 if ! rg -Fq '    - grubcfg' "${PROJECT_ROOT}/installer/settings.conf"; then
@@ -611,6 +848,11 @@ if ! rg -Fq '    - starlight-bootloader' \
     echo "Calamares must run the Starlight bootloader module." >&2
     ((errors += 1))
 fi
+if ! rg -Fq '    - starlight-clean-installed-system' \
+    "${PROJECT_ROOT}/installer/settings.conf"; then
+    echo "Calamares must clean live-only artifacts from the installed system." >&2
+    ((errors += 1))
+fi
 if ! rg -Fq '    - starlight-user-avatar' \
     "${PROJECT_ROOT}/installer/settings.conf"; then
     echo "Calamares must run the Starlight user avatar module." >&2
@@ -619,9 +861,29 @@ fi
 if ! awk '
     $0 ~ /^[[:space:]]*-[[:space:]]*grubcfg$/ { seen_grubcfg = NR }
     $0 ~ /^[[:space:]]*-[[:space:]]*starlight-bootloader$/ { seen_bootloader = NR }
-    END { exit !(seen_grubcfg && seen_bootloader && seen_grubcfg < seen_bootloader) }
+    $0 ~ /^[[:space:]]*-[[:space:]]*starlight-clean-installed-system$/ { seen_cleanup = NR }
+    $0 ~ /^[[:space:]]*-[[:space:]]*umount$/ { seen_umount = NR }
+    END {
+        exit !(seen_grubcfg && seen_bootloader && seen_cleanup && seen_umount &&
+            seen_grubcfg < seen_bootloader &&
+            seen_bootloader < seen_cleanup &&
+            seen_cleanup < seen_umount)
+    }
 ' "${PROJECT_ROOT}/installer/settings.conf"; then
-    echo "Calamares grubcfg must run before the Starlight bootloader module." >&2
+    echo "Calamares must run cleanup after bootloader and before umount." >&2
+    ((errors += 1))
+fi
+if ! rg -Fq 'PACKAGES_TO_PURGE' \
+    "${PROJECT_ROOT}/installer/modules/starlight-clean-installed-system/main.py" || \
+    ! rg -Fq 'starlight-install.desktop' \
+        "${PROJECT_ROOT}/installer/modules/starlight-clean-installed-system/main.py" || \
+    ! rg -Fq 'epiphany-browser' \
+        "${PROJECT_ROOT}/installer/modules/starlight-clean-installed-system/main.py" || \
+    ! rg -Fq 'apt-get", "--purge", "-q", "-y", "remove' \
+        "${PROJECT_ROOT}/installer/modules/starlight-clean-installed-system/main.py" || \
+    ! rg -Fq 'dconf", "update"' \
+        "${PROJECT_ROOT}/installer/modules/starlight-clean-installed-system/main.py"; then
+    echo "The installed-system cleanup module does not remove installer/browser leftovers." >&2
     ((errors += 1))
 fi
 if ! rg -Fq -- '--no-nvram' \

@@ -32,7 +32,7 @@ if ! grep -Fq "${MARKER_BEGIN}" "${HOME}/.bashrc"; then
         printf '\n%s\n' "${MARKER_BEGIN}"
         printf 'export OSH="${HOME}/.oh-my-bash"\n'
         printf 'OSH_THEME="${STARLIGHT_OMB_THEME:-agnoster}"\n'
-        printf 'plugins=(git sudo history bashmarks)\n'
+        printf 'plugins=(git sudo bashmarks colored-man-pages)\n'
         printf 'aliases=(general)\n'
         printf '[[ -s "${OSH}/oh-my-bash.sh" ]] && source "${OSH}/oh-my-bash.sh"\n'
         printf '%s\n' "${MARKER_END}"

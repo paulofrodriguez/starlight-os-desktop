@@ -287,6 +287,310 @@
   box-shadow: inset 0 0 0 2px rgba(243, 198, 83, 0.70) !important;
 }
 
+/* Starlight shell surfaces: lock screen, dialogs, switchers and OSDs. */
+.unlock-dialog,
+.modal-dialog,
+#LookingGlassDialog,
+.screenshot-ui-panel,
+.workspace-switcher,
+.switcher-list,
+.resize-popup,
+.osd-window,
+.pad-osd-window,
+.dash-label,
+.window-caption,
+.screenshot-ui-tooltip,
+.app-folder-dialog {
+  color: #f1eee6;
+  background-color: rgba(8, 17, 30, 0.96);
+  background-gradient-direction: vertical;
+  background-gradient-start: rgba(13, 23, 38, 0.98);
+  background-gradient-end: rgba(5, 11, 22, 0.96);
+  border-color: rgba(200, 155, 60, 0.40);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+}
+
+.modal-dialog {
+  border: 1px solid rgba(200, 155, 60, 0.42);
+}
+
+.modal-dialog .modal-dialog-content-box,
+.end-session-dialog,
+.message-dialog-content,
+.prompt-dialog,
+.run-dialog,
+.polkit-dialog-user-layout,
+.audio-device-selection-dialog,
+.access-dialog,
+.conflicting-session-dialog-content {
+  color: #f1eee6;
+}
+
+.message-dialog-content .message-dialog-title,
+.message-dialog-content .message-dialog-description,
+.message-dialog-content .message-dialog-title.lightweight,
+.conflicting-session-dialog-content .conflicting-session-dialog-title,
+.conflicting-session-dialog-content .conflicting-session-dialog-desc,
+.restart-message,
+.dialog-list .dialog-list-title,
+.dialog-list .dialog-list-box .dialog-list-item .dialog-list-item-title,
+.polkit-dialog-user-layout .polkit-dialog-user-label,
+.unlock-dialog-clock,
+.unlock-dialog-clock .unlock-dialog-clock-time,
+.unlock-dialog-clock .unlock-dialog-clock-date,
+.unlock-dialog-clock .unlock-dialog-clock-hint,
+.unlock-dialog .user-widget .user-widget-label {
+  color: #f1eee6;
+}
+
+.end-session-dialog .end-session-dialog-battery-warning,
+.end-session-dialog .dialog-list-title,
+.conflicting-session-dialog-content .conflicting-session-dialog-desc-warning,
+.prompt-dialog .prompt-dialog-error-label,
+.polkit-dialog-user-layout .polkit-dialog-user-root-label {
+  color: #ffe082;
+  background-color: rgba(200, 155, 60, 0.16);
+  border: 1px solid rgba(200, 155, 60, 0.38);
+}
+
+.dialog-list .dialog-list-box .dialog-list-item,
+.unlock-dialog-notifications-container .notification,
+.unlock-dialog-notifications-container .unlock-dialog-notification-source,
+.message {
+  color: #f1eee6;
+  background-color: rgba(13, 23, 38, 0.92);
+  border: 1px solid rgba(200, 155, 60, 0.26);
+}
+
+.dialog-list .dialog-list-box .dialog-list-item .dialog-list-item-description,
+.prompt-dialog .prompt-dialog-info-label,
+.prompt-dialog .prompt-dialog-null-label,
+.run-dialog .run-dialog-description,
+.message .message-header,
+.message .message-header .message-header-content .event-time,
+.unlock-dialog-notification-label {
+  color: rgba(241, 238, 230, 0.78);
+}
+
+.unlock-dialog .login-dialog-prompt-layout {
+  padding: 1.25em;
+  border: 1px solid rgba(200, 155, 60, 0.40);
+  border-radius: 14px;
+  background-color: rgba(8, 17, 30, 0.94);
+  background-gradient-direction: vertical;
+  background-gradient-start: rgba(13, 23, 38, 0.98);
+  background-gradient-end: rgba(5, 11, 22, 0.96);
+}
+
+.unlock-dialog .user-widget .user-icon {
+  color: #f1eee6;
+  background-color: #08111e;
+  border: 2px solid rgba(200, 155, 60, 0.74);
+}
+
+.unlock-dialog-notification-count-text {
+  color: #050b16;
+  background-color: #c89b3c;
+}
+
+.modal-dialog .modal-dialog-button-box .modal-dialog-button,
+.modal-dialog .button,
+.unlock-dialog .button,
+.unlock-dialog .icon-button,
+.unlock-dialog .login-dialog-button.cancel-button,
+.unlock-dialog .login-dialog-button.switch-user-button,
+.unlock-dialog .login-dialog-button.login-dialog-session-list-button,
+.run-dialog .button,
+.prompt-dialog .button,
+.access-dialog .button,
+.audio-device-selection-dialog .audio-selection-box .audio-selection-device,
+.switcher-list .item-box,
+.screenshot-ui-type-button,
+.screenshot-ui-shot-cast-button,
+#LookingGlassDialog .notebook-tab,
+#LookingGlassDebugFlags .lg-debug-flag-button {
+  color: #f6d47a;
+  background-color: rgba(8, 17, 30, 0.92);
+  border: 1px solid rgba(200, 155, 60, 0.42);
+}
+
+.modal-dialog .modal-dialog-button-box .modal-dialog-button:hover,
+.modal-dialog .modal-dialog-button-box .modal-dialog-button:focus,
+.modal-dialog .button:hover,
+.modal-dialog .button:focus,
+.unlock-dialog .button:hover,
+.unlock-dialog .button:focus,
+.unlock-dialog .icon-button:hover,
+.unlock-dialog .icon-button:focus,
+.unlock-dialog .login-dialog-button.cancel-button:hover,
+.unlock-dialog .login-dialog-button.cancel-button:focus,
+.unlock-dialog .login-dialog-button.switch-user-button:hover,
+.unlock-dialog .login-dialog-button.switch-user-button:focus,
+.unlock-dialog .login-dialog-button.login-dialog-session-list-button:hover,
+.unlock-dialog .login-dialog-button.login-dialog-session-list-button:focus,
+.run-dialog .button:hover,
+.run-dialog .button:focus,
+.prompt-dialog .button:hover,
+.prompt-dialog .button:focus,
+.access-dialog .button:hover,
+.access-dialog .button:focus,
+.audio-device-selection-dialog .audio-selection-box .audio-selection-device:hover,
+.audio-device-selection-dialog .audio-selection-box .audio-selection-device:focus,
+.switcher-list .item-box:hover,
+.switcher-list .item-box:focus,
+.screenshot-ui-type-button:hover,
+.screenshot-ui-type-button:focus,
+.screenshot-ui-shot-cast-button:hover,
+.screenshot-ui-shot-cast-button:focus,
+#LookingGlassDialog .notebook-tab:hover,
+#LookingGlassDialog .notebook-tab:focus,
+#LookingGlassDebugFlags .lg-debug-flag-button:hover,
+#LookingGlassDebugFlags .lg-debug-flag-button:focus {
+  color: #050b16;
+  background-color: #c89b3c;
+  background-gradient-direction: vertical;
+  background-gradient-start: #ffe082;
+  background-gradient-end: #c89b3c;
+  border-color: #f3c653;
+  box-shadow: inset 0 0 0 2px rgba(5, 11, 22, 0.42) !important;
+}
+
+.modal-dialog .modal-dialog-button-box .modal-dialog-button:active,
+.modal-dialog .modal-dialog-button-box .modal-dialog-button:checked,
+.modal-dialog .modal-dialog-button-box .modal-dialog-button.default,
+.modal-dialog .modal-dialog-button-box .modal-dialog-button.destructive-action,
+.modal-dialog .button.default,
+.unlock-dialog .button:active,
+.unlock-dialog .button:checked,
+.unlock-dialog .icon-button:active,
+.unlock-dialog .icon-button:checked,
+.audio-device-selection-dialog .audio-selection-box .audio-selection-device:active,
+.audio-device-selection-dialog .audio-selection-box .audio-selection-device:selected,
+.audio-device-selection-dialog .audio-selection-box .audio-selection-device:checked,
+.switcher-list .item-box:active,
+.switcher-list .item-box:selected,
+.switcher-list .item-box:checked,
+.switcher-list .item-box:highlighted,
+.screenshot-ui-type-button:checked,
+.screenshot-ui-shot-cast-button:checked,
+#LookingGlassDialog .notebook-tab:selected {
+  color: #050b16;
+  background-color: #c89b3c;
+  background-gradient-direction: vertical;
+  background-gradient-start: #f3c653;
+  background-gradient-end: #c89b3c;
+  border-color: #ffe082;
+  box-shadow: inset 0 0 0 1px rgba(5, 11, 22, 0.34);
+}
+
+.modal-dialog .modal-dialog-button-box .modal-dialog-button:insensitive,
+.modal-dialog .button:insensitive,
+.unlock-dialog .button:insensitive,
+.unlock-dialog .icon-button:insensitive,
+.audio-device-selection-dialog .audio-selection-box .audio-selection-device:insensitive,
+.switcher-list .item-box:insensitive,
+.screenshot-ui-type-button:insensitive,
+.screenshot-ui-shot-cast-button:insensitive {
+  color: rgba(241, 238, 230, 0.46);
+  background-color: rgba(8, 17, 30, 0.50);
+  border-color: rgba(200, 155, 60, 0.18);
+}
+
+.unlock-dialog .login-dialog-prompt-entry,
+.run-dialog .run-dialog-entry,
+.prompt-dialog .prompt-dialog-password-entry,
+.prompt-dialog .prompt-dialog-password-grid .prompt-dialog-password-entry,
+.app-folder-dialog .folder-name-container .folder-name-entry,
+.search-entry,
+.lg-dialog StEntry,
+StEntry {
+  color: #f1eee6;
+  background-color: rgba(5, 11, 22, 0.98);
+  border: 1px solid rgba(200, 155, 60, 0.62);
+  box-shadow: inset 0 0 0 1px rgba(200, 155, 60, 0.22);
+}
+
+.unlock-dialog .login-dialog-prompt-entry:hover,
+.unlock-dialog .login-dialog-prompt-entry:focus,
+.run-dialog .run-dialog-entry:hover,
+.run-dialog .run-dialog-entry:focus,
+.prompt-dialog .prompt-dialog-password-entry:hover,
+.prompt-dialog .prompt-dialog-password-entry:focus,
+.prompt-dialog .prompt-dialog-password-grid .prompt-dialog-password-entry:hover,
+.prompt-dialog .prompt-dialog-password-grid .prompt-dialog-password-entry:focus,
+.app-folder-dialog .folder-name-container .folder-name-entry:hover,
+.app-folder-dialog .folder-name-container .folder-name-entry:focus,
+.search-entry:hover,
+.search-entry:focus,
+.lg-dialog StEntry:hover,
+.lg-dialog StEntry:focus,
+StEntry:hover,
+StEntry:focus {
+  border-color: #f3c653;
+  box-shadow: inset 0 0 0 2px rgba(243, 198, 83, 0.54) !important;
+}
+
+.osd-window .level {
+  -barlevel-background-color: rgba(241, 238, 230, 0.18);
+  -barlevel-active-background-color: #f3c653;
+  -barlevel-overdrive-color: #ffe082;
+}
+
+.osd-monitor-label,
+.osd-break-countdown-label,
+.ws-switcher-indicator:active,
+.cycler-highlight {
+  color: #050b16;
+  background-color: #c89b3c;
+  border-color: #f3c653;
+}
+
+.ws-switcher-indicator {
+  background-color: rgba(241, 238, 230, 0.40);
+}
+
+.switcher-list .separator,
+.screenshot-ui-shot-cast-container {
+  background-color: rgba(200, 155, 60, 0.22);
+}
+
+.screenshot-ui-capture-button {
+  border: 4px #f3c653;
+}
+
+.screenshot-ui-capture-button .screenshot-ui-capture-button-circle,
+.screenshot-ui-window-selector-window:checked .screenshot-ui-window-selector-check,
+.screenshot-ui-area-selector-handle {
+  color: #050b16;
+  background-color: #f3c653;
+}
+
+.screenshot-ui-capture-button:hover .screenshot-ui-capture-button-circle,
+.screenshot-ui-capture-button:focus .screenshot-ui-capture-button-circle {
+  background-color: #ffe082;
+}
+
+.screenshot-ui-window-selector,
+.screenshot-ui-screen-selector {
+  background-color: rgba(5, 11, 22, 0.72);
+}
+
+.screenshot-ui-area-selector .screenshot-ui-area-indicator-selection,
+.screenshot-ui-screen-selector:checked,
+.screenshot-ui-window-selector-window:checked .screenshot-ui-window-selector-window-border {
+  border-color: #f3c653;
+}
+
+.screenshot-ui-window-selector-window:checked .screenshot-ui-window-selector-window-border {
+  background-color: rgba(200, 155, 60, 0.22);
+}
+
+.dash-label,
+.window-caption,
+.screenshot-ui-tooltip {
+  border: 1px solid rgba(200, 155, 60, 0.42);
+}
+
 #dashtodockContainer .dash-background,
 #dash .dash-background {
   background-color: rgba(7, 24, 43, 0.74);

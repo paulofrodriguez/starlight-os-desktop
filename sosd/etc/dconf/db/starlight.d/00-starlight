@@ -14,14 +14,31 @@ picture-options='zoom'
 picture-uri='file:///usr/share/backgrounds/starlight/starlight-wallpaper.png'
 picture-options='zoom'
 
+[org/gnome/desktop/calendar]
+show-weekdate=true
+
 [org/gnome/desktop/default-applications/terminal]
 exec='ptyxis'
 exec-arg=''
 
 [org/gnome/shell]
 disable-user-extensions=false
-enabled-extensions=['blur-my-shell@aunetx', 'dash-to-dock@micxgx.gmail.com', 'starlight-clock-right@starlightbrasil.com']
+enabled-extensions=['blur-my-shell@aunetx', 'dash-to-dock@micxgx.gmail.com', 'ubuntu-appindicators@ubuntu.com', 'caffeine@patapon.info', 'tiling-assistant@leleat-on-github', 'starlight-clock-right@starlightbrasil.com']
 favorite-apps=['chromium.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Ptyxis.desktop', 'org.gnome.Software.desktop', 'starlight-install.desktop']
+
+# Blur My Shell uses shared pipelines. Keep the Starlight blue tint scoped to
+# the app grid/overview background so it does not flatten the top panel or dock.
+[org/gnome/shell/extensions/blur-my-shell]
+pipelines={'pipeline_default': {'name': <'Default'>, 'effects': <[<{'type': <'native_static_gaussian_blur'>, 'id': <'effect_000000000000'>, 'params': <{'unscaled_radius': <30>, 'brightness': <0.6>}>}>]>}, 'pipeline_default_rounded': {'name': <'Default rounded'>, 'effects': <[<{'type': <'native_static_gaussian_blur'>, 'id': <'effect_000000000001'>, 'params': <{'unscaled_radius': <30>, 'brightness': <0.6>}>}>, <{'type': <'corner'>, 'id': <'effect_000000000002'>, 'params': <{'radius': <24>}>}>]>}, 'pipeline_starlight_app_grid': {'name': <'Starlight app grid'>, 'effects': <[<{'type': <'native_static_gaussian_blur'>, 'id': <'effect_starlight_app_grid_blur'>, 'params': <{'unscaled_radius': <30>, 'brightness': <0.6>}>}>, <{'type': <'color'>, 'id': <'effect_starlight_app_grid_tint'>, 'params': <{'color': <(0.054901960784313725, 0.12156862745098039, 0.29411764705882354, 0.05)>}>}>]>}}
+
+[org/gnome/shell/extensions/blur-my-shell/overview]
+pipeline='pipeline_starlight_app_grid'
+
+[org/gnome/shell/extensions/blur-my-shell/panel]
+pipeline='pipeline_default'
+
+[org/gnome/shell/extensions/blur-my-shell/dash-to-dock]
+pipeline='pipeline_default_rounded'
 
 # Dash to Dock owns the desktop dock appearance. Keep it as a floating,
 # translucent navy surface instead of inheriting the grey upstream fallback.

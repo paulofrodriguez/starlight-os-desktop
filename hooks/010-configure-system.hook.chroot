@@ -31,6 +31,7 @@ systemctl enable gdm3.service
 systemctl enable NetworkManager.service
 systemctl enable ssh.service
 systemctl enable libvirtd.service
+systemctl enable switcheroo-control.service
 systemctl enable starlight-firstboot.service
 systemctl enable starlight-live-session.service
 

@@ -1,0 +1,9 @@
+avahi-daemon
+libnss-mdns
+cifs-utils
+smbclient
+exfatprogs
+ntfs-3g
+libmtp-runtime
+mtp-tools
+7zip

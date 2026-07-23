@@ -14,6 +14,8 @@ test -f "${PROJECT_ROOT}/installer/modules/starlight-bootloader/module.desc"
 test -f "${PROJECT_ROOT}/installer/modules/starlight-bootloader/main.py"
 test -f "${PROJECT_ROOT}/installer/modules/starlight-user-avatar/module.desc"
 test -f "${PROJECT_ROOT}/installer/modules/starlight-user-avatar/main.py"
+test -f "${PROJECT_ROOT}/installer/modules/starlight-clean-installed-system/module.desc"
+test -f "${PROJECT_ROOT}/installer/modules/starlight-clean-installed-system/main.py"
 test -f "${PROJECT_ROOT}/installer/modules/users.conf"
 test -s "${PROJECT_ROOT}/branding/starlight-calamares.png"
 test -s "${PROJECT_ROOT}/branding/starlight-calamares-light.png"
@@ -22,7 +24,11 @@ test -f "${PROJECT_ROOT}/sosd/etc/systemd/system/starlight-live-session.service"
 test -f "${PROJECT_ROOT}/sosd/lib/live/config/0035-starlight-user"
 test -f "${PROJECT_ROOT}/sosd/usr/local/bin/starlight-launch-installer"
 test -f "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-run-installer"
+test -f "${PROJECT_ROOT}/sosd/usr/share/firefox-esr/distribution/policies.json"
+test -f "${PROJECT_ROOT}/sosd/usr/share/starlight/easyeffects/presets/README.md"
 test -f "${PROJECT_ROOT}/docs/metapackages.md"
+test -f "${PROJECT_ROOT}/packages/files-devices.list.chroot"
+test -f "${PROJECT_ROOT}/metapackages/distro-files-devices.depends"
 test -f "${PROJECT_ROOT}/metapackages/distro-desktop-gnome.depends"
 test -f "${PROJECT_ROOT}/flatpaks/system-apps.txt"
 test -f "${PROJECT_ROOT}/sosd/etc/skel/.bashrc"
@@ -84,9 +90,30 @@ rg -Fxq "exec='ptyxis'" \
     "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
 rg -Fq "'starlight-clock-right@starlightbrasil.com'" \
     "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
+rg -Fq "pipeline_starlight_app_grid" \
+    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
+rg -Fq "'color': <(0.054901960784313725, 0.12156862745098039, 0.29411764705882354, 0.05)>" \
+    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
+rg -Fxq "pipeline='pipeline_starlight_app_grid'" \
+    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
+rg -Fxq "pipeline='pipeline_default'" \
+    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
+rg -Fxq "pipeline='pipeline_default_rounded'" \
+    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
+for enabled_extension in \
+    "'ubuntu-appindicators@ubuntu.com'" \
+    "'caffeine@patapon.info'" \
+    "'tiling-assistant@leleat-on-github'"; do
+    rg -Fq "${enabled_extension}" \
+        "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
+done
+! rg -Fq "'ding@rastersoft.com'" \
+    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
 rg -Fq "favorite-apps=['chromium.desktop'" \
     "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
 ! rg -q "favorite-apps=.*firefox" \
+    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
+rg -Fxq "show-weekdate=true" \
     "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
 rg -Fxq 'text/html=chromium.desktop' "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list"
 rg -Fxq 'x-scheme-handler/http=chromium.desktop' "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list"
@@ -98,6 +125,10 @@ rg -Fxq 'application/x-debian-package=gdebi.desktop' \
     "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list"
 ! rg -q '^application/(vnd\.debian\.binary-package|x-deb|x-debian-package)=.*(file-roller|FileRoller)' \
     "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list"
+python3 -c 'import json, pathlib, sys; policies = json.loads(pathlib.Path(sys.argv[1]).read_text())["policies"]; assert policies["NoDefaultBookmarks"] is True; assert "Debian packages" in policies["SearchEngines"]["Remove"]' \
+    "${PROJECT_ROOT}/sosd/usr/share/firefox-esr/distribution/policies.json"
+test ! -e "${PROJECT_ROOT}/sosd/usr/share/applications/starlight-browser.desktop"
+! rg -q 'epiphany' "${PROJECT_ROOT}/sosd/usr/local/bin/starlight-browser"
 rg -Fxq "background-color='#07182b'" \
     "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
 rg -Fxq "background-opacity=0.74" \
@@ -128,6 +159,23 @@ rg -Fq '.calendar .calendar-day.calendar-today' \
     "${PROJECT_ROOT}/assets/gdm/starlight-os-vega/assets/starlight-os-vega-gdm.css"
 rg -Fq '.calendar-day-base' \
     "${PROJECT_ROOT}/assets/gdm/starlight-os-vega/assets/starlight-os-vega-gdm.css"
+for shell_selector in \
+    '.unlock-dialog' \
+    '.modal-dialog' \
+    '.end-session-dialog' \
+    '.message-dialog-content' \
+    '.prompt-dialog' \
+    '.run-dialog' \
+    '.polkit-dialog-user-layout' \
+    '.access-dialog' \
+    '.audio-device-selection-dialog' \
+    '.screenshot-ui-panel' \
+    '.switcher-list' \
+    '.osd-window' \
+    '#LookingGlassDialog'; do
+    rg -Fq "${shell_selector}" \
+        "${PROJECT_ROOT}/assets/gdm/starlight-os-vega/assets/starlight-os-vega-gdm.css"
+done
 test -s "${PROJECT_ROOT}/sosd/etc/gtk-3.0/gtk.css"
 test -s "${PROJECT_ROOT}/sosd/etc/gtk-4.0/gtk.css"
 test -s "${PROJECT_ROOT}/sosd/etc/skel/.config/gtk-3.0/gtk.css"
@@ -197,6 +245,13 @@ rg -Fq 'OSH_THEME=${STARLIGHT_OMB_THEME:-agnoster}' \
     "${PROJECT_ROOT}/sosd/etc/skel/.bashrc"
 rg -Fq '/usr/share/oh-my-bash' \
     "${PROJECT_ROOT}/sosd/etc/skel/.bashrc"
+rg -Fq 'plugins=(git sudo bashmarks colored-man-pages)' \
+    "${PROJECT_ROOT}/sosd/etc/skel/.bashrc"
+rg -Fq 'plugins=(git sudo bashmarks colored-man-pages)' \
+    "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-install-oh-my-bash"
+! rg -Fq 'plugins=(git sudo history bashmarks)' \
+    "${PROJECT_ROOT}/sosd/etc/skel/.bashrc" \
+    "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-install-oh-my-bash"
 rg -Fq '.sdkman/bin/sdkman-init.sh' \
     "${PROJECT_ROOT}/sosd/etc/skel/.bashrc"
 rg -Fq 'raw.githubusercontent.com/Homebrew/install/HEAD/install.sh' \
@@ -221,6 +276,22 @@ rg -q '^incus$' "${PROJECT_ROOT}/packages/incus.list.chroot"
 rg -q '^incus-client$' "${PROJECT_ROOT}/packages/incus.list.chroot"
 rg -q '^incus-extra$' "${PROJECT_ROOT}/packages/incus.list.chroot"
 rg -q '^gnome-tweaks$' "${PROJECT_ROOT}/packages/gnome.list.chroot"
+for gnome_extension_package in \
+    gnome-shell-extension-appindicator \
+    gnome-shell-extension-caffeine \
+    gnome-shell-extension-tiling-assistant; do
+    rg -qx "${gnome_extension_package}" "${PROJECT_ROOT}/packages/gnome.list.chroot"
+    rg -qx "${gnome_extension_package}" \
+        "${PROJECT_ROOT}/metapackages/distro-desktop-gnome.depends"
+done
+! rg -qx 'gnome-shell-extension-desktop-icons-ng' \
+    "${PROJECT_ROOT}/packages/gnome.list.chroot"
+! rg -qx 'gnome-shell-extension-desktop-icons-ng' \
+    "${PROJECT_ROOT}/metapackages/distro-desktop-gnome.depends"
+rg -Fq 'Desktop Icons NG must not be installed' \
+    "${PROJECT_ROOT}/hooks/1000-verify-image.hook.chroot"
+rg -Fq 'test ! -e /usr/share/gnome-shell/extensions/ding@rastersoft.com' \
+    "${PROJECT_ROOT}/hooks/1000-verify-image.hook.chroot"
 ! rg -q '^(task-gnome-desktop|libreoffice|libreoffice-gtk3)$' \
     "${PROJECT_ROOT}/packages/gnome.list.chroot"
 ! rg -q '^(task-gnome-desktop|libreoffice|libreoffice-gtk3)$' \
@@ -258,7 +329,50 @@ rg -q '^user-setup$' "${PROJECT_ROOT}/packages/base.list.chroot"
 ! rg -q '^(snapd|casper|ubuntu-drivers-common)$' \
     "${PROJECT_ROOT}/packages" --glob '*.list.chroot'
 rg -q '^gnome-core$' "${PROJECT_ROOT}/packages/gnome.list.chroot"
+! rg -q '^epiphany-browser$' "${PROJECT_ROOT}/packages/gnome.list.chroot"
+for gnome_software_deb_package in \
+    gnome-software-plugin-deb \
+    gnome-software-plugin-fwupd \
+    packagekit \
+    packagekit-tools \
+    appstream \
+    apt-config-icons; do
+    rg -qx "${gnome_software_deb_package}" \
+        "${PROJECT_ROOT}/packages/gnome.list.chroot"
+    rg -qx "${gnome_software_deb_package}" \
+        "${PROJECT_ROOT}/metapackages/distro-desktop-gnome.depends"
+done
+rg -Fq 'libgs_plugin_packagekit.so' \
+    "${PROJECT_ROOT}/hooks/1000-verify-image.hook.chroot"
+rg -Fq 'org.freedesktop.PackageKit.service' \
+    "${PROJECT_ROOT}/hooks/1000-verify-image.hook.chroot"
+rg -q '^seahorse$' "${PROJECT_ROOT}/packages/gnome.list.chroot"
+rg -q '^seahorse$' "${PROJECT_ROOT}/metapackages/distro-desktop-gnome.depends"
 rg -q '^papirus-icon-theme$' "${PROJECT_ROOT}/packages/gnome.list.chroot"
+rg -q '^gnome-firmware$' "${PROJECT_ROOT}/packages/system-polish.list.chroot"
+rg -q '^flatseal$' "${PROJECT_ROOT}/packages/system-polish.list.chroot"
+rg -q '^switcheroo-control$' "${PROJECT_ROOT}/packages/system-polish.list.chroot"
+rg -q '^gnome-firmware$' "${PROJECT_ROOT}/metapackages/distro-system-polish.depends"
+rg -q '^flatseal$' "${PROJECT_ROOT}/metapackages/distro-system-polish.depends"
+rg -q '^switcheroo-control$' "${PROJECT_ROOT}/metapackages/distro-system-polish.depends"
+rg -Fq 'systemctl enable switcheroo-control.service' \
+    "${PROJECT_ROOT}/hooks/010-configure-system.hook.chroot"
+rg -Fq 'com.github.tchx84.Flatseal' \
+    "${PROJECT_ROOT}/hooks/1000-verify-image.hook.chroot"
+for files_device_package in \
+    avahi-daemon \
+    libnss-mdns \
+    cifs-utils \
+    smbclient \
+    exfatprogs \
+    ntfs-3g \
+    libmtp-runtime \
+    mtp-tools \
+    7zip; do
+    rg -qx "${files_device_package}" "${PROJECT_ROOT}/packages/files-devices.list.chroot"
+    rg -qx "${files_device_package}" \
+        "${PROJECT_ROOT}/metapackages/distro-files-devices.depends"
+done
 rg -q '^qt6-wayland$' "${PROJECT_ROOT}/packages/installer.list.chroot"
 rg -q '^squashfs-tools$' "${PROJECT_ROOT}/packages/installer.list.chroot"
 rg -q '^rsync$' "${PROJECT_ROOT}/packages/installer.list.chroot"
@@ -276,6 +390,8 @@ rg -Fq -- '-eltorito-alt-boot' "${PROJECT_ROOT}/scripts/build.sh"
 rg -Fq -- '-isohybrid-gpt-basdat' "${PROJECT_ROOT}/scripts/build.sh"
 rg -Fq '    - grubcfg' "${PROJECT_ROOT}/installer/settings.conf"
 rg -Fq '    - starlight-bootloader' "${PROJECT_ROOT}/installer/settings.conf"
+rg -Fq '    - starlight-clean-installed-system' \
+    "${PROJECT_ROOT}/installer/settings.conf"
 rg -Fq '    - starlight-user-avatar' "${PROJECT_ROOT}/installer/settings.conf"
 rg -Fq -- '--no-nvram' \
     "${PROJECT_ROOT}/installer/modules/starlight-bootloader/main.py"
@@ -299,8 +415,29 @@ rg -Fq 'NoDisplay=true' \
     "${PROJECT_ROOT}/sosd/usr/share/applications/calamares.desktop"
 rg -Fq 'com.starlight.install.pkexec.run' \
     "${PROJECT_ROOT}/sosd/etc/polkit-1/rules.d/49-starlight-live-installer.rules"
-rg -q '^epiphany-browser$' "${PROJECT_ROOT}/packages/gnome.list.chroot"
 rg -q '^libavcodec-extra$' "${PROJECT_ROOT}/packages/audio-codecs.list.chroot"
+rg -q '^ffmpeg$' "${PROJECT_ROOT}/packages/audio-codecs.list.chroot"
+rg -q '^gstreamer1.0-plugins-base$' "${PROJECT_ROOT}/packages/audio-codecs.list.chroot"
+rg -q '^gstreamer1.0-plugins-good$' "${PROJECT_ROOT}/packages/audio-codecs.list.chroot"
+rg -q '^gstreamer1.0-plugins-bad$' "${PROJECT_ROOT}/packages/audio-codecs.list.chroot"
+rg -q '^gstreamer1.0-plugins-ugly$' "${PROJECT_ROOT}/packages/audio-codecs.list.chroot"
+rg -q '^gstreamer1.0-libav$' "${PROJECT_ROOT}/packages/audio-codecs.list.chroot"
+rg -q '^gstreamer1.0-vaapi$' "${PROJECT_ROOT}/packages/audio-codecs.list.chroot"
+rg -q '^va-driver-all$' "${PROJECT_ROOT}/packages/audio-codecs.list.chroot"
+rg -q '^vdpau-driver-all$' "${PROJECT_ROOT}/packages/audio-codecs.list.chroot"
+rg -q '^vainfo$' "${PROJECT_ROOT}/packages/audio-codecs.list.chroot"
+rg -q '^easyeffects$' "${PROJECT_ROOT}/packages/audio-codecs.list.chroot"
+rg -q '^va-driver-all$' "${PROJECT_ROOT}/metapackages/distro-codecs-media.depends"
+rg -q '^vdpau-driver-all$' "${PROJECT_ROOT}/metapackages/distro-codecs-media.depends"
+rg -q '^vainfo$' "${PROJECT_ROOT}/metapackages/distro-codecs-media.depends"
+rg -q '^easyeffects$' "${PROJECT_ROOT}/metapackages/distro-codecs-media.depends"
+rg -q '^lame$' "${PROJECT_ROOT}/packages/audio-codecs.list.chroot"
+rg -q '^libdvdnav4$' "${PROJECT_ROOT}/packages/audio-codecs.list.chroot"
+rg -q '^libdvdread8t64$' "${PROJECT_ROOT}/packages/audio-codecs.list.chroot"
+rg -q '^unrar$' "${PROJECT_ROOT}/packages/audio-codecs.list.chroot"
+rg -q '^vlc$' "${PROJECT_ROOT}/packages/audio-codecs.list.chroot"
+! find "${PROJECT_ROOT}/sosd/usr/share/starlight/easyeffects/presets" \
+    -maxdepth 1 -type f -name '*.json' | grep -q .
 rg -q '^NERD_FONT_SHA256=[0-9a-f]{64}$' "${PROJECT_ROOT}/config/assets.env"
 rg -q '/run/live/medium/live/filesystem.squashfs' \
     "${PROJECT_ROOT}/installer/modules/unpackfs.conf"
@@ -337,12 +474,26 @@ rg -Fq 'usr/lib/x86_64-linux-gnu/calamares/modules' \
     "${PROJECT_ROOT}/scripts/build.sh"
 rg -Fq 'installer/modules/${local_module}/' \
     "${PROJECT_ROOT}/scripts/build.sh"
+rg -Fq 'starlight-clean-installed-system' \
+    "${PROJECT_ROOT}/scripts/build.sh"
 rg -Fq 'starlight-user-avatar' \
     "${PROJECT_ROOT}/scripts/build.sh"
 rg -Fq 'branding/starlight-calamares.png' \
     "${PROJECT_ROOT}/scripts/build.sh"
 rg -Fq 'AccountsService/icons' \
     "${PROJECT_ROOT}/installer/modules/starlight-user-avatar/main.py"
+test -f "${PROJECT_ROOT}/installer/modules/starlight-clean-installed-system/module.desc"
+test -f "${PROJECT_ROOT}/installer/modules/starlight-clean-installed-system/main.py"
+python3 -c 'import ast, pathlib, sys; ast.parse(pathlib.Path(sys.argv[1]).read_text())' \
+    "${PROJECT_ROOT}/installer/modules/starlight-clean-installed-system/main.py"
+rg -Fq 'PACKAGES_TO_PURGE' \
+    "${PROJECT_ROOT}/installer/modules/starlight-clean-installed-system/main.py"
+rg -Fq 'starlight-install.desktop' \
+    "${PROJECT_ROOT}/installer/modules/starlight-clean-installed-system/main.py"
+rg -Fq 'epiphany-browser' \
+    "${PROJECT_ROOT}/installer/modules/starlight-clean-installed-system/main.py"
+rg -Fq 'dconf", "update"' \
+    "${PROJECT_ROOT}/installer/modules/starlight-clean-installed-system/main.py"
 rg -Fq '.sosd-package-lists.sha256' \
     "${PROJECT_ROOT}/scripts/build.sh"
 rg -Fq 'SidebarBackgroundCurrent: "#c89b3c"' \

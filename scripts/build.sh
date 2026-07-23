@@ -231,7 +231,11 @@ sync_calamares_config() {
         "${target_root}/etc/calamares/modules/"
 
     module_root="${target_root}/usr/lib/x86_64-linux-gnu/calamares/modules"
-    for local_module in starlight-bootloader starlight-user-avatar; do
+    for local_module in \
+        starlight-bootloader \
+        starlight-clean-installed-system \
+        starlight-user-avatar
+    do
         install -d -m 0755 "${module_root}/${local_module}"
         rsync -a --delete \
             --exclude '__pycache__/' \

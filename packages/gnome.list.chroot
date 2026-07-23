@@ -5,6 +5,9 @@ gnome-shell-extension-prefs
 gnome-tweaks
 gnome-shell-extension-blur-my-shell
 gnome-shell-extension-dashtodock
+gnome-shell-extension-appindicator
+gnome-shell-extension-caffeine
+gnome-shell-extension-tiling-assistant
 mutter
 binutils
 libglib2.0-bin
@@ -15,6 +18,12 @@ gnome-control-center
 gnome-terminal
 gnome-software
 gnome-software-plugin-flatpak
+gnome-software-plugin-deb
+gnome-software-plugin-fwupd
+packagekit
+packagekit-tools
+appstream
+apt-config-icons
 xdg-desktop-portal
 xdg-desktop-portal-gtk
 nautilus
@@ -30,6 +39,7 @@ gnome-disk-utility
 gnome-system-monitor
 baobab
 simple-scan
+seahorse
 adwaita-icon-theme
 papirus-icon-theme
 gnome-themes-extra
@@ -37,4 +47,3 @@ xdg-desktop-portal-gnome
 xwayland
 power-profiles-daemon
 upower
-epiphany-browser

@@ -1,0 +1,10 @@
+{
+  "policies": {
+    "NoDefaultBookmarks": true,
+    "SearchEngines": {
+      "Remove": [
+        "Debian packages"
+      ]
+    }
+  }
+}

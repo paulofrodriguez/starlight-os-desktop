@@ -15,9 +15,5 @@ if command -v firefox-esr >/dev/null 2>&1; then
     exec firefox-esr "$@"
 fi
 
-if command -v epiphany >/dev/null 2>&1; then
-    exec epiphany "$@"
-fi
-
 echo "No usable web browser is installed." >&2
 exit 1

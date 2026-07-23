@@ -6,9 +6,21 @@ gnome-control-center
 gnome-tweaks
 gnome-settings-daemon
 mutter
+gnome-shell-extension-appindicator
+gnome-shell-extension-blur-my-shell
+gnome-shell-extension-caffeine
+gnome-shell-extension-dashtodock
+gnome-shell-extension-prefs
+gnome-shell-extension-tiling-assistant
 nautilus
 gnome-software
 gnome-software-plugin-flatpak
+gnome-software-plugin-deb
+gnome-software-plugin-fwupd
+packagekit
+packagekit-tools
+appstream
+apt-config-icons
 xdg-desktop-portal
 xdg-desktop-portal-gnome
 xdg-desktop-portal-gtk
@@ -29,3 +41,4 @@ gnome-disk-utility
 gnome-system-monitor
 baobab
 simple-scan
+seahorse

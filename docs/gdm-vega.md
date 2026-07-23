@@ -39,8 +39,12 @@ O mesmo recurso é usado pelo GNOME Shell da sessão. Por isso, o override Vega
 também deixa o painel superior azul-marinho, o dash da Visão Geral e o Dash to
 Dock com superfície flutuante translúcida azul-marinho, gradiente vertical,
 borda fria discreta e sombra. Os estados de foco, seleção e aplicações em
-execução permanecem dourados. Dash to Dock, Blur my Shell e a extensão local
-`starlight-clock-right@starlightbrasil.com` compõem os ajustes padrão da sessão.
+execução permanecem dourados. O bloco também cobre as superfícies nativas do
+GNOME Shell: tela de desbloqueio, confirmação de desligar/reiniciar, prompts
+de senha e polkit, diálogo de executar comando, seleção de áudio, OSDs,
+switcher de janelas, ferramenta de screenshot e Looking Glass. Dash to Dock,
+Blur my Shell e a extensão local `starlight-clock-right@starlightbrasil.com`
+compõem os ajustes padrão da sessão.
 
 No GDM, tanto a lista inicial de usuários quanto o prompt de senha recebem o
 painel azul-marinho, bordas douradas discretas, avatar com aro dourado e
@@ -55,6 +59,10 @@ O Blur my Shell vem do pacote oficial Debian
 live (`blur-my-shell@aunetx`). O pacote Trixie 67-3 declara compatibilidade com
 GNOME Shell 48 e não com o 49; uma atualização de GNOME que altere essa faixa
 de compatibilidade fará o build falhar na resolução de pacotes, como deve ser.
+O tom azul `#0e1f4b` com 5% de opacidade fica restrito ao pipeline
+`pipeline_starlight_app_grid`, usado pelo fundo da visão de aplicativos. O
+painel superior e o Dash to Dock permanecem nos pipelines sem tint para não
+encobrir o degradê e a transparência definidos pelo tema Starlight.
 
 O aplicativo oficial **Extensions** também é incluído pelo pacote
 `gnome-shell-extension-prefs`, para que extensões instaladas possam ser vistas

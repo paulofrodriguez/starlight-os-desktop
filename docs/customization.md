@@ -18,6 +18,28 @@ Place system services in `sosd/etc/systemd/system/`, executables in
 idempotent, log without secrets, tolerate missing optional network services, and
 have an explicit state directory.
 
+## GNOME Shell extensions
+
+System extensions should come from Debian packages whenever possible and must be
+enabled through the Starlight dconf defaults, not by mutating a live user's
+profile. Starlight enables Blur my Shell, Dash to Dock, AppIndicator support,
+Caffeine, Tiling Assistant, and the local Starlight Clock Right extension by
+default. Desktop Icons NG is intentionally not shipped because it can cover the
+configured wallpaper with a solid colour on the current Starlight GNOME session.
+Blur my Shell uses a dedicated `pipeline_starlight_app_grid` pipeline for the
+GNOME overview/app-grid tint (`#0e1f4b` at 5% opacity). Do not add that tint to
+`pipeline_default`: the top panel and Dash to Dock also consume shared Blur my
+Shell pipelines, and the dock's own translucent navy styling is managed by Dash
+to Dock defaults.
+
+Clipboard Indicator (`clipboard-indicator@tudmotu.com`) and Quick Settings
+Audio Panel (`quick-settings-audio-panel@rayzeq.github.io`) are compatible with
+GNOME Shell 48 according to GNOME Extensions, but they are not present as direct
+Debian packages in the local Debian 13 package indices used by this build.
+Do not vendor those extensions from extensions.gnome.org or GitHub until the
+project decides the packaging, license review, update policy, and checksum
+pinning strategy.
+
 ## Drivers
 
 Firmware and CPU microcode are package-list concerns. Proprietary drivers must
@@ -26,6 +48,21 @@ installs Debian's NVIDIA Wayland stack (`nvidia-driver`,
 `nvidia-open-kernel-dkms`, `libnvidia-egl-wayland1`, `nvidia-vaapi-driver`,
 `nvidia-settings`, and `firmware-misc-nonfree`). Add future driver families as
 independent functions with separate logs and failure handling.
+
+GNOME's native "Launch using Dedicated Graphics Card" integration is provided
+by `switcheroo-control`, which is installed and enabled in the image. The menu
+entry is intentionally left to GNOME Shell and appears only when
+switcheroo-control reports a non-default GPU and the application is not already
+running. It will not appear in VirtualBox or on machines exposing only one GPU.
+`PrefersNonDefaultGPU=true` should be added only to individual
+`.desktop` files for applications that should always prefer the discrete GPU;
+do not set it globally because that would keep hybrid laptops on the dedicated
+GPU unnecessarily.
+
+GNOME Software must support both Debian packages and Flatpaks. Because live-build
+runs with package recommendations disabled, the Debian backend is requested
+explicitly through `gnome-software-plugin-deb`, PackageKit, AppStream, and APT
+icon metadata packages instead of relying on `gnome-software` recommendations.
 
 ## Optional applications
 
@@ -60,8 +97,26 @@ theme and SDKMAN integration when present.
 
 The audio layer includes PipeWire, WirePlumber, ALSA compatibility, PulseAudio
 client tools, Bluetooth audio, and graphical routing/volume tools. Multimedia
-support includes GStreamer base/good/bad/ugly, FFmpeg, libav, VA-API, and GNOME
-metadata extraction plugins. `ubuntu-restricted-extras` is intentionally not
-used because it can pull EULA-gated fonts and non-redistributable extras. The
-selected codec packages still require legal review before commercial release
-in each target jurisdiction.
+support includes GStreamer base/good/bad/ugly, FFmpeg, libav, VA-API, VDPAU,
+LAME, DVD read/navigation libraries, RAR support, VLC, MPV, and GNOME metadata
+extraction plugins. Intel/Mesa VA-API drivers and `vainfo` are selected
+explicitly so video acceleration can be inspected without changing the NVIDIA
+first-boot driver policy.
+
+EasyEffects is available for user-controlled PipeWire effects. Starlight
+reserves `/usr/share/starlight/easyeffects/presets/` for future validated
+presets, but ships no preset JSON and enables no effects automatically.
+
+`ubuntu-restricted-extras` is intentionally not used because it can pull
+EULA-gated fonts and non-redistributable extras; encrypted DVD CSS support is
+not bundled. The selected codec packages still require legal review before
+commercial release in each target jurisdiction.
+
+## Files, network, and devices
+
+Nautilus remains the file manager and File Roller remains the archive UI.
+`gnome-core` supplies GVFS backends and Sushi integration. Starlight adds
+explicit Debian packages for Avahi/mDNS discovery, `.local` resolution, SMB/CIFS
+clients and mounts, exFAT, NTFS, MTP tools, and 7-Zip archive support. These
+packages complement GNOME and do not replace Nautilus, File Roller, or the
+existing MIME defaults.

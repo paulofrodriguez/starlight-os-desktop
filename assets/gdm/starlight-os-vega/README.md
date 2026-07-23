@@ -14,7 +14,8 @@ um tema comum instalado pelo usuário.
 
 - `assets/starlight-os-vega-4k.png`: fundo real usado pelo GDM.
 - `assets/login-reference.png`: referência visual; não deve ser usada como fundo.
-- `assets/starlight-os-vega-gdm.css`: override visual e posicionamento.
+- `assets/starlight-os-vega-gdm.css`: override visual do GDM, lock screen,
+  diálogos nativos do GNOME Shell, OSDs, switchers e dock.
 - `scripts/install-gdm-theme.sh`: extrai, altera e recompila o gresource.
 - `scripts/validate-gdm-theme.sh`: valida o resultado após a instalação.
 - `scripts/0999-starlight-vega-gdm.hook.chroot`: exemplo para live-build.
