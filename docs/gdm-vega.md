@@ -59,10 +59,11 @@ O Blur my Shell vem do pacote oficial Debian
 live (`blur-my-shell@aunetx`). O pacote Trixie 67-3 declara compatibilidade com
 GNOME Shell 48 e não com o 49; uma atualização de GNOME que altere essa faixa
 de compatibilidade fará o build falhar na resolução de pacotes, como deve ser.
-O tom azul `#0e1f4b` com 5% de opacidade fica restrito ao pipeline
-`pipeline_starlight_app_grid`, usado pelo fundo da visão de aplicativos. O
-painel superior e o Dash to Dock permanecem nos pipelines sem tint para não
-encobrir o degradê e a transparência definidos pelo tema Starlight.
+Os defaults em `/etc/dconf/db/starlight.d/30-starlight-blur-my-shell` limitam a
+extensão ao desfoque do wallpaper na visão geral/grade de aplicativos e ao fundo
+das pastas de aplicativos. O painel superior, Dash to Dock, janelas normais,
+seletor de screenshot, tela de bloqueio e módulos de compatibilidade ficam
+desativados, sem tint ou classes de estilo impostas pelo Blur my Shell.
 
 O aplicativo oficial **Extensions** também é incluído pelo pacote
 `gnome-shell-extension-prefs`, para que extensões instaladas possam ser vistas

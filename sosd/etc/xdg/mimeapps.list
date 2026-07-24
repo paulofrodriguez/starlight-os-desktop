@@ -1,7 +1,7 @@
 [Default Applications]
-text/html=chromium.desktop
-x-scheme-handler/http=chromium.desktop
-x-scheme-handler/https=chromium.desktop
+text/html=firefox-esr.desktop
+x-scheme-handler/http=firefox-esr.desktop
+x-scheme-handler/https=firefox-esr.desktop
 application/vnd.debian.binary-package=gdebi.desktop
 application/x-deb=gdebi.desktop
 application/x-debian-package=gdebi.desktop

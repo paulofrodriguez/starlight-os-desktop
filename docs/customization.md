@@ -33,11 +33,15 @@ profile. Starlight enables Blur my Shell, Dash to Dock, AppIndicator support,
 Caffeine, Tiling Assistant, and the local Starlight Clock Right extension by
 default. Desktop Icons NG is intentionally not shipped because it can cover the
 configured wallpaper with a solid colour on the current Starlight GNOME session.
-Blur my Shell uses a dedicated `pipeline_starlight_app_grid` pipeline for the
-GNOME overview/app-grid tint (`#0e1f4b` at 5% opacity). Do not add that tint to
-`pipeline_default`: the top panel and Dash to Dock also consume shared Blur my
-Shell pipelines, and the dock's own translucent navy styling is managed by Dash
-to Dock defaults.
+Blur my Shell is scoped to the GNOME overview/app-grid wallpaper and
+application-folder dialogs. Its panel, dock, application-window, screenshot,
+lock-screen, window-list, Coverflow Alt-Tab, Hide Top Bar compatibility, and
+Dash to Panel compatibility defaults are disabled so GNOME Shell, the current
+theme, and Dash to Dock own those surfaces. The overview uses the packaged
+`pipeline_default` without a Starlight tint, and `style-components=0` prevents
+Blur my Shell from restyling the top panel, dock, search, or overview controls.
+Application folders keep `style-dialogs=0`, moderate blur, and the GNOME theme's
+dialog colours.
 
 Clipboard Indicator (`clipboard-indicator@tudmotu.com`) and Quick Settings
 Audio Panel (`quick-settings-audio-panel@rayzeq.github.io`) are compatible with

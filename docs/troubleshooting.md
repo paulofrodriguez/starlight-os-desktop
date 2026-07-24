@@ -8,7 +8,7 @@ build.
 
 ## Browser installation fails
 
-Chromium and Firefox ESR are installed from the Debian archive. Check mirror
+Firefox ESR is installed from the Debian archive. Check mirror
 reachability, the package indices in `build/live-build/chroot/var/lib/apt/lists`,
 and whether `main contrib non-free non-free-firmware` are still enabled in
 `config/build.env`.

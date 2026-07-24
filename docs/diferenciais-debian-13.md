@@ -27,7 +27,7 @@ o Debian fornece.
   `Starlight-Colloid-Yellow-Dark`, wallpaper Starlight e fonte monoespacada
   JetBrainsMono Nerd Font.
 - Dock inferior flutuante azul-marinho, com indicadores dourados; favoritos
-  incluem Chromium, Arquivos, Ptyxis, Software e o instalador na sessao live.
+  incluem Firefox ESR, Arquivos, Ptyxis, Software e o instalador na sessao live.
 - Extensoes habilitadas: Dash to Dock, AppIndicator, Caffeine, Tiling
   Assistant, Blur My Shell e a extensao propria que move o relogio para o lado
   direito do painel. O blur e restrito ao overview e a pastas de aplicativos.
@@ -38,9 +38,8 @@ o Debian fornece.
 
 ## Aplicacoes e fluxos escolhidos
 
-- Chromium e o navegador padrao e fica fixado no dock. Firefox ESR permanece
-  como alternativa/fallback, com politicas que removem favoritos padrao e o
-  mecanismo de busca de pacotes Debian.
+- Firefox ESR e o navegador padrao e fica fixado no dock, com politicas que
+  removem favoritos padrao e o mecanismo de busca de pacotes Debian.
 - GNOME Web/Epiphany e o lancador generico `Web Browser` sao removidos para
   evitar navegadores concorrentes na grade de aplicativos.
 - Nautilus e File Roller permanecem como fluxo de arquivos. O sistema inclui

@@ -47,12 +47,11 @@ Debian packages, dconf defaults, and small local GNOME Shell extensions instead
 of forking GNOME Shell.
 
 The upstream-oriented `gnome-core` application set supplies the normal desktop
-utilities without the Ubuntu Desktop metapackage. Chromium is the default web
-browser and the browser pinned to the dock. Firefox ESR remains installed from
-the Debian package archive as a fallback/testing browser, with Starlight
-policies that suppress default bookmarks and the Debian package search shortcut
-for new profiles. GNOME Web/Epiphany and the generic `Web Browser` desktop
-launcher are excluded so the app grid exposes only the real default browser.
+utilities without the Ubuntu Desktop metapackage. Firefox ESR is the default
+web browser and is pinned to the dock, with Starlight policies that suppress
+default bookmarks and the Debian package search shortcut for new profiles.
+Chromium, GNOME Web/Epiphany, and the generic `Web Browser` desktop launcher
+are excluded so the app grid exposes only the default browser.
 Snap is intentionally excluded from the image.
 
 Nautilus and File Roller remain the file workflow. Additional Debian packages

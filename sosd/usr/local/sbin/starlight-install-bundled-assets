@@ -17,10 +17,7 @@ colloid_source=/usr/local/src/starlight-os/colloid
 rm -rf "${colloid_source}"
 mkdir -p "${colloid_source}"
 tar -xzf "${COLLOID_ARCHIVE}" -C "${colloid_source}" --strip-components=1
-bash "${colloid_source}/install.sh" \
-    --dest "${ICON_ROOT}" \
-    --name Starlight-Colloid \
-    --theme yellow
+bash "${colloid_source}/install-starlight.sh" --system
 
 tela_source=/usr/local/src/starlight-os/tela-circle
 rm -rf "${tela_source}"

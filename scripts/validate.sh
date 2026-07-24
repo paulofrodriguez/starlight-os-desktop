@@ -7,6 +7,8 @@ source "${SCRIPT_DIR}/lib.sh"
 load_build_env
 
 errors=0
+starlight_dconf="${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
+blur_my_shell_dconf="${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/30-starlight-blur-my-shell"
 
 require_package() {
     local package_name="$1"
@@ -183,35 +185,69 @@ if ! rg -qx 'binutils' "${PROJECT_ROOT}/packages/gnome.list.chroot"; then
     echo "binutils is required to patch GNOME Shell JS resources." >&2
     ((errors += 1))
 fi
-if ! rg -Fq "'blur-my-shell@aunetx'" \
-    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"; then
+if ! rg -Fq "'blur-my-shell@aunetx'" "${starlight_dconf}"; then
     echo "Blur my Shell is not enabled in the Starlight GNOME defaults." >&2
     ((errors += 1))
 fi
-if ! rg -Fq "pipeline_starlight_app_grid" \
-    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight" || \
-    ! rg -Fq "'color': <(0.054901960784313725, 0.12156862745098039, 0.29411764705882354, 0.05)>" \
-        "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"; then
-    echo "Blur my Shell must define the Starlight app-grid-only blue tint pipeline." >&2
+if [[ ! -f "${blur_my_shell_dconf}" ]]; then
+    echo "Blur my Shell dconf defaults must live in a dedicated Starlight file." >&2
     ((errors += 1))
 fi
-if ! rg -Fxq "pipeline='pipeline_starlight_app_grid'" \
-    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"; then
-    echo "Blur my Shell overview must use the Starlight app-grid tint pipeline." >&2
+if rg -Fq "pipeline_starlight_app_grid" \
+    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d" || \
+    rg -Fq "'color': <(0.054901960784313725, 0.12156862745098039, 0.29411764705882354, 0.05)>" \
+        "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d"; then
+    echo "Blur my Shell must not force the old Starlight app-grid tint pipeline." >&2
     ((errors += 1))
 fi
-if ! rg -Fxq "pipeline='pipeline_default'" \
-    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight" || \
-    ! rg -Fxq "pipeline='pipeline_default_rounded'" \
-        "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"; then
-    echo "Blur my Shell panel and dock must stay on untinted pipelines." >&2
+if ! rg -Fxq "[org/gnome/shell/extensions/blur-my-shell/overview]" "${blur_my_shell_dconf}" || \
+    ! rg -Fxq "pipeline='pipeline_default'" "${blur_my_shell_dconf}" || \
+    ! rg -Fxq "style-components=0" "${blur_my_shell_dconf}"; then
+    echo "Blur my Shell overview must blur only the wallpaper and not style overview components." >&2
     ((errors += 1))
 fi
-if ! rg -Fq "'dash-to-dock@micxgx.gmail.com'" \
-    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"; then
+if ! rg -Fxq "[org/gnome/shell/extensions/blur-my-shell/appfolder]" "${blur_my_shell_dconf}" || \
+    ! rg -Fxq "sigma=30" "${blur_my_shell_dconf}" || \
+    ! rg -Fxq "brightness=0.6" "${blur_my_shell_dconf}" || \
+    ! rg -Fxq "style-dialogs=0" "${blur_my_shell_dconf}"; then
+    echo "Blur my Shell app folders must use moderate blur without overriding GNOME folder styling." >&2
+    ((errors += 1))
+fi
+if [[ "$(rg -c '^blur=true$' "${blur_my_shell_dconf}")" != 2 ]] || \
+    [[ "$(rg -c '^blur=false$' "${blur_my_shell_dconf}")" != 7 ]]; then
+    echo "Blur my Shell must be enabled only for overview and app folders." >&2
+    ((errors += 1))
+fi
+for disabled_blur_my_shell_module in \
+    panel dash-to-dock applications screenshot lockscreen window-list coverflow-alt-tab; do
+    if ! rg -Fxq "[org/gnome/shell/extensions/blur-my-shell/${disabled_blur_my_shell_module}]" \
+        "${blur_my_shell_dconf}"; then
+        echo "Blur my Shell module is not explicitly configured: ${disabled_blur_my_shell_module}" >&2
+        ((errors += 1))
+    fi
+done
+for required_blur_my_shell_default in \
+    "override-background=false" \
+    "force-light-text=false" \
+    "blur-on-overview=false" \
+    "enable-all=false" \
+    "compatibility=false" \
+    "blur-original-panel=false"; do
+    if ! rg -Fxq "${required_blur_my_shell_default}" "${blur_my_shell_dconf}"; then
+        echo "Missing Blur my Shell default: ${required_blur_my_shell_default}" >&2
+        ((errors += 1))
+    fi
+done
+if ! rg -Fq "'dash-to-dock@micxgx.gmail.com'" "${starlight_dconf}"; then
     echo "Dash to Dock is not enabled in the Starlight GNOME defaults." >&2
     ((errors += 1))
 fi
+for dash_to_dock_default in "autohide=false" "intellihide=false" "dock-fixed=true"; do
+    if ! rg -Fxq "${dash_to_dock_default}" "${starlight_dconf}"; then
+        echo "Missing Dash to Dock default: ${dash_to_dock_default}" >&2
+        ((errors += 1))
+    fi
+done
 for enabled_extension in \
     "'ubuntu-appindicators@ubuntu.com'" \
     "'caffeine@patapon.info'" \
@@ -227,14 +263,9 @@ if rg -Fq "'ding@rastersoft.com'" \
     echo "Desktop Icons NG must not be enabled because it hides the wallpaper on this image." >&2
     ((errors += 1))
 fi
-if ! rg -Fq "favorite-apps=['chromium.desktop'" \
+if ! rg -Fq "favorite-apps=['firefox-esr.desktop'" \
     "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"; then
-    echo "Chromium is not pinned as the first GNOME dock favourite." >&2
-    ((errors += 1))
-fi
-if rg -q "favorite-apps=.*firefox" \
-    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"; then
-    echo "Firefox must not be pinned to the GNOME dock by default." >&2
+    echo "Firefox ESR is not pinned as the first GNOME dock favourite." >&2
     ((errors += 1))
 fi
 if ! rg -Fxq "show-weekdate=true" \
@@ -242,10 +273,14 @@ if ! rg -Fxq "show-weekdate=true" \
     echo "GNOME calendar week numbers are not enabled by default." >&2
     ((errors += 1))
 fi
-if ! rg -Fxq 'text/html=chromium.desktop' "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list" || \
-    ! rg -Fxq 'x-scheme-handler/http=chromium.desktop' "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list" || \
-    ! rg -Fxq 'x-scheme-handler/https=chromium.desktop' "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list"; then
-    echo "Chromium is not configured as the default browser." >&2
+if ! rg -Fxq 'text/html=firefox-esr.desktop' "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list" || \
+    ! rg -Fxq 'x-scheme-handler/http=firefox-esr.desktop' "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list" || \
+    ! rg -Fxq 'x-scheme-handler/https=firefox-esr.desktop' "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list"; then
+    echo "Firefox ESR is not configured as the default browser." >&2
+    ((errors += 1))
+fi
+if rg -qx 'chromium' "${PROJECT_ROOT}/packages/build.list.chroot"; then
+    echo "Chromium must not be requested for the image." >&2
     ((errors += 1))
 fi
 if ! rg -Fxq 'application/vnd.debian.binary-package=gdebi.desktop' \
@@ -322,6 +357,11 @@ fi
 if ! rg -Fxq "icon-theme='Starlight-Colloid-Yellow-Dark'" \
     "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"; then
     echo "The Starlight Colloid icon theme is not the default." >&2
+    ((errors += 1))
+fi
+if ! rg -Fxq "button-layout='appmenu:minimize,maximize,close'" \
+    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"; then
+    echo "GNOME window controls must include minimize, maximize, and close." >&2
     ((errors += 1))
 fi
 if ! rg -Fxq "accent-color='yellow'" \

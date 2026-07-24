@@ -2,6 +2,8 @@
 set -Eeuo pipefail
 
 PROJECT_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+STARLIGHT_DCONF="${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
+BMS_DCONF="${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/30-starlight-blur-my-shell"
 
 test -f "${PROJECT_ROOT}/sosd/etc/os-release"
 test -f "${PROJECT_ROOT}/sosd/etc/systemd/system/starlight-firstboot.service"
@@ -35,6 +37,7 @@ test -f "${PROJECT_ROOT}/sosd/etc/skel/.bashrc"
 test -f "${PROJECT_ROOT}/sosd/etc/skel/.profile"
 test -f "${PROJECT_ROOT}/sosd/usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/metadata.json"
 test -f "${PROJECT_ROOT}/sosd/usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/extension.js"
+test -f "${BMS_DCONF}"
 for helper_script in \
     starlight-configure-debian-apt-sources \
     starlight-remove-debian-wallpapers \
@@ -84,49 +87,61 @@ rg -Fq "name 'wallpaper-withlogo'" \
 rg -Fq 'update-alternatives --set' \
     "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-remove-debian-wallpapers"
 rg -Fq "picture-uri='file:///usr/share/backgrounds/starlight/starlight-wallpaper.png'" \
-    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
+    "${STARLIGHT_DCONF}"
 rg -Fxq "accent-color='yellow'" \
-    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
+    "${STARLIGHT_DCONF}"
 rg -Fxq "color-scheme='prefer-dark'" \
-    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
+    "${STARLIGHT_DCONF}"
 rg -Fxq "gtk-theme='Adwaita-dark'" \
-    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
+    "${STARLIGHT_DCONF}"
 rg -Fxq "icon-theme='Starlight-Colloid-Yellow-Dark'" \
-    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
+    "${STARLIGHT_DCONF}"
 rg -Fxq "monospace-font-name='JetBrainsMono Nerd Font 11'" \
-    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
+    "${STARLIGHT_DCONF}"
 rg -Fxq "exec='ptyxis'" \
-    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
+    "${STARLIGHT_DCONF}"
 rg -Fq "'starlight-clock-right@starlightbrasil.com'" \
-    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
-rg -Fq "pipeline_starlight_app_grid" \
-    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
-rg -Fq "'color': <(0.054901960784313725, 0.12156862745098039, 0.29411764705882354, 0.05)>" \
-    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
-rg -Fxq "pipeline='pipeline_starlight_app_grid'" \
-    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
-rg -Fxq "pipeline='pipeline_default'" \
-    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
-rg -Fxq "pipeline='pipeline_default_rounded'" \
-    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
+    "${STARLIGHT_DCONF}"
+! rg -Fq "pipeline_starlight_app_grid" \
+    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d"
+! rg -Fq "'color': <(0.054901960784313725, 0.12156862745098039, 0.29411764705882354, 0.05)>" \
+    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d"
+rg -Fxq "[org/gnome/shell/extensions/blur-my-shell/overview]" "${BMS_DCONF}"
+rg -Fxq "pipeline='pipeline_default'" "${BMS_DCONF}"
+rg -Fxq "style-components=0" "${BMS_DCONF}"
+rg -Fxq "[org/gnome/shell/extensions/blur-my-shell/appfolder]" "${BMS_DCONF}"
+rg -Fxq "sigma=30" "${BMS_DCONF}"
+rg -Fxq "brightness=0.6" "${BMS_DCONF}"
+rg -Fxq "style-dialogs=0" "${BMS_DCONF}"
+rg -Fxq "override-background=false" "${BMS_DCONF}"
+rg -Fxq "force-light-text=false" "${BMS_DCONF}"
+rg -Fxq "blur-on-overview=false" "${BMS_DCONF}"
+rg -Fxq "enable-all=false" "${BMS_DCONF}"
+rg -Fxq "compatibility=false" "${BMS_DCONF}"
+rg -Fxq "blur-original-panel=false" "${BMS_DCONF}"
+[[ "$(rg -c '^blur=true$' "${BMS_DCONF}")" == 2 ]]
+[[ "$(rg -c '^blur=false$' "${BMS_DCONF}")" == 7 ]]
+for blur_my_shell_disabled_module in \
+    panel dash-to-dock applications screenshot lockscreen window-list coverflow-alt-tab; do
+    rg -Fxq "[org/gnome/shell/extensions/blur-my-shell/${blur_my_shell_disabled_module}]" \
+        "${BMS_DCONF}"
+done
 for enabled_extension in \
     "'ubuntu-appindicators@ubuntu.com'" \
     "'caffeine@patapon.info'" \
     "'tiling-assistant@leleat-on-github'"; do
     rg -Fq "${enabled_extension}" \
-        "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
+        "${STARLIGHT_DCONF}"
 done
 ! rg -Fq "'ding@rastersoft.com'" \
-    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
-rg -Fq "favorite-apps=['chromium.desktop'" \
-    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
-! rg -q "favorite-apps=.*firefox" \
-    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
+    "${STARLIGHT_DCONF}"
+rg -Fq "favorite-apps=['firefox-esr.desktop'" \
+    "${STARLIGHT_DCONF}"
 rg -Fxq "show-weekdate=true" \
-    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
-rg -Fxq 'text/html=chromium.desktop' "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list"
-rg -Fxq 'x-scheme-handler/http=chromium.desktop' "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list"
-rg -Fxq 'x-scheme-handler/https=chromium.desktop' "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list"
+    "${STARLIGHT_DCONF}"
+rg -Fxq 'text/html=firefox-esr.desktop' "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list"
+rg -Fxq 'x-scheme-handler/http=firefox-esr.desktop' "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list"
+rg -Fxq 'x-scheme-handler/https=firefox-esr.desktop' "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list"
 rg -Fxq 'application/vnd.debian.binary-package=gdebi.desktop' \
     "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list"
 rg -Fxq 'application/x-deb=gdebi.desktop' "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list"
@@ -332,7 +347,7 @@ rg -Fq 'org.gnome.tweaks.desktop' \
     "${PROJECT_ROOT}/hooks/1000-verify-image.hook.chroot"
 rg -Fq 'Icon=org.gnome.tweaks' \
     "${PROJECT_ROOT}/hooks/1000-verify-image.hook.chroot"
-rg -q '^chromium$' "${PROJECT_ROOT}/packages/build.list.chroot"
+! rg -q '^chromium$' "${PROJECT_ROOT}/packages/build.list.chroot"
 rg -q '^firefox-esr$' "${PROJECT_ROOT}/packages/build.list.chroot"
 rg -q '^user-setup$' "${PROJECT_ROOT}/packages/base.list.chroot"
 ! rg -q '^(snapd|casper|ubuntu-drivers-common)$' \

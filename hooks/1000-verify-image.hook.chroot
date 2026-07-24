@@ -2,9 +2,12 @@
 set -Eeuo pipefail
 trap 'echo "Starlight image verification failed at line ${LINENO}: ${BASH_COMMAND}" >&2' ERR
 
+readonly STARLIGHT_DCONF=/etc/dconf/db/starlight.d/00-starlight
+readonly BMS_DCONF=/etc/dconf/db/starlight.d/30-starlight-blur-my-shell
+
 required_commands=(
     gnome-shell gnome-calculator gnome-calendar gnome-system-monitor
-    gnome-tweaks chromium firefox-esr ffmpeg gst-inspect-1.0 gst-launch-1.0
+    gnome-tweaks firefox-esr ffmpeg gst-inspect-1.0 gst-launch-1.0
     lame unrar vlc pipewire wpctl flatpak git docker podman python3
     pkcon appstreamcli
     seahorse gnome-firmware com.github.tchx84.Flatseal easyeffects vainfo avahi-daemon
@@ -214,30 +217,54 @@ if grep -Rqs '/usr/share/desktop-base/' /usr/share/gnome-background-properties; 
     exit 1
 fi
 test ! -e /usr/share/desktop-base/futureprototype-theme/wallpaper-withlogo
-grep -Fxq "accent-color='yellow'" /etc/dconf/db/starlight.d/00-starlight
-grep -Fxq "color-scheme='prefer-dark'" /etc/dconf/db/starlight.d/00-starlight
-grep -Fxq "gtk-theme='Adwaita-dark'" /etc/dconf/db/starlight.d/00-starlight
-grep -Fxq "icon-theme='Starlight-Colloid-Yellow-Dark'" /etc/dconf/db/starlight.d/00-starlight
-grep -Fq "'starlight-clock-right@starlightbrasil.com'" /etc/dconf/db/starlight.d/00-starlight
-grep -Fq "pipeline_starlight_app_grid" /etc/dconf/db/starlight.d/00-starlight
-grep -Fq "'color': <(0.054901960784313725, 0.12156862745098039, 0.29411764705882354, 0.05)>" /etc/dconf/db/starlight.d/00-starlight
-grep -Fxq "pipeline='pipeline_starlight_app_grid'" /etc/dconf/db/starlight.d/00-starlight
-grep -Fxq "pipeline='pipeline_default'" /etc/dconf/db/starlight.d/00-starlight
-grep -Fxq "pipeline='pipeline_default_rounded'" /etc/dconf/db/starlight.d/00-starlight
-grep -Fq "'ubuntu-appindicators@ubuntu.com'" /etc/dconf/db/starlight.d/00-starlight
-grep -Fq "'caffeine@patapon.info'" /etc/dconf/db/starlight.d/00-starlight
-if grep -Fq "'ding@rastersoft.com'" /etc/dconf/db/starlight.d/00-starlight; then
+grep -Fxq "accent-color='yellow'" "${STARLIGHT_DCONF}"
+grep -Fxq "color-scheme='prefer-dark'" "${STARLIGHT_DCONF}"
+grep -Fxq "gtk-theme='Adwaita-dark'" "${STARLIGHT_DCONF}"
+grep -Fxq "icon-theme='Starlight-Colloid-Yellow-Dark'" "${STARLIGHT_DCONF}"
+grep -Fxq "button-layout='appmenu:minimize,maximize,close'" "${STARLIGHT_DCONF}"
+grep -Fq "'starlight-clock-right@starlightbrasil.com'" "${STARLIGHT_DCONF}"
+test -f "${BMS_DCONF}"
+if grep -Rqs "pipeline_starlight_app_grid" /etc/dconf/db/starlight.d || \
+    grep -Rqs "'color': <(0.054901960784313725, 0.12156862745098039, 0.29411764705882354, 0.05)>" /etc/dconf/db/starlight.d; then
     exit 1
 fi
-grep -Fq "'tiling-assistant@leleat-on-github'" /etc/dconf/db/starlight.d/00-starlight
-grep -Fq "favorite-apps=['chromium.desktop'" /etc/dconf/db/starlight.d/00-starlight
-if grep -Eq "favorite-apps=.*firefox" /etc/dconf/db/starlight.d/00-starlight; then
+grep -Fxq "[org/gnome/shell/extensions/blur-my-shell/overview]" "${BMS_DCONF}"
+grep -Fxq "pipeline='pipeline_default'" "${BMS_DCONF}"
+grep -Fxq "style-components=0" "${BMS_DCONF}"
+grep -Fxq "[org/gnome/shell/extensions/blur-my-shell/appfolder]" "${BMS_DCONF}"
+grep -Fxq "sigma=30" "${BMS_DCONF}"
+grep -Fxq "brightness=0.6" "${BMS_DCONF}"
+grep -Fxq "style-dialogs=0" "${BMS_DCONF}"
+grep -Fxq "override-background=false" "${BMS_DCONF}"
+grep -Fxq "force-light-text=false" "${BMS_DCONF}"
+grep -Fxq "blur-on-overview=false" "${BMS_DCONF}"
+grep -Fxq "enable-all=false" "${BMS_DCONF}"
+grep -Fxq "compatibility=false" "${BMS_DCONF}"
+grep -Fxq "blur-original-panel=false" "${BMS_DCONF}"
+[[ "$(grep -cx 'blur=true' "${BMS_DCONF}")" == 2 ]]
+[[ "$(grep -cx 'blur=false' "${BMS_DCONF}")" == 7 ]]
+for blur_my_shell_disabled_module in \
+    panel dash-to-dock applications screenshot lockscreen window-list coverflow-alt-tab; do
+    grep -Fxq "[org/gnome/shell/extensions/blur-my-shell/${blur_my_shell_disabled_module}]" \
+        "${BMS_DCONF}"
+done
+grep -Fq "'ubuntu-appindicators@ubuntu.com'" "${STARLIGHT_DCONF}"
+grep -Fq "'caffeine@patapon.info'" "${STARLIGHT_DCONF}"
+grep -Fxq "autohide=false" "${STARLIGHT_DCONF}"
+grep -Fxq "intellihide=false" "${STARLIGHT_DCONF}"
+grep -Fxq "dock-fixed=true" "${STARLIGHT_DCONF}"
+if grep -Fq "'ding@rastersoft.com'" "${STARLIGHT_DCONF}"; then
     exit 1
 fi
-grep -Fxq "show-weekdate=true" /etc/dconf/db/starlight.d/00-starlight
-grep -Fxq 'text/html=chromium.desktop' /etc/xdg/mimeapps.list
-grep -Fxq 'x-scheme-handler/http=chromium.desktop' /etc/xdg/mimeapps.list
-grep -Fxq 'x-scheme-handler/https=chromium.desktop' /etc/xdg/mimeapps.list
+grep -Fq "'tiling-assistant@leleat-on-github'" "${STARLIGHT_DCONF}"
+grep -Fq "favorite-apps=['firefox-esr.desktop'" "${STARLIGHT_DCONF}"
+grep -Fxq "show-weekdate=true" "${STARLIGHT_DCONF}"
+grep -Fxq 'text/html=firefox-esr.desktop' /etc/xdg/mimeapps.list
+grep -Fxq 'x-scheme-handler/http=firefox-esr.desktop' /etc/xdg/mimeapps.list
+grep -Fxq 'x-scheme-handler/https=firefox-esr.desktop' /etc/xdg/mimeapps.list
+if command -v chromium >/dev/null 2>&1; then
+    exit 1
+fi
 grep -Fxq 'application/vnd.debian.binary-package=gdebi.desktop' /etc/xdg/mimeapps.list
 grep -Fxq 'application/x-deb=gdebi.desktop' /etc/xdg/mimeapps.list
 grep -Fxq 'application/x-debian-package=gdebi.desktop' /etc/xdg/mimeapps.list
