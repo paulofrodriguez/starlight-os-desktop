@@ -30,8 +30,9 @@ have an explicit state directory.
 System extensions should come from Debian packages whenever possible and must be
 enabled through the Starlight dconf defaults, not by mutating a live user's
 profile. Starlight enables Blur my Shell, Dash to Dock, AppIndicator support,
-Caffeine, Tiling Assistant, and the local Starlight Clock Right extension by
-default. Desktop Icons NG is intentionally not shipped because it can cover the
+Caffeine, Tiling Assistant, MonitorControl, Kiwi Menu, Search Light, and the
+local Starlight Clock Right extension by default. Vitals, GSConnect, and
+OpenWeather are installed for optional use but remain disabled. Desktop Icons NG is intentionally not shipped because it can cover the
 configured wallpaper with a solid colour on the current Starlight GNOME session.
 Blur my Shell is scoped to the GNOME overview/app-grid wallpaper and
 application-folder dialogs. Its panel, dock, application-window, screenshot,
@@ -43,6 +44,12 @@ Blur my Shell from restyling the top panel, dock, search, or overview controls.
 Application folders keep `style-dialogs=0`, moderate blur, and the GNOME theme's
 dialog colours.
 
+The official GNOME Extensions API is used at build time for the extensions that
+Debian does not package. The Firefox `gnome-browser-connector` package is also
+included, so the GNOME Extensions website can manage them after installation.
+Search Light is configured with Ctrl+Space. MonitorControl uses Debian's
+`ddcutil` and `i2c-tools`; Calamares adds installed users to the `i2c` group.
+
 Clipboard Indicator (`clipboard-indicator@tudmotu.com`) and Quick Settings
 Audio Panel (`quick-settings-audio-panel@rayzeq.github.io`) are compatible with
 GNOME Shell 48 according to GNOME Extensions, but they are not present as direct
@@ -53,12 +60,9 @@ pinning strategy.
 
 ## Drivers
 
-Firmware and CPU microcode are package-list concerns. Proprietary drivers must
-not be embedded silently. The first-boot service detects PCI vendor `10de` and
-installs Debian's NVIDIA Wayland stack (`nvidia-driver`,
-`nvidia-open-kernel-dkms`, `libnvidia-egl-wayland1`, `nvidia-vaapi-driver`,
-`nvidia-settings`, and `firmware-misc-nonfree`). Add future driver families as
-independent functions with separate logs and failure handling.
+Firmware and CPU microcode are package-list concerns. The image uses Debian's
+standard firmware and Mesa/VA-API stack; proprietary drivers are not installed
+automatically during first boot.
 
 GNOME's native "Launch using Dedicated Graphics Card" integration is provided
 by `switcheroo-control`, which is installed and enabled in the image. The menu
@@ -111,12 +115,12 @@ client tools, Bluetooth audio, and graphical routing/volume tools. Multimedia
 support includes GStreamer base/good/bad/ugly, FFmpeg, libav, VA-API, VDPAU,
 LAME, DVD read/navigation libraries, RAR support, VLC, MPV, and GNOME metadata
 extraction plugins. Intel/Mesa VA-API drivers and `vainfo` are selected
-explicitly so video acceleration can be inspected without changing the NVIDIA
-first-boot driver policy.
+explicitly so video acceleration can be inspected with the standard graphics
+stack.
 
-EasyEffects is available for user-controlled PipeWire effects. Starlight
-reserves `/usr/share/starlight/easyeffects/presets/` for future validated
-presets, but ships no preset JSON and enables no effects automatically.
+Audio is provided by the standard PipeWire/WirePlumber stack. Pavucontrol is
+available for routing and device selection; no effects processor is enabled by
+default.
 
 `ubuntu-restricted-extras` is intentionally not used because it can pull
 EULA-gated fonts and non-redistributable extras; encrypted DVD CSS support is

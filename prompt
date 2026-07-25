@@ -135,12 +135,6 @@ Instalar automaticamente:
 - microcodes Intel
 - microcodes AMD
 
-Preparar suporte para NVIDIA.
-
-Não instalar driver proprietário na ISO.
-
-Criar mecanismo que detecte GPU NVIDIA no primeiro boot e instale automaticamente o driver proprietário recomendado utilizando os repositórios oficiais do Ubuntu.
-
 Registrar logs.
 
 Caso falhe, continuar normalmente.
@@ -220,8 +214,6 @@ Responsável por:
 detectar hardware
 
 registrar informações
-
-instalar drivers NVIDIA quando necessário
 
 configurar Flatpak
 

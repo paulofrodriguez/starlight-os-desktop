@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# WPS Office's bundled UI has no Portuguese locale and otherwise shows its
+# first-run licence page in Chinese. This affects WPS only, not the desktop.
+export LANGUAGE=en_US:en
+export LC_MESSAGES=en_US.UTF-8
+exec /usr/local/bin/wps.starlight-real "$@"

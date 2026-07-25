@@ -2,6 +2,7 @@
   "uuid": "starlight-clock-right@starlightbrasil.com",
   "name": "Starlight Clock Right",
   "description": "Moves the native GNOME date and notifications menu to the right side of the top panel.",
+  "icon": "starlight-calamares-light.png",
   "shell-version": [
     "48"
   ],

@@ -25,6 +25,23 @@ mkdir -p "${tela_source}"
 tar -xzf "${TELA_ARCHIVE}" -C "${tela_source}" --strip-components=1
 bash "${tela_source}/install.sh" -d "${ICON_ROOT}" yellow
 
+# Web App Manager 1.4.6 uses XApp symbolic action names. Tela ships these
+# icons, while the selected Starlight Colloid theme does not. Copy them into
+# the default theme so Add, Remove, Edit, Run, and Find icon controls render.
+starlight_icon_root="${ICON_ROOT}/Starlight-Colloid-Yellow-Dark"
+install -d -m 0755 \
+    "${starlight_icon_root}/actions/symbolic" \
+    "${starlight_icon_root}/apps/symbolic"
+for icon in xsi-list-add-symbolic xsi-list-remove-symbolic \
+    xsi-document-edit-symbolic xsi-insert-image-symbolic; do
+    install -m 0644 \
+        "${ICON_ROOT}/Tela-circle-yellow-dark/symbolic/actions/${icon}.svg" \
+        "${starlight_icon_root}/actions/symbolic/${icon}.svg"
+done
+install -m 0644 \
+    "${ICON_ROOT}/Tela-circle-yellow-dark/symbolic/apps/xsi-web-browser-symbolic.svg" \
+    "${starlight_icon_root}/apps/symbolic/xsi-web-browser-symbolic.svg"
+
 install_wps_office() {
     local postinst=/var/lib/dpkg/info/wps-office.postinst
     local postinst_backup=/var/lib/dpkg/info/wps-office.postinst.starlight-original
@@ -57,6 +74,14 @@ EOF
 }
 
 install_wps_office
+
+# WPS falls back to Chinese for the first-run licence dialog when the selected
+# desktop locale is not shipped by that vendor build. Keep the wrapper in
+# /usr/local so package upgrades cannot remove the English locale override.
+if [[ -x /usr/bin/wps ]]; then
+    install -m 0755 /usr/bin/wps /usr/local/bin/wps.starlight-real
+    install -m 0755 /usr/local/bin/wps.starlight-wrapper /usr/local/bin/wps
+fi
 apt-get install -y --allow-downgrades \
     "${LINUXTOYS_PACKAGE}" \
     "${WEBAPP_MANAGER_PACKAGE}"

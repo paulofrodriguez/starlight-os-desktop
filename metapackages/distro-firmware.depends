@@ -4,5 +4,7 @@ firmware-misc-nonfree
 firmware-realtek
 firmware-mediatek
 firmware-iwlwifi
+firmware-sof-signed
+firmware-intel-sound
 intel-microcode
 amd64-microcode

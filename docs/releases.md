@@ -6,7 +6,7 @@
 4. Run validation and static tests from a clean checkout.
 5. Build twice from clean state and compare manifests and ISO checksums.
 6. Boot-test BIOS and UEFI paths in QEMU and test installation on an empty disk.
-7. Test representative Intel, AMD, and NVIDIA hardware.
+7. Test representative Intel and AMD hardware.
 8. Sign the checksum and release metadata with the project release key.
 9. Publish the ISO, checksum, signature, source commit, package manifest, and
    known issues.
@@ -19,4 +19,3 @@ retention are production-ready.
 
 Commercial distribution requires a separate legal review of trademarks,
 codecs, firmware, proprietary-driver consent, export requirements, and licenses.
-

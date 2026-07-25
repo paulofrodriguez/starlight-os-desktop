@@ -26,14 +26,20 @@ biblioteca original em `/usr/lib/starlight-os/backups/libshell-16.so.original`.
 O bloco entre `STARLIGHT_OS_VEGA_GDM_BEGIN` e `STARLIGHT_OS_VEGA_GDM_END` é
 removido antes de uma nova aplicação, tornando a operação idempotente.
 
-O formulário permanece sendo o diálogo nativo e funcional do GDM. O seletor
-`#lockDialogGroup` só aplica o fundo. O deslocamento real para a direita fica
+O formulário permanece sendo o diálogo nativo e funcional do GDM. O wallpaper
+do login é aplicado em `.login-dialog`, que o GNOME Shell restringe ao monitor
+primário com `Layout.MonitorConstraint({primary: true})`. O ator global
+`#lockDialogGroup` recebe apenas a cor de fallback; nos atores por monitor, o
+CSS usa `background-size: 100% 100%` para evitar que `cover` amplie e recorte a
+imagem em layouts com monitores ultrawide ou de proporções diferentes. Nas
+telas secundárias, o GDM mantém o fundo azul-marinho, sem esticar uma única
+imagem através de toda a área virtual.
+O deslocamento real para a direita fica
 no `loginDialog.js`, que posiciona tanto a seleção de usuário quanto o prompt
 de senha com margem direita proporcional e mínimo de 48 px. O fundo é aplicado
-tanto em `#lockDialogGroup` quanto em
-`.screen-shield-background`, cobrindo a tela inicial do GDM e o diálogo de
-autenticação. Os seletores foram confirmados no GNOME Shell 48.7 do Debian 13
-Trixie.
+em `.screen-shield-background` por monitor na tela de bloqueio; o relógio da
+tela de bloqueio recebe o mesmo alinhamento visual à direita. Os seletores
+foram confirmados no GNOME Shell 48.7 do Debian 13 Trixie.
 
 O mesmo recurso é usado pelo GNOME Shell da sessão. Por isso, o override Vega
 também deixa o painel superior azul-marinho, o dash da Visão Geral e o Dash to

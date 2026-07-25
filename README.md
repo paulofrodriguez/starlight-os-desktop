@@ -13,7 +13,7 @@ On a supported Debian or Ubuntu build host:
 
 ```bash
 sudo apt install live-build debootstrap squashfs-tools xorriso \
-  isolinux syslinux-common qemu-system-x86 ovmf shellcheck
+  isolinux syslinux-common qemu-system-x86 ovmf shellcheck ripgrep
 make validate
 sudo make build
 make test

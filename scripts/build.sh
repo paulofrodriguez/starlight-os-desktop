@@ -170,6 +170,8 @@ rsync -a "${PROJECT_ROOT}/packages/" config/package-lists/
 find config/hooks -mindepth 1 -maxdepth 1 -type f -name '*.hook.chroot' -delete
 rsync -a "${PROJECT_ROOT}/hooks/" config/hooks/
 rsync -a "${PROJECT_ROOT}/sosd/" config/includes.chroot/
+install -m 0644 "${PROJECT_ROOT}/branding/starlight-calamares-light.png" \
+    config/includes.chroot/usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/starlight-calamares-light.png
 install -D -m 0644 "${PROJECT_ROOT}/flatpaks/system-apps.txt" \
     config/includes.chroot/usr/share/starlight/flatpaks/system-apps.txt
 install -d -m 0755 config/includes.chroot/opt/starlight-os/third-party

@@ -31,27 +31,11 @@ if command -v flatpak >/dev/null 2>&1; then
     flatpak remote-add --system --if-not-exists flathub \
         https://flathub.org/repo/flathub.flatpakrepo || true
     flatpak update --system --appstream --noninteractive || true
-    for application in com.mitchellh.ghostty com.rtosta.zapzap; do
+    for application in com.mitchellh.ghostty com.rtosta.zapzap io.github.kolunmi.Bazaar; do
         flatpak install --system --noninteractive --or-update flathub \
             "${application}" || \
             echo "Flatpak installation failed for ${application}; continuing."
     done
-fi
-
-if lspci -nnd 10de: | grep -q .; then
-    echo "NVIDIA GPU detected; installing the Debian NVIDIA driver stack."
-    export DEBIAN_FRONTEND=noninteractive
-    apt-get update || true
-    apt-get install -y \
-        nvidia-driver \
-        nvidia-open-kernel-dkms \
-        libnvidia-egl-wayland1 \
-        nvidia-vaapi-driver \
-        nvidia-settings \
-        firmware-misc-nonfree || \
-        echo "NVIDIA driver installation failed; continuing."
-else
-    echo "No NVIDIA GPU detected."
 fi
 
 touch "${DONE_FILE}"

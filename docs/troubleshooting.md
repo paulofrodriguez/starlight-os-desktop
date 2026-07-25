@@ -29,9 +29,3 @@ stage instead of during `rsync`.
 Open `build/artifacts/qemu-boot.log`. Confirm the boot menu passes the serial
 console argument and check for kernel panic, missing squashfs, live-boot, or GDM
 errors. Increase the timeout only after ruling out a real failure.
-
-## NVIDIA first boot fails
-
-Read `/var/log/starlight/firstboot.log`. The failure is non-fatal by design.
-Verify internet connectivity, Secure Boot enrollment requirements, enabled
-Debian archive areas, and the Debian NVIDIA package branch.

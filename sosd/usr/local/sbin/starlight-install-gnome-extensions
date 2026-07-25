@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# Install GNOME Extensions from the official extensions.gnome.org API. The API
+# selects the latest reviewed build compatible with the image's GNOME 48.
+readonly EXTENSION_ROOT=/usr/share/gnome-shell/extensions
+readonly API_ROOT=https://extensions.gnome.org/extension-info/
+
+install_extension() {
+    local pk="$1"
+    local enabled="$2"
+    local info uuid download_url archive extension_dir
+
+    info="$(curl --fail --silent --show-error --location \
+        "${API_ROOT}?pk=${pk}&shell_version=48")"
+    uuid="$(jq -er '.uuid' <<<"${info}")"
+    download_url="$(jq -er '.download_url' <<<"${info}")"
+    extension_dir="${EXTENSION_ROOT}/${uuid}"
+    archive="$(mktemp --suffix=.zip /tmp/starlight-extension.XXXXXX)"
+    trap 'rm -f "${archive}"' RETURN
+
+    curl --fail --silent --show-error --location --retry 3 \
+        --output "${archive}" "${download_url}"
+    rm -rf "${extension_dir}"
+    install -d -m 0755 "${extension_dir}"
+    unzip -q "${archive}" -d "${extension_dir}"
+    find "${extension_dir}" -type d -exec chmod 0755 {} +
+    find "${extension_dir}" -type f -exec chmod 0644 {} +
+    [[ "${enabled}" == true ]] && echo "Installed and enabled: ${uuid}" || \
+        echo "Installed but disabled: ${uuid}"
+}
+
+# MonitorControl, Kiwi Menu and Search Light are enabled by dconf defaults.
+install_extension 6325 true
+install_extension 8697 true
+install_extension 5489 true
+
+# Keep Vitals available in Extensions for users who want it, but do not put it
+# in the default enabled-extensions list. GSConnect and OpenWeather come from
+# the Debian packages listed in the image package group.
+install_extension 1460 false
+
+# Kiwi's schema uses an icon index. Point the first slot at a bundled Starlight
+# image. The upstream extension stores the selectable icon list in
+# src/icons.json; replacing a guessed icon.png does not change what Kiwi
+# displays.
+kiwi_dir="$(find "${EXTENSION_ROOT}" -maxdepth 1 -type d -name 'kiwi*' -print -quit)"
+if [[ -n "${kiwi_dir}" && \
+    -f /usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/starlight-calamares-light.png ]]; then
+    icon_source=/usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/starlight-calamares-light.png
+    icon_target="${kiwi_dir}/src/starlight-menu.png"
+    icons_json="${kiwi_dir}/src/icons.json"
+    install -D -m 0644 "${icon_source}" "${icon_target}"
+    sed -i '0,/\/icons\/gnome-icon-symbolic\.svg/s|/icons/gnome-icon-symbolic.svg|/src/starlight-menu.png|' "${icons_json}"
+    grep -Fq '"path": "/src/starlight-menu.png"' "${icons_json}"
+fi

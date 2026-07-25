@@ -1,11 +1,17 @@
 /* STARLIGHT_OS_VEGA_GDM_BEGIN */
 /* Debian 13 / GNOME Shell 48 selectors verified during the image build. */
 .screen-shield-background,
-#lockDialogGroup {
+.login-dialog {
   background: #050b16 url("resource:///org/gnome/shell/theme/starlight-os-vega-4k.png");
-  background-size: cover;
+  /* Fit each monitor independently; cover magnifies/crops on ultrawide and
+   * mixed-aspect multi-monitor layouts. */
+  background-size: 100% 100%;
   background-position: center;
   background-repeat: no-repeat;
+}
+
+#lockDialogGroup {
+  background-color: #050b16;
 }
 
 .login-dialog {
@@ -341,6 +347,12 @@
 .unlock-dialog-clock .unlock-dialog-clock-hint,
 .unlock-dialog .user-widget .user-widget-label {
   color: #f1eee6;
+}
+
+/* Keep the lock-screen clock aligned with the right-hand login composition. */
+.unlock-dialog-clock {
+  x-align: end;
+  margin-right: 5.5em;
 }
 
 .end-session-dialog .end-session-dialog-battery-warning,

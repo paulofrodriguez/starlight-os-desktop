@@ -12,6 +12,13 @@ gnome-shell-extension-caffeine
 gnome-shell-extension-dashtodock
 gnome-shell-extension-prefs
 gnome-shell-extension-tiling-assistant
+gnome-shell-extension-gsconnect
+gnome-shell-extension-weather
+gnome-browser-connector
+ddcutil
+i2c-tools
+curl
+unzip
 nautilus
 gnome-software
 gnome-software-plugin-flatpak

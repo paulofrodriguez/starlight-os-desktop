@@ -6,6 +6,9 @@ firmware-misc-nonfree
 firmware-realtek
 firmware-mediatek
 firmware-iwlwifi
+firmware-atheros
+firmware-sof-signed
+firmware-intel-sound
 intel-microcode
 amd64-microcode
 systemd-sysv
@@ -23,9 +26,16 @@ live-config-systemd
 user-setup
 network-manager
 network-manager-gnome
-openssh-server
+wpasupplicant
+wireless-regdb
+rfkill
 pciutils
 usbutils
+wireless-tools
+iw
+net-tools
+iproute2
+openssh-server
 lshw
 jq
 zstd

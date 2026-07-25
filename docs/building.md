@@ -12,7 +12,7 @@ Install:
 ```bash
 sudo apt-get update
 sudo apt-get install live-build debootstrap squashfs-tools xorriso \
-  isolinux syslinux-common qemu-system-x86 ovmf shellcheck rsync
+  isolinux syslinux-common qemu-system-x86 ovmf shellcheck rsync ripgrep
 ```
 
 ## Workflow

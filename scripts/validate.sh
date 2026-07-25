@@ -292,6 +292,14 @@ if ! rg -Fxq 'application/vnd.debian.binary-package=gdebi.desktop' \
     echo "Debian packages are not configured to open with GDebi by default." >&2
     ((errors += 1))
 fi
+for image_mime in \
+    image/bmp image/gif image/jpeg image/png image/svg+xml image/tiff image/webp; do
+    if ! rg -Fxq "${image_mime}=org.gnome.eog.desktop" \
+        "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list"; then
+        echo "${image_mime} is not configured to open with Eye of GNOME." >&2
+        ((errors += 1))
+    fi
+done
 if rg -q '^application/(vnd\.debian\.binary-package|x-deb|x-debian-package)=.*(file-roller|FileRoller)' \
     "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list"; then
     echo "Debian packages must not open with File Roller by default." >&2
@@ -519,8 +527,6 @@ require_package 'vdpau-driver-all' 'audio-codecs.list.chroot' \
     'VDPAU driver metapackage is not requested by the codec package list.'
 require_package 'vainfo' 'audio-codecs.list.chroot' \
     'VA-API inspection tool is not requested by the codec package list.'
-require_package 'easyeffects' 'audio-codecs.list.chroot' \
-    'EasyEffects is not requested by the codec/audio package list.'
 require_package 'lame' 'audio-codecs.list.chroot' \
     'LAME MP3 encoder is not requested by the codec package list.'
 require_package 'libdvdnav4' 'audio-codecs.list.chroot' \
@@ -552,7 +558,7 @@ require_package 'fonts-cascadia-code' 'terminal-fonts.list.chroot' \
 require_package 'fonts-noto-color-emoji' 'terminal-fonts.list.chroot' \
     'Noto Color Emoji terminal font is not requested.'
 require_package 'firmware-misc-nonfree' 'base.list.chroot' \
-    'NVIDIA-capable firmware package is not requested by the base package list.'
+    'Standard non-free firmware package is not requested by the base package list.'
 require_package 'xdg-desktop-portal' 'gnome.list.chroot' \
     'Wayland desktop portal is not requested by the GNOME package list.'
 require_package 'xdg-desktop-portal-gtk' 'gnome.list.chroot' \
@@ -615,7 +621,7 @@ for files_device_package in \
         ((errors += 1))
     fi
 done
-for metapackage_media_entry in easyeffects va-driver-all vdpau-driver-all vainfo; do
+for metapackage_media_entry in va-driver-all vdpau-driver-all vainfo; do
     if ! rg -qx "${metapackage_media_entry}" \
         "${PROJECT_ROOT}/metapackages/distro-codecs-media.depends"; then
         echo "Media package is missing from distro-codecs-media: ${metapackage_media_entry}" >&2
@@ -629,14 +635,6 @@ for metapackage_polish_entry in gnome-firmware flatseal switcheroo-control; do
         ((errors += 1))
     fi
 done
-easyeffects_presets="${PROJECT_ROOT}/sosd/usr/share/starlight/easyeffects/presets"
-if [[ ! -f "${easyeffects_presets}/README.md" ]]; then
-    echo "EasyEffects preset directory must contain a README placeholder." >&2
-    ((errors += 1))
-elif find "${easyeffects_presets}" -maxdepth 1 -type f -name '*.json' | grep -q .; then
-    echo "EasyEffects preset JSON files must not ship before technical validation." >&2
-    ((errors += 1))
-fi
 require_package 'gir1.2-xapp-1.0' 'webapps-support.list.chroot' \
     'XApp introspection data is not requested for WebApp Manager.'
 require_package 'xapps-common' 'webapps-support.list.chroot' \
@@ -736,6 +734,15 @@ if ! rg -Fq 'WEBAPP_MANAGER_PACKAGE' \
     echo "WebApp Manager is not installed from the bundled Linux Mint package." >&2
     ((errors += 1))
 fi
+for webapp_icon in \
+    xsi-list-add-symbolic xsi-list-remove-symbolic xsi-document-edit-symbolic \
+    xsi-web-browser-symbolic xsi-insert-image-symbolic; do
+    if ! rg -Fq "${webapp_icon}" \
+        "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-install-bundled-assets"; then
+        echo "Web App Manager icon compatibility is missing: ${webapp_icon}." >&2
+        ((errors += 1))
+    fi
+done
 if ! rg -Fq 'apt-mark manual' \
     "${PROJECT_ROOT}/hooks/010-configure-system.hook.chroot"; then
     echo "Bootloader support packages must be marked manual in the installed target." >&2
@@ -1140,6 +1147,13 @@ if rg -q 'padding-left: 42%;' "${vega_root}/assets/starlight-os-vega-gdm.css"; t
 fi
 if ! rg -q '//RIGHT' "${vega_root}/scripts/install-gdm-theme.sh"; then
     echo "The GNOME Shell login dialog right-side patch is absent." >&2
+    ((errors += 1))
+fi
+if ! rg -Fq '.login-dialog {' \
+    "${vega_root}/assets/starlight-os-vega-gdm.css" || \
+    rg -Uq '#lockDialogGroup[[:space:]]*\{[^}]*url\(' \
+    "${vega_root}/assets/starlight-os-vega-gdm.css"; then
+    echo "The GDM wallpaper must be sized on the primary monitor, not the combined monitor stage." >&2
     ((errors += 1))
 fi
 

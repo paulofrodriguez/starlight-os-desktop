@@ -73,14 +73,11 @@ o Debian fornece.
 ## Midia, hardware e jogos
 
 - Pilha de audio moderna com PipeWire, Bluetooth, JACK/Pulse/ALSA,
-  EasyEffects, Helvum e Pavucontrol.
+  Helvum e Pavucontrol.
 - Codecs e ferramentas para video e midia: FFmpeg, GStreamer, VLC, MPV, GIMP,
   VA-API, VDPAU e suporte a DVD.
 - Firmware Debian para dispositivos comuns, incluindo Intel, AMD, Realtek,
   MediaTek e Wi-Fi Intel, alem de microcode Intel e AMD.
-- No primeiro boot, quando uma GPU NVIDIA e detectada, a imagem tenta instalar
-  a pilha NVIDIA do repositorio Debian, incluindo DKMS open, EGL Wayland,
-  VA-API e ferramentas de configuracao. A falha nao bloqueia a sessao.
 - Perfil de jogos com Steam, suporte i386, GameMode, MangoHud, GOverlay,
   Vulkan, Mesa e vkBasalt.
 
@@ -95,8 +92,8 @@ o Debian fornece.
   habilitado, entra diretamente na sessao live. Isso e um recurso da midia de
   instalacao, nao uma conta padrao criada no sistema instalado.
 - O primeiro boot instalado registra inventario local minimo de hardware em
-  `/var/lib/starlight`, configura Flathub e executa a deteccao de NVIDIA. O
-  inventario nao e enviado para servicos externos.
+  `/var/lib/starlight` e configura Flathub. O inventario nao e enviado para
+  servicos externos.
 
 ## Higiene, manutencao e limites
 

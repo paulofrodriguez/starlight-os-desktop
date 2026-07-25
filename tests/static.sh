@@ -27,7 +27,6 @@ test -f "${PROJECT_ROOT}/sosd/lib/live/config/0035-starlight-user"
 test -f "${PROJECT_ROOT}/sosd/usr/local/bin/starlight-launch-installer"
 test -f "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-run-installer"
 test -f "${PROJECT_ROOT}/sosd/usr/share/firefox-esr/distribution/policies.json"
-test -f "${PROJECT_ROOT}/sosd/usr/share/starlight/easyeffects/presets/README.md"
 test -f "${PROJECT_ROOT}/docs/metapackages.md"
 test -f "${PROJECT_ROOT}/packages/files-devices.list.chroot"
 test -f "${PROJECT_ROOT}/metapackages/distro-files-devices.depends"
@@ -37,6 +36,20 @@ test -f "${PROJECT_ROOT}/sosd/etc/skel/.bashrc"
 test -f "${PROJECT_ROOT}/sosd/etc/skel/.profile"
 test -f "${PROJECT_ROOT}/sosd/usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/metadata.json"
 test -f "${PROJECT_ROOT}/sosd/usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/extension.js"
+test -x "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-install-gnome-extensions"
+test -x "${PROJECT_ROOT}/sosd/usr/local/bin/wps.starlight-wrapper"
+test -x "${PROJECT_ROOT}/sosd/usr/local/bin/starlight-steam"
+rg -Fq -- '-no-cef-sandbox -cef-disable-gpu' \
+    "${PROJECT_ROOT}/sosd/usr/local/bin/starlight-steam"
+rg -Fq 'chmod 0755 /usr/local/bin/starlight-steam' \
+    "${PROJECT_ROOT}/hooks/010-configure-system.hook.chroot"
+rg -Fq 'Exec=/usr/local/bin/starlight-steam' \
+    "${PROJECT_ROOT}/hooks/010-configure-system.hook.chroot"
+rg -Fq 'sed -i '\''s|Exec=/usr/games/steam|Exec=/usr/local/bin/starlight-steam|g'\''' \
+    "${PROJECT_ROOT}/hooks/010-configure-system.hook.chroot"
+rg -Fq '"icon": "starlight-calamares-light.png"' \
+    "${PROJECT_ROOT}/sosd/usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/metadata.json"
+rg -Fq 'branding/starlight-calamares-light.png' "${PROJECT_ROOT}/scripts/build.sh"
 test -f "${BMS_DCONF}"
 for helper_script in \
     starlight-configure-debian-apt-sources \
@@ -102,6 +115,16 @@ rg -Fxq "exec='ptyxis'" \
     "${STARLIGHT_DCONF}"
 rg -Fq "'starlight-clock-right@starlightbrasil.com'" \
     "${STARLIGHT_DCONF}"
+for extension_id in \
+    monitor-brightness-volume@ailin.nemui \
+    kiwimenu@kemma \
+    search-light@icedman.github.com; do
+    rg -Fq "'${extension_id}'" "${STARLIGHT_DCONF}"
+done
+rg -Fxq "shortcut-search=['<Control>space']" "${STARLIGHT_DCONF}"
+! rg -Fq "'Vitals@CoreCoding.com'" "${STARLIGHT_DCONF}"
+! rg -Fq "'gsconnect@andyholmes.github.io'" "${STARLIGHT_DCONF}"
+! rg -Fq "'openweather-extension@jensizaek.com'" "${STARLIGHT_DCONF}"
 ! rg -Fq "pipeline_starlight_app_grid" \
     "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d"
 ! rg -Fq "'color': <(0.054901960784313725, 0.12156862745098039, 0.29411764705882354, 0.05)>" \
@@ -147,6 +170,11 @@ rg -Fxq 'application/vnd.debian.binary-package=gdebi.desktop' \
 rg -Fxq 'application/x-deb=gdebi.desktop' "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list"
 rg -Fxq 'application/x-debian-package=gdebi.desktop' \
     "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list"
+for image_mime in \
+    image/bmp image/gif image/jpeg image/png image/svg+xml image/tiff image/webp; do
+    rg -Fxq "${image_mime}=org.gnome.eog.desktop" \
+        "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list"
+done
 ! rg -q '^application/(vnd\.debian\.binary-package|x-deb|x-debian-package)=.*(file-roller|FileRoller)' \
     "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list"
 python3 -c 'import json, pathlib, sys; policies = json.loads(pathlib.Path(sys.argv[1]).read_text())["policies"]; assert policies["NoDefaultBookmarks"] is True; assert "Debian packages" in policies["SearchEngines"]["Remove"]' \
@@ -240,11 +268,10 @@ rg -Fq 'wps-office2023-wpsmain.svg' \
     "${PROJECT_ROOT}/hooks/1000-verify-image.hook.chroot"
 rg -q 'com.mitchellh.ghostty' \
     "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-firstboot"
-rg -q 'nvidia-open-kernel-dkms' \
-    "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-firstboot"
-rg -q 'libnvidia-egl-wayland1' \
+rg -q 'io.github.kolunmi.Bazaar' \
     "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-firstboot"
 rg -q '^com.rtosta.zapzap$' "${PROJECT_ROOT}/flatpaks/system-apps.txt"
+rg -q '^io.github.kolunmi.Bazaar$' "${PROJECT_ROOT}/flatpaks/system-apps.txt"
 rg -Fq 'flatpak install --system --noninteractive --or-update flathub' \
     "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-install-bundled-assets"
 rg -Fq 'install_wps_office' \
@@ -259,6 +286,12 @@ rg -q 'LINUXTOYS_PACKAGE' \
     "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-install-bundled-assets"
 rg -q 'WEBAPP_MANAGER_PACKAGE' \
     "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-install-bundled-assets"
+for webapp_icon in \
+    xsi-list-add-symbolic xsi-list-remove-symbolic xsi-document-edit-symbolic \
+    xsi-web-browser-symbolic xsi-insert-image-symbolic; do
+    rg -Fq "${webapp_icon}" \
+        "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-install-bundled-assets"
+done
 rg -Fq 'rm -rf "${ASSET_ROOT}"' \
     "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-install-bundled-assets"
 rg -Fq 'apt-mark manual' "${PROJECT_ROOT}/hooks/010-configure-system.hook.chroot"
@@ -350,6 +383,8 @@ rg -Fq 'Icon=org.gnome.tweaks' \
 ! rg -q '^chromium$' "${PROJECT_ROOT}/packages/build.list.chroot"
 rg -q '^firefox-esr$' "${PROJECT_ROOT}/packages/build.list.chroot"
 rg -q '^user-setup$' "${PROJECT_ROOT}/packages/base.list.chroot"
+rg -q '^firmware-sof-signed$' "${PROJECT_ROOT}/packages/base.list.chroot"
+rg -q '^firmware-intel-sound$' "${PROJECT_ROOT}/packages/base.list.chroot"
 ! rg -q '^(snapd|casper|ubuntu-drivers-common)$' \
     "${PROJECT_ROOT}/packages" --glob '*.list.chroot'
 rg -q '^gnome-core$' "${PROJECT_ROOT}/packages/gnome.list.chroot"
@@ -450,18 +485,14 @@ rg -q '^gstreamer1.0-vaapi$' "${PROJECT_ROOT}/packages/audio-codecs.list.chroot"
 rg -q '^va-driver-all$' "${PROJECT_ROOT}/packages/audio-codecs.list.chroot"
 rg -q '^vdpau-driver-all$' "${PROJECT_ROOT}/packages/audio-codecs.list.chroot"
 rg -q '^vainfo$' "${PROJECT_ROOT}/packages/audio-codecs.list.chroot"
-rg -q '^easyeffects$' "${PROJECT_ROOT}/packages/audio-codecs.list.chroot"
 rg -q '^va-driver-all$' "${PROJECT_ROOT}/metapackages/distro-codecs-media.depends"
 rg -q '^vdpau-driver-all$' "${PROJECT_ROOT}/metapackages/distro-codecs-media.depends"
 rg -q '^vainfo$' "${PROJECT_ROOT}/metapackages/distro-codecs-media.depends"
-rg -q '^easyeffects$' "${PROJECT_ROOT}/metapackages/distro-codecs-media.depends"
 rg -q '^lame$' "${PROJECT_ROOT}/packages/audio-codecs.list.chroot"
 rg -q '^libdvdnav4$' "${PROJECT_ROOT}/packages/audio-codecs.list.chroot"
 rg -q '^libdvdread8t64$' "${PROJECT_ROOT}/packages/audio-codecs.list.chroot"
 rg -q '^unrar$' "${PROJECT_ROOT}/packages/audio-codecs.list.chroot"
 rg -q '^vlc$' "${PROJECT_ROOT}/packages/audio-codecs.list.chroot"
-! find "${PROJECT_ROOT}/sosd/usr/share/starlight/easyeffects/presets" \
-    -maxdepth 1 -type f -name '*.json' | grep -q .
 rg -q '^NERD_FONT_SHA256=[0-9a-f]{64}$' "${PROJECT_ROOT}/config/assets.env"
 rg -q '/run/live/medium/live/filesystem.squashfs' \
     "${PROJECT_ROOT}/installer/modules/unpackfs.conf"

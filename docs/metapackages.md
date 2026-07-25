@@ -8,12 +8,12 @@ Debian metapackages and post-install installers.
 
 - `distro-desktop-gnome`: GNOME, Wayland, portals, PipeWire, and common
   desktop applications plus the Debian-packaged default GNOME Shell extensions.
+  Eye of GNOME is the explicit default handler for common image formats.
   LibreOffice is intentionally excluded because the image bundles WPS Office.
 - `distro-codecs-media`: codecs, GStreamer plugin set, VLC, MPV, and GIMP.
 - `distro-files-devices`: network discovery, Windows share clients, exFAT,
   NTFS, MTP, and 7-Zip support for the file manager and command-line tools.
 - `distro-gaming`: Steam, Vulkan, GameMode, MangoHud, GOverlay, and vkBasalt.
-- `distro-nvidia`: Debian NVIDIA driver stack with EGL Wayland and VA-API.
 - `distro-devtools`: developer tools, virtualization, containers, shells,
   terminal utilities, and the DKMS/kernel-header prerequisites needed to build
   VirtualBox Guest Additions inside a VM.
@@ -48,7 +48,8 @@ Element repository key, writes the Element APT source into live-build, and then
 installs `element-desktop` through APT. `starlight-enable-element-repo` remains
 available for installed systems.
 
-ZapZap is installed as a system Flatpak (`com.rtosta.zapzap`) from Flathub
+ZapZap and Bazaar (`io.github.kolunmi.Bazaar`) are installed as system Flatpaks
+from Flathub
 during image creation. First boot still attempts to repair/update the same
 Flatpak if networking was unavailable during a custom build.
 
@@ -66,6 +67,8 @@ icon, and font caches manually.
 Linux Mint WebApp Manager is bundled from the official Mint Debian package and
 source archive. Its Debian XApp/Python dependencies are declared in
 `packages/webapps-support.list.chroot`.
+The image installer also bridges its XApp symbolic action icons into the
+selected Starlight Colloid theme.
 
 JetBrainsMono Nerd Font and Oh My Bash are installed in the live image. The
 default Bash profile uses the `agnoster` Oh My Bash theme with a Starship
@@ -107,13 +110,9 @@ the standard Guest Additions installer can build modules inside a VirtualBox VM.
 - `timeshift` is the current installed-system backup/restore tool. Pika Backup
   is not present in the Debian 13 package indices used by this build, and
   Deja Dup is not added while Timeshift remains the selected solution.
-- EasyEffects is installed for optional PipeWire effects, but Starlight ships
-  only an empty preset directory and does not enable or publish audio presets by
-  default.
+- Audio uses the standard PipeWire/WirePlumber stack with Pavucontrol available
+  for routing; no effects processor is enabled by default.
 - `switcheroo-control` is installed and enabled for GNOME's native dedicated
   GPU launch menu. Starlight does not add launcher wrappers or global
   `PrefersNonDefaultGPU=true` entries. The menu is expected to be absent in
   VirtualBox and other single-GPU environments.
-- `nvidia-open-kernel-dkms` resolved with `nvidia-driver` in Debian trixie
-  during local APT simulation, but legacy NVIDIA GPUs may still need a different
-  branch selected by Debian's NVIDIA packages.

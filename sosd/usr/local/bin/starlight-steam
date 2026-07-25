@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# Steam's CEF helper can abort on the Starlight GNOME Wayland session when its
+# GPU/D-Bus path is initialized. Keep the workaround local to Steam; games do
+# not inherit these flags.
+exec /usr/games/steam -no-cef-sandbox -cef-disable-gpu "$@"

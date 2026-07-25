@@ -9,14 +9,25 @@ chmod 0755 /usr/local/sbin/starlight-remove-debian-wallpapers
 chmod 0755 /usr/local/sbin/starlight-install-bundled-assets
 chmod 0755 /usr/local/sbin/starlight-run-installer
 chmod 0755 /usr/local/bin/starlight-launch-installer
+chmod 0755 /usr/local/bin/starlight-steam
 chmod 0755 /usr/local/bin/starlight-install-chrome
 chmod 0755 /usr/local/bin/starlight-install-wps
+chmod 0755 /usr/local/bin/wps.starlight-wrapper
 chmod 0755 /usr/local/bin/starlight-install-insync
 chmod 0755 /usr/local/bin/starlight-browser
 chmod 0755 /usr/local/sbin/starlight-live-session
 chmod 0755 /lib/live/config/0035-starlight-user
+chmod 0755 /usr/local/sbin/starlight-install-gnome-extensions
 
 /usr/local/sbin/starlight-install-bundled-assets
+/usr/local/sbin/starlight-install-gnome-extensions
+
+# Route the vendor desktop entry (including its protocol actions) through the
+# CEF compatibility wrapper. The package is installed before this hook runs.
+if [[ -f /usr/share/applications/steam.desktop ]]; then
+    sed -i 's|Exec=/usr/games/steam|Exec=/usr/local/bin/starlight-steam|g' \
+        /usr/share/applications/steam.desktop
+fi
 
 apt-mark manual \
     dosfstools \

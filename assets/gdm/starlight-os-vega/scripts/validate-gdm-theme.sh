@@ -59,7 +59,13 @@ for name in gnome-shell-dark.css gnome-shell-light.css gnome-shell-high-contrast
     grep -Fq '#lockDialogGroup' <<<"${css}" || fail "#lockDialogGroup absent from ${name}"
     grep -Fq '.screen-shield-background' <<<"${css}" || \
         fail ".screen-shield-background absent from ${name}"
-    grep -Eq '#lockDialogGroup[[:space:]]*\{' <<<"${css}" || fail "login background override absent from ${name}"
+    grep -Eq '\.login-dialog[[:space:]]*\{' <<<"${css}" || \
+        fail "primary-monitor login background override absent from ${name}"
+    grep -Eq '#lockDialogGroup[[:space:]]*\{' <<<"${css}" || \
+        fail "login stage fallback background absent from ${name}"
+    if grep -Fq '#lockDialogGroup,' <<<"${css}"; then
+        fail "login wallpaper must not be sized against the combined monitor stage in ${name}"
+    fi
     grep -Fq 'width: 25em;' <<<"${css}" || fail "compact login selection width absent from ${name}"
     grep -Fq 'starlight-os-vega-4k.png' <<<"${css}" || fail "wallpaper rule absent from ${name}"
     grep -Eq 'background:[[:space:]]*#050b16[[:space:]]+url\(' <<<"${css}" || \
