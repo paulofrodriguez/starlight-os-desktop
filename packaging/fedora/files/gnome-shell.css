@@ -1,0 +1,45 @@
+/* Starlight Vega — GNOME Shell navy/blue layer. */
+#panel {
+  background-color: #08111e;
+  color: #f1eee6;
+  border-bottom: 1px solid #163552;
+}
+
+#panel .panel-button,
+#panel .panel-button:active,
+#panel .panel-button:overview,
+#panel .panel-button:focus {
+  color: #f1eee6;
+}
+
+#panel .panel-button:hover,
+#panel .panel-button:active {
+  background-color: #2c6fa6;
+  color: #ffffff;
+}
+
+.panel-button:focus,
+.panel-button:checked,
+.panel-button:active {
+  box-shadow: inset 0 -2px 0 #d1a643;
+}
+
+.clock-display {
+  color: #78b9ec;
+  font-weight: 700;
+}
+
+.popup-menu-boxpointer,
+.popup-menu-content,
+.quick-settings {
+  background-color: #0d1726;
+  color: #f1eee6;
+  border: 1px solid #163552;
+}
+
+.quick-toggle:checked,
+.quick-menu-toggle:checked,
+.popup-menu-item:selected {
+  background-color: #2c6fa6;
+  color: #ffffff;
+}

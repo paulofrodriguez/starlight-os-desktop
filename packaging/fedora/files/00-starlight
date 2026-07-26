@@ -1,5 +1,5 @@
 [org/gnome/desktop/interface]
-accent-color='yellow'
+accent-color='blue'
 color-scheme='prefer-dark'
 gtk-theme='Starlight'
 icon-theme='Starlight-Colloid-Yellow-Dark'
@@ -26,7 +26,10 @@ exec-arg=''
 
 [org/gnome/shell]
 disable-user-extensions=false
-enabled-extensions=['dash-to-dock@micxgx.gmail.com', 'appindicatorsupport@rgcjonas.gmail.com', 'caffeine@patapon.info', 'blur-my-shell@aunetx', 'kiwimenu@kemma', 'starlight-clock-right@starlightbrasil.com']
+enabled-extensions=['dash-to-dock@micxgx.gmail.com', 'appindicatorsupport@rgcjonas.gmail.com', 'caffeine@patapon.info', 'blur-my-shell@aunetx', 'user-theme@gnome-shell-extensions.gcampax.github.com', 'kiwimenu@kemma', 'starlight-clock-right@starlightbrasil.com']
+
+[org/gnome/shell/extensions/user-theme]
+name='Starlight'
 
 [org/gnome/shell/extensions/kiwimenu]
 icon=0

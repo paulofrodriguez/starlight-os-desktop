@@ -15,8 +15,9 @@ usage() {
 Usage: starlight-fedora-apply [--remove-conflicts] [--skip-flatpaks]
 
 Installs the Fedora-mapped Starlight application set and records only packages
-that were absent beforehand. --remove-conflicts additionally removes Epiphany
-and Chromium if installed, recording them for rollback. It never removes data.
+that were absent beforehand. --remove-conflicts additionally removes Epiphany,
+Chromium and all installed LibreOffice components, recording them for rollback.
+It never removes user data.
 EOF
 }
 
@@ -48,6 +49,7 @@ packages=(
   virt-manager bridge-utils bash-completion fzf fd-find bat eza yq tmux
   direnv ShellCheck shfmt starship jetbrains-mono-fonts-all fira-code-fonts google-noto-emoji-fonts
   gamemode mangohud vulkan-tools mesa-dri-drivers mesa-vulkan-drivers
+  steam
   incus incus-client incus-tools lxcfs dnsmasq btrfs-progs lvm2
   gnome-shell-extension-dash-to-dock gnome-shell-extension-appindicator
   gnome-shell-extension-caffeine gnome-shell-extension-tiling-assistant
@@ -74,7 +76,10 @@ if ((${#to_install[@]})); then
 fi
 
 if ${remove_conflicts}; then
-    for package in epiphany chromium; do
+    conflict_packages=(epiphany chromium)
+    mapfile -t libreoffice_packages < <(rpm -qa --qf '%{NAME}\n' 'libreoffice*' | sort -u)
+    conflict_packages+=("${libreoffice_packages[@]}")
+    for package in "${conflict_packages[@]}"; do
         if rpm -q "${package}" >/dev/null 2>&1; then
             dnf remove -y "${package}"
             printf '%s\n' "${package}" >>"${removed_file}"

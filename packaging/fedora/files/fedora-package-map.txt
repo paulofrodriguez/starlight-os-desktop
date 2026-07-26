@@ -3,11 +3,11 @@ Starlight OS Vega → Fedora conversion
 
 Applied visual profile
 ----------------------
-* Starlight wallpaper, GNOME wallpaper registration, yellow/dark dconf defaults,
-  floating navy Dash-to-Dock settings, Blur My Shell settings, and the local
-  Starlight Clock Right GNOME Shell extension. The Starlight GTK 3/4 theme is
-  shipped for applications that honor GTK themes; libadwaita apps retain GNOME's
-  supported dark/accent controls rather than being patched.
+* Starlight wallpaper registration for both the desktop and GDM login screen,
+  blue/dark dconf defaults, floating navy Dash-to-Dock settings, Blur My Shell,
+  the User Themes extension, and the local Starlight Clock Right extension.
+  The Starlight GNOME Shell layer styles the top bar, clock and quick settings;
+  the GTK 3/4 layer styles applications that honor GTK themes.
 * Dash to Dock, AppIndicator, Caffeine, Blur My Shell, and Kiwi Menu (version
   1.6.4, SHA-256 e097c80d0bec5e832059e26ee33b0ad353c0ec830bffdcb84295e30143106447)
   are installed with this package. Tiling Assistant is not in
@@ -37,17 +37,23 @@ Not applied: Debian-only or unavailable upstream components
 * Debian-specific Firefox policy path (/usr/share/firefox-esr), GDM resource
   handling, Plymouth/GRUB/Syslinux ISO branding, and live-session/autologin
   components. Fedora keeps its own boot and GDM integration untouched.
+* WPS Office is proprietary and has no Fedora repository package. Downloading
+  its vendor RPM and accepting the vendor licence remain an explicit user action;
+  it is therefore not silently installed by this RPM.
 * Incus, its client/tools, lxcfs, dnsmasq, Btrfs, and LVM are direct RPM
-  dependencies. Steam, GOverlay, vkBasalt, ZFS, and proprietary codecs still
-  depend on the enabled Fedora repositories (often RPM Fusion); the apply
-  helper reports unavailable packages instead of enabling third-party
-  repositories or silently ignoring a failed transaction.
+  dependencies. Steam is applied when its repository is enabled (normally RPM
+  Fusion); because it is already installed it is not recorded or removed by
+  rollback. GOverlay, vkBasalt, ZFS, and proprietary codecs still depend on
+  the enabled Fedora repositories; the apply helper reports unavailable
+  packages instead of enabling third-party repositories or silently ignoring a
+  failed transaction.
 
 Rollback
 --------
 sudo starlight-fedora-rollback
   Removes only packages and Flatpaks recorded as newly installed by the apply
-  helper, then reinstalls applications removed by --remove-conflicts.
+  helper, then reinstalls applications removed by --remove-conflicts (including
+  LibreOffice components).
 
 sudo starlight-fedora-rollback --purge-assets
   Also removes the RPM, which removes its wallpaper, icon theme, extension and
