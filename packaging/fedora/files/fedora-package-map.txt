@@ -12,6 +12,9 @@ Applied visual profile
   1.6.4, SHA-256 e097c80d0bec5e832059e26ee33b0ad353c0ec830bffdcb84295e30143106447)
   are installed with this package. Tiling Assistant is not in
   the enabled Fedora repositories, so it is not fetched implicitly.
+* LinuxToys 6.4.8 is bundled from the repository's tracked upstream source
+  archive. Its own scripts detect and support Fedora/DNF; it is not installed
+  from the Debian `.deb`.
 * Starlight-Colloid-Yellow-Dark icon theme is built from the repository's
   tracked source archive and installed under /usr/share/icons.
 

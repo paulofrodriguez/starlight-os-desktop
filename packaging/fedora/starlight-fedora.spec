@@ -1,6 +1,6 @@
 Name:           starlight-fedora
 Version:        1.0.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Starlight OS Vega visual profile and Fedora application helper
 License:        GPL-3.0-or-later
 BuildArch:      noarch
@@ -25,6 +25,9 @@ Requires:       lxcfs
 Requires:       dnsmasq
 Requires:       btrfs-progs
 Requires:       lvm2
+Requires:       python3-gobject
+Requires:       python3-requests
+Requires:       vte291
 
 %description
 Starlight OS Vega visual profile for Fedora GNOME.  It installs the Starlight
@@ -63,6 +66,11 @@ unzip -q packaging/fedora/sources/kiwi-menu-32.zip \
   -d %{buildroot}%{_datadir}/gnome-shell/extensions/kiwimenu@kemma
 find %{buildroot}%{_datadir}/gnome-shell/extensions/kiwimenu@kemma -type d -exec chmod 0755 {} +
 find %{buildroot}%{_datadir}/gnome-shell/extensions/kiwimenu@kemma -type f -exec chmod 0644 {} +
+install -d %{buildroot}%{_prefix}
+linuxtoys_stage="$(mktemp -d)"
+tar -xJf assets/third-party/linuxtoys_6.4.8.orig.tar.xz -C "${linuxtoys_stage}"
+cp -a "${linuxtoys_stage}/linuxtoys_6.4.8.orig/usr/." %{buildroot}%{_prefix}/
+rm -rf "${linuxtoys_stage}"
 install -d %{buildroot}%{_datadir}/starlight-fedora
 install -m 0644 packaging/fedora/files/fedora-package-map.txt \
   %{buildroot}%{_datadir}/starlight-fedora/fedora-package-map.txt
@@ -104,6 +112,9 @@ fi
 %config(noreplace) %{_sysconfdir}/dconf/db/local.d/30-starlight-blur-my-shell
 %{_datadir}/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com
 %{_datadir}/gnome-shell/extensions/kiwimenu@kemma
+%{_bindir}/linuxtoys
+%{_datadir}/applications/LinuxToys.desktop
+%{_datadir}/linuxtoys
 %{_datadir}/icons/Starlight-Colloid-Yellow-Dark
 %{_datadir}/starlight-fedora/fedora-package-map.txt
 %{_sbindir}/starlight-fedora-apply
@@ -111,5 +122,8 @@ fi
 %{_sbindir}/starlight-fedora-reset-gnome
 
 %changelog
-* Sun Jul 26 2026 Paulo Rodrigues <paulofrodriguez@users.noreply.github.com> - 1.0.0-1
+* Sun Jul 26 2026 Paulo Rodriguez <paulofrodriguez@users.noreply.github.com> - 1.0.0-2
+- Bundle Fedora-compatible LinuxToys source release
+
+* Sun Jul 26 2026 Paulo Rodriguez <paulofrodriguez@users.noreply.github.com> - 1.0.0-1
 - Initial Fedora conversion of the Starlight OS Vega profile

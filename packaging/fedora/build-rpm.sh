@@ -19,6 +19,7 @@ cp -a "${root}/packaging/fedora" "${stage}/packaging/"
 cp -a "${root}/branding" "${stage}/"
 mkdir -p "${stage}/assets/third-party"
 cp -a "${root}/assets/third-party/starlight-colloid-icon-theme.tar.gz" "${stage}/assets/third-party/"
+cp -a "${root}/assets/third-party/linuxtoys_6.4.8.orig.tar.xz" "${stage}/assets/third-party/"
 mkdir -p "${stage}/sosd/usr/share/gnome-shell/extensions"
 cp -a "${root}/sosd/usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com" \
   "${stage}/sosd/usr/share/gnome-shell/extensions/"
