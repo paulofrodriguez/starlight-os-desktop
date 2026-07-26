@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+# Apply Starlight's optional Fedora application profile.  Every action is
+# recorded so starlight-fedora-rollback can undo only what this command did.
+set -Eeuo pipefail
+
+state_dir=/var/lib/starlight-fedora
+installed_file="${state_dir}/installed-rpms"
+removed_file="${state_dir}/removed-rpms"
+flatpak_file="${state_dir}/flatpaks"
+remove_conflicts=false
+skip_flatpaks=false
+
+usage() {
+    cat <<'EOF'
+Usage: starlight-fedora-apply [--remove-conflicts] [--skip-flatpaks]
+
+Installs the Fedora-mapped Starlight application set and records only packages
+that were absent beforehand. --remove-conflicts additionally removes Epiphany
+and Chromium if installed, recording them for rollback. It never removes data.
+EOF
+}
+
+while (($#)); do
+    case "$1" in
+        --remove-conflicts) remove_conflicts=true ;;
+        --skip-flatpaks) skip_flatpaks=true ;;
+        -h|--help) usage; exit 0 ;;
+        *) echo "Unknown option: $1" >&2; usage >&2; exit 2 ;;
+    esac
+    shift
+done
+
+[[ ${EUID} -eq 0 ]] || { echo 'Run as root: sudo starlight-fedora-apply' >&2; exit 1; }
+command -v dnf >/dev/null || { echo 'This helper requires Fedora dnf.' >&2; exit 1; }
+install -d -m 0755 "${state_dir}"
+touch "${installed_file}" "${removed_file}" "${flatpak_file}"
+
+# Fedora base/RPM Fusion-independent mappings of the Starlight package lists.
+packages=(
+  firefox thunderbird gnome-tweaks gnome-extensions-app ptyxis gnome-terminal
+  gnome-software flatpak flatseal fwupd gnome-firmware
+  pipewire wireplumber pipewire-utils pavucontrol helvum bluez
+  gstreamer1-plugins-base gstreamer1-plugins-good gstreamer1-plugins-bad-free
+  gstreamer1-plugin-libav ffmpeg-free vlc mpv gimp
+  avahi cifs-utils samba-client exfatprogs ntfs-3g libmtp mtp-tools 7zip
+  git curl wget file procps-ng zip unzip vim-enhanced htop python3-pip
+  python3-virtualenv nodejs npm podman qemu-kvm qemu-img libvirt-client
+  virt-manager bridge-utils bash-completion fzf fd-find bat eza yq tmux
+  direnv ShellCheck shfmt starship jetbrains-mono-fonts-all fira-code-fonts google-noto-emoji-fonts
+  gamemode mangohud vulkan-tools mesa-dri-drivers mesa-vulkan-drivers
+  incus incus-client incus-tools lxcfs dnsmasq btrfs-progs lvm2
+  gnome-shell-extension-dash-to-dock gnome-shell-extension-appindicator
+  gnome-shell-extension-caffeine gnome-shell-extension-tiling-assistant
+  gnome-shell-extension-blur-my-shell ddcutil i2c-tools
+)
+
+available=()
+for package in "${packages[@]}"; do
+    if dnf -q repoquery --available --qf '%{name}' "${package}" 2>/dev/null | grep -Fxq "${package}"; then
+        available+=("${package}")
+    else
+        echo "Skipped unavailable Fedora package: ${package}" >&2
+    fi
+done
+
+to_install=()
+for package in "${available[@]}"; do
+    rpm -q "${package}" >/dev/null 2>&1 || to_install+=("${package}")
+done
+if ((${#to_install[@]})); then
+    dnf install -y "${to_install[@]}"
+    printf '%s\n' "${to_install[@]}" >>"${installed_file}"
+    sort -u -o "${installed_file}" "${installed_file}"
+fi
+
+if ${remove_conflicts}; then
+    for package in epiphany chromium; do
+        if rpm -q "${package}" >/dev/null 2>&1; then
+            dnf remove -y "${package}"
+            printf '%s\n' "${package}" >>"${removed_file}"
+        fi
+    done
+    sort -u -o "${removed_file}" "${removed_file}"
+fi
+
+if ! ${skip_flatpaks}; then
+    flatpak remote-add --system --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+    for application in com.rtosta.zapzap io.github.kolunmi.Bazaar; do
+        if ! flatpak info --system "${application}" >/dev/null 2>&1; then
+            flatpak install --system --noninteractive flathub "${application}"
+            printf '%s\n' "${application}" >>"${flatpak_file}"
+        fi
+    done
+    sort -u -o "${flatpak_file}" "${flatpak_file}"
+fi
+
+echo 'Starlight Fedora profile applied. Log out and back in for GNOME defaults.'
+echo 'Rollback: sudo starlight-fedora-rollback'

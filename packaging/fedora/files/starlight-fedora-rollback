@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Reverses recorded optional actions. RPM assets are removed with dnf remove.
+set -Eeuo pipefail
+state_dir=/var/lib/starlight-fedora
+purge_assets=false
+
+usage() { echo 'Usage: starlight-fedora-rollback [--purge-assets]'; }
+[[ ${EUID} -eq 0 ]] || { echo 'Run as root: sudo starlight-fedora-rollback' >&2; exit 1; }
+while (($#)); do
+    case "$1" in
+        --purge-assets) purge_assets=true ;;
+        -h|--help) usage; exit 0 ;;
+        *) echo "Unknown option: $1" >&2; exit 2 ;;
+    esac
+    shift
+done
+
+if [[ -s "${state_dir}/flatpaks" ]] && command -v flatpak >/dev/null; then
+    xargs -r -n1 flatpak uninstall --system --noninteractive <"${state_dir}/flatpaks" || true
+fi
+if [[ -s "${state_dir}/installed-rpms" ]]; then
+    xargs -r dnf remove -y <"${state_dir}/installed-rpms"
+fi
+if [[ -s "${state_dir}/removed-rpms" ]]; then
+    xargs -r dnf install -y <"${state_dir}/removed-rpms"
+fi
+rm -rf "${state_dir}"
+if ${purge_assets}; then
+    dnf remove -y starlight-fedora
+fi
+echo 'Program rollback finished. To clear per-user GNOME choices, run starlight-fedora-reset-gnome in each GNOME user session.'

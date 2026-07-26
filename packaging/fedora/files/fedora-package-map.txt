@@ -1,0 +1,54 @@
+Starlight OS Vega → Fedora conversion
+======================================
+
+Applied visual profile
+----------------------
+* Starlight wallpaper, GNOME wallpaper registration, yellow/dark dconf defaults,
+  floating navy Dash-to-Dock settings, Blur My Shell settings, and the local
+  Starlight Clock Right GNOME Shell extension. The Starlight GTK 3/4 theme is
+  shipped for applications that honor GTK themes; libadwaita apps retain GNOME's
+  supported dark/accent controls rather than being patched.
+* Dash to Dock, AppIndicator, Caffeine, Blur My Shell, and Kiwi Menu (version
+  1.6.4, SHA-256 e097c80d0bec5e832059e26ee33b0ad353c0ec830bffdcb84295e30143106447)
+  are installed with this package. Tiling Assistant is not in
+  the enabled Fedora repositories, so it is not fetched implicitly.
+* Starlight-Colloid-Yellow-Dark icon theme is built from the repository's
+  tracked source archive and installed under /usr/share/icons.
+
+Fedora application mappings (applied only when the package is available)
+-----------------------------------------------------------------------
+Firefox ESR → firefox; GNOME extension packages → Fedora's corresponding
+gnome-shell-extension-* packages; PipeWire, GNOME Software, Flatseal, fwupd,
+media, device integration, development, virtualization and gaming packages are
+mapped in /usr/sbin/starlight-fedora-apply. ZapZap and Bazaar remain system
+Flatpaks from Flathub.
+
+Not applied: Debian-only or unavailable upstream components
+-----------------------------------------------------------
+* live-build, debootstrap, live-boot/live-config, Calamares configuration,
+  Debian APT sources, apt/nala/gdebi/synaptic/debsums/apt-listchanges,
+  dpkg i386 handling, Debian firmware and microcode package names.
+* Debian packages bundled by the ISO: WPS Office .deb, LinuxToys .deb, Linux
+  Mint WebApp Manager .deb, Element's Debian APT repository, and Debian's
+  desktop-base wallpaper alternatives.
+* Debian-specific Firefox policy path (/usr/share/firefox-esr), GDM resource
+  handling, Plymouth/GRUB/Syslinux ISO branding, and live-session/autologin
+  components. Fedora keeps its own boot and GDM integration untouched.
+* Incus, its client/tools, lxcfs, dnsmasq, Btrfs, and LVM are direct RPM
+  dependencies. Steam, GOverlay, vkBasalt, ZFS, and proprietary codecs still
+  depend on the enabled Fedora repositories (often RPM Fusion); the apply
+  helper reports unavailable packages instead of enabling third-party
+  repositories or silently ignoring a failed transaction.
+
+Rollback
+--------
+sudo starlight-fedora-rollback
+  Removes only packages and Flatpaks recorded as newly installed by the apply
+  helper, then reinstalls applications removed by --remove-conflicts.
+
+sudo starlight-fedora-rollback --purge-assets
+  Also removes the RPM, which removes its wallpaper, icon theme, extension and
+  system dconf defaults.
+
+starlight-fedora-reset-gnome
+  Run as each desktop user after rollback to reset that user's dconf overrides.
