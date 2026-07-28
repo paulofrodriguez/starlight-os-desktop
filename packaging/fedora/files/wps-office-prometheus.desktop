@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=WPS Office
+GenericName=WPS Office
+Comment=Create and edit office documents with WPS Office.
+Exec=/usr/libexec/starlight-fedora/wps-language-wrapper wps %F
+TryExec=/usr/bin/wps
+Icon=wps-office2023-kprometheus
+Categories=Office;WordProcessor;Qt;
+StartupNotify=false
+StartupWMClass=wpsoffice
+InitialPreference=3

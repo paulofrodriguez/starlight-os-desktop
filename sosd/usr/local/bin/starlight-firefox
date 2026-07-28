@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# Firefox's native Wayland input path does not currently handle cedilla
+# composition reliably.  Run only Firefox through XWayland, where the legacy
+# input method remains compatible.
+exec env MOZ_ENABLE_WAYLAND=0 /usr/bin/firefox-esr "$@"

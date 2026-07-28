@@ -1,7 +1,7 @@
 [org/gnome/desktop/interface]
 accent-color='yellow'
 color-scheme='prefer-dark'
-gtk-theme='Adwaita-dark'
+gtk-theme='Starlight'
 icon-theme='Starlight-Colloid-Yellow-Dark'
 monospace-font-name='JetBrainsMono Nerd Font 11'
 
@@ -40,6 +40,9 @@ shortcut-search=['<Control>space']
 [org/gnome/shell/extensions/kiwimenu]
 # 0 is the extension's first icon slot; the image is replaced during build.
 icon=0
+# Keep shutdown/restart inside the menus instead of duplicating the power
+# action in the Quick Settings button row.
+hide-power-button=true
 
 # Dash to Dock owns the desktop dock appearance. Keep it as a floating,
 # translucent navy surface instead of inheriting the grey upstream fallback.

@@ -58,12 +58,13 @@ while IFS= read -r script; do
     fi
     bash -n "${script}" || ((errors += 1))
 done < <(find "${PROJECT_ROOT}/scripts" "${PROJECT_ROOT}/hooks" \
-    "${PROJECT_ROOT}/sosd/usr/local" -type f -print | sort)
+    "${PROJECT_ROOT}/sosd/usr/local/bin" \
+    "${PROJECT_ROOT}/sosd/usr/local/sbin" -type f -print | sort)
 
 if command -v shellcheck >/dev/null 2>&1; then
     mapfile -t shell_files < <(find "${PROJECT_ROOT}/scripts" \
-        "${PROJECT_ROOT}/hooks" "${PROJECT_ROOT}/sosd/usr/local" \
-        -type f -print | sort)
+        "${PROJECT_ROOT}/hooks" "${PROJECT_ROOT}/sosd/usr/local/bin" \
+        "${PROJECT_ROOT}/sosd/usr/local/sbin" -type f -print | sort)
     shellcheck -x \
         -P "${PROJECT_ROOT}/scripts" \
         -P "${PROJECT_ROOT}/config" \
@@ -279,6 +280,14 @@ if ! rg -Fxq 'text/html=firefox-esr.desktop' "${PROJECT_ROOT}/sosd/etc/xdg/mimea
     echo "Firefox ESR is not configured as the default browser." >&2
     ((errors += 1))
 fi
+firefox_launcher="${PROJECT_ROOT}/sosd/usr/local/share/applications/firefox-esr.desktop"
+firefox_wrapper="${PROJECT_ROOT}/sosd/usr/local/bin/starlight-firefox"
+if [[ ! -x "${firefox_wrapper}" ]] || \
+    ! rg -Fxq 'exec env MOZ_ENABLE_WAYLAND=0 /usr/bin/firefox-esr "$@"' "${firefox_wrapper}" || \
+    ! rg -Fxq 'Exec=/usr/local/bin/starlight-firefox %u' "${firefox_launcher}"; then
+    echo "Firefox ESR must use the XWayland launcher for cedilla input compatibility." >&2
+    ((errors += 1))
+fi
 if rg -qx 'chromium' "${PROJECT_ROOT}/packages/build.list.chroot"; then
     echo "Chromium must not be requested for the image." >&2
     ((errors += 1))
@@ -343,6 +352,31 @@ if ! rg -Fq 'Main.panel.statusArea.dateMenu' "${clock_right_root}/extension.js" 
     echo "Starlight Clock Right must move the native date menu into the right panel box." >&2
     ((errors += 1))
 fi
+brighter_root="${PROJECT_ROOT}/sosd/usr/share/gnome-shell/extensions/starlight-brighter@starlightbrasil.com"
+if [[ ! -s "${brighter_root}/metadata.json" ]] || \
+    [[ ! -s "${brighter_root}/extension.js" ]] || \
+    [[ ! -s "${brighter_root}/stylesheet.css" ]]; then
+    echo "Missing Starlight Brighter GNOME Shell extension." >&2
+    ((errors += 1))
+elif ! python3 -c 'import json, pathlib, sys; data = json.loads(pathlib.Path(sys.argv[1]).read_text()); assert data["uuid"] == "starlight-brighter@starlightbrasil.com"; assert all(version in data["shell-version"] for version in ("48", "50"))' \
+    "${brighter_root}/metadata.json"; then
+    echo "Starlight Brighter metadata is invalid." >&2
+    ((errors += 1))
+fi
+if ! rg -Fq 'background-gradient-start: #3d4551;' \
+    "${brighter_root}/stylesheet.css" || \
+    ! rg -Fq 'background-gradient-end: #373c45;' \
+        "${brighter_root}/stylesheet.css" || \
+    ! rg -Fq '#dashtodockContainer .dash-background' \
+        "${brighter_root}/stylesheet.css"; then
+    echo "Starlight Brighter must lighten the Shell palette and dock by 20%." >&2
+    ((errors += 1))
+fi
+if rg -Fq "'starlight-brighter@starlightbrasil.com'" \
+    "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"; then
+    echo "Starlight Brighter must remain optional and disabled by default." >&2
+    ((errors += 1))
+fi
 if ! rg -Fq "background-color='#07182b'" \
     "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"; then
     echo "The Starlight Dash to Dock colour is not configured." >&2
@@ -382,7 +416,7 @@ if ! rg -Fxq "color-scheme='prefer-dark'" \
     echo "The GNOME colour scheme is not configured for dark surfaces." >&2
     ((errors += 1))
 fi
-if ! rg -Fxq "gtk-theme='Adwaita-dark'" \
+if ! rg -Fxq "gtk-theme='Starlight'" \
     "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"; then
     echo "The GTK theme is not configured for dark titlebars." >&2
     ((errors += 1))
@@ -1154,6 +1188,18 @@ if ! rg -Fq '.login-dialog {' \
     rg -Uq '#lockDialogGroup[[:space:]]*\{[^}]*url\(' \
     "${vega_root}/assets/starlight-os-vega-gdm.css"; then
     echo "The GDM wallpaper must be sized on the primary monitor, not the combined monitor stage." >&2
+    ((errors += 1))
+fi
+if ! rg -Fq 'background-size: cover;' \
+    "${vega_root}/assets/starlight-os-vega-gdm.css"; then
+    echo "The GDM wallpaper must cover each monitor without fallback side bands." >&2
+    ((errors += 1))
+fi
+if ! rg -Fq "picture-options='zoom'" \
+    "${PROJECT_ROOT}/packaging/fedora/files/01-starlight-gdm" || \
+    ! rg -Fq "logo=''" "${PROJECT_ROOT}/packaging/fedora/files/01-starlight-gdm" || \
+    ! rg -Fq "fallback-logo=''" "${PROJECT_ROOT}/packaging/fedora/files/01-starlight-gdm"; then
+    echo "The Fedora GDM defaults must fill the display and disable the Fedora logo." >&2
     ((errors += 1))
 fi
 

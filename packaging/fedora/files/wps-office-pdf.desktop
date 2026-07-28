@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=WPS PDF
+GenericName=WPS PDF Reader
+Comment=Read PDF documents with WPS PDF.
+Exec=/usr/libexec/starlight-fedora/wps-language-wrapper wpspdf %F
+TryExec=/usr/bin/wpspdf
+Icon=wps-office2023-pdfmain
+MimeType=application/pdf;
+Categories=Office;Viewer;Qt;
+StartupNotify=false
+StartupWMClass=wpspdf
+InitialPreference=3

@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Install Starlight profile
+Name[pt_BR]=Instalar perfil Starlight
+Comment=Complete the Starlight application setup
+Comment[pt_BR]=Completar a instalação dos aplicativos Starlight
+Exec=/usr/bin/starlight-fedora-manager
+Icon=starlight-fedora-manager
+Terminal=false
+StartupNotify=true
+Categories=Settings;
+Keywords=Starlight;install;setup;aplicar;instalar;

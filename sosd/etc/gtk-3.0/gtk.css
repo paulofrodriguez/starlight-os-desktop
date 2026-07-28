@@ -8,6 +8,10 @@
 @define-color starlight_muted #8f949d;
 @define-color starlight_yellow #f3c653;
 @define-color starlight_gold #c89b3c;
+@define-color theme_selected_bg_color #f3c653;
+@define-color theme_selected_fg_color #050b16;
+@define-color theme_unfocused_selected_bg_color #c89b3c;
+@define-color theme_unfocused_selected_fg_color #050b16;
 @define-color accent_color #f3c653;
 @define-color accent_bg_color #c89b3c;
 @define-color accent_fg_color #050b16;
@@ -21,6 +25,8 @@
 @define-color popover_fg_color #f1eee6;
 @define-color card_bg_color #0d1726;
 @define-color card_fg_color #f1eee6;
+@define-color sidebar_bg_color #08111e;
+@define-color sidebar_fg_color #f1eee6;
 
 window,
 dialog,
@@ -31,6 +37,31 @@ popover,
 .background {
   background-color: @starlight_surface;
   color: @starlight_text;
+}
+
+/* GNOME Settings uses a separate navigation-sidebar surface. It does not
+ * inherit the window background, which previously left the whole left pane
+ * Adwaita grey even when the Starlight theme was selected. */
+sidebar,
+.sidebar,
+navigation-sidebar,
+.navigation-sidebar,
+stacksidebar,
+.sidebar-pane,
+.sidebar-pane > scrolledwindow,
+.navigation-sidebar > scrolledwindow {
+  background-color: @starlight_surface;
+  background-image: none;
+  color: @starlight_text;
+}
+
+sidebar row,
+.sidebar row,
+navigation-sidebar row,
+.navigation-sidebar row,
+stacksidebar row {
+  color: @starlight_text;
+  background-color: transparent;
 }
 
 headerbar,
@@ -96,6 +127,13 @@ calendar.view {
   color: @starlight_text;
   background-color: @starlight_bg;
   border-color: alpha(@starlight_yellow, 0.38);
+}
+
+/* Firefox obtains form-field selection colours from GTK's legacy named
+ * colours. Keep the CSS selection node in sync for native GTK text widgets. */
+selection {
+  color: @theme_selected_fg_color;
+  background-color: @theme_selected_bg_color;
 }
 
 calendar.view header {

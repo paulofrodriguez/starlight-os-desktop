@@ -1,0 +1,26 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Firefox ESR
+Comment=Browse the World Wide Web
+GenericName=Web Browser
+Exec=/usr/local/bin/starlight-firefox %u
+Icon=firefox-esr
+Terminal=false
+StartupNotify=true
+Categories=Network;WebBrowser;
+MimeType=text/html;text/xml;application/xhtml+xml;application/xml;application/rss+xml;application/rdf+xml;image/gif;image/jpeg;image/png;x-scheme-handler/http;x-scheme-handler/https;
+StartupWMClass=firefox-esr
+Actions=new-window;new-private-window;profile-manager;
+
+[Desktop Action new-window]
+Name=Open a New Window
+Exec=/usr/local/bin/starlight-firefox --new-window
+
+[Desktop Action new-private-window]
+Name=Open a New Private Window
+Exec=/usr/local/bin/starlight-firefox --private-window
+
+[Desktop Action profile-manager]
+Name=Profile Manager
+Exec=/usr/local/bin/starlight-firefox --ProfileManager

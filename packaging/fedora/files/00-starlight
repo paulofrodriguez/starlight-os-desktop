@@ -1,9 +1,8 @@
 [org/gnome/desktop/interface]
-accent-color='blue'
+accent-color='yellow'
 color-scheme='prefer-dark'
 gtk-theme='Starlight'
 icon-theme='Starlight-Colloid-Yellow-Dark'
-monospace-font-name='JetBrainsMono Nerd Font 11'
 
 [org/gnome/desktop/background]
 picture-uri='file:///usr/share/backgrounds/starlight/starlight-wallpaper.png'
@@ -27,13 +26,17 @@ exec-arg=''
 [org/gnome/shell]
 disable-user-extensions=false
 enabled-extensions=['dash-to-dock@micxgx.gmail.com', 'appindicatorsupport@rgcjonas.gmail.com', 'caffeine@patapon.info', 'blur-my-shell@aunetx', 'user-theme@gnome-shell-extensions.gcampax.github.com', 'kiwimenu@kemma', 'starlight-clock-right@starlightbrasil.com']
+favorite-apps=['firefox.desktop', 'org.gnome.Nautilus.desktop', 'app.devsuite.Ptyxis.desktop', 'org.gnome.Software.desktop', 'com.starlight.FedoraManager.desktop']
 
 [org/gnome/shell/extensions/user-theme]
 name='Starlight'
 
 [org/gnome/shell/extensions/kiwimenu]
 icon=0
-favorite-apps=['firefox.desktop', 'org.gnome.Nautilus.desktop', 'app.devsuite.Ptyxis.desktop', 'org.gnome.Software.desktop']
+# Keep shutdown/restart inside the menus instead of duplicating the power
+# action in the Quick Settings button row.
+hide-power-button=true
+favorite-apps=['firefox.desktop', 'org.gnome.Nautilus.desktop', 'app.devsuite.Ptyxis.desktop', 'org.gnome.Software.desktop', 'com.starlight.FedoraManager.desktop']
 
 [org/gnome/shell/extensions/dash-to-dock]
 dock-position='BOTTOM'
@@ -44,7 +47,7 @@ extend-height=false
 dash-max-icon-size=48
 custom-theme-shrink=false
 custom-background-color=true
-background-color='#07182b'
+background-color='#08111e'
 transparency-mode='FIXED'
 background-opacity=0.74
 custom-theme-customize-running-dots=true

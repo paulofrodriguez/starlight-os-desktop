@@ -2,42 +2,34 @@
 set -Eeuo pipefail
 
 readonly ROOT="${STARLIGHT_ROOT:-}"
-readonly KIT_ROOT="${ROOT}/opt/starlight-os/gdm/starlight-os-vega"
-readonly ASSET="${KIT_ROOT}/assets/starlight-os-vega-4k.png"
-readonly OVERRIDE="${KIT_ROOT}/assets/starlight-os-vega-gdm.css"
+readonly KIT_ROOT="${ROOT}/usr/share/starlight-gdm"
+readonly ASSET="${KIT_ROOT}/starlight-os-vega-4k.png"
+readonly OVERRIDE="${KIT_ROOT}/starlight-os-vega-gdm.css"
 readonly RESOURCE="${ROOT}/usr/share/gnome-shell/gnome-shell-theme.gresource"
-readonly SHELL_RESOURCE="${ROOT}/usr/lib/gnome-shell/libshell-16.so"
-readonly BACKUP_DIR="${ROOT}/usr/lib/starlight-os/backups"
+readonly SHELL_RESOURCE="${ROOT}/usr/lib64/gnome-shell/libshell-18.so"
+readonly BACKUP_DIR="${ROOT}/var/lib/starlight-fedora/gdm-backups"
 readonly BACKUP="${BACKUP_DIR}/gnome-shell-theme.gresource.original"
-readonly SHELL_BACKUP="${BACKUP_DIR}/libshell-16.so.original"
+readonly SHELL_BACKUP="${BACKUP_DIR}/libshell-18.so.original"
 readonly RESOURCE_PREFIX=/org/gnome/shell/theme
 readonly SHELL_RESOURCE_PREFIX=/org/gnome/shell
 readonly SHELL_JS_SECTION=.gresource.shell_js_resources
-readonly EXPECTED_GNOME_MAJOR=48
+readonly EXPECTED_GNOME_MAJOR=50
 
 fail() {
     echo "Starlight Vega GDM installation failed: $*" >&2
     exit 1
 }
 
-for command_name in dpkg-query gresource glib-compile-resources objcopy python3; do
+for command_name in rpm gresource glib-compile-resources objcopy python3; do
     command -v "${command_name}" >/dev/null 2>&1 || fail "missing command: ${command_name}"
 done
 
-dpkg_query() {
-    if [[ -n "${ROOT}" ]]; then
-        dpkg-query --admindir="${ROOT}/var/lib/dpkg" "$@"
-    else
-        dpkg-query "$@"
-    fi
-}
-
-for package_name in binutils gdm3 gnome-shell libglib2.0-bin libglib2.0-dev-bin python3; do
-    status="$(dpkg_query -W -f='${db:Status-Status}' "${package_name}" 2>/dev/null || true)"
-    [[ "${status}" == "installed" ]] || fail "required package is not installed: ${package_name}"
+for package_name in binutils gdm gnome-shell glib2-devel python3; do
+    rpm -q "${package_name}" >/dev/null 2>&1 || \
+        fail "required package is not installed: ${package_name}"
 done
 
-gnome_version="$(dpkg_query -W -f='${Version}' gnome-shell)"
+gnome_version="$(rpm -q --qf '%{VERSION}' gnome-shell)"
 gnome_major="${gnome_version%%.*}"
 [[ "${gnome_major}" == "${EXPECTED_GNOME_MAJOR}" ]] || \
     fail "unsupported GNOME Shell ${gnome_version}; this integration is validated only for major ${EXPECTED_GNOME_MAJOR}"
@@ -147,8 +139,8 @@ import sys
 path = sys.argv[1]
 marker = "        //RIGHT\n"
 old = """        let [, , natWidth, natHeight] = actor.get_preferred_size();
-        let centerX = dialogBox.x1 + (dialogBox.x2 - dialogBox.x1) / 2;
-        let centerY = dialogBox.y1 + (dialogBox.y2 - dialogBox.y1) / 2;
+        const centerX = dialogBox.x1 + (dialogBox.x2 - dialogBox.x1) / 2;
+        const centerY = dialogBox.y1 + (dialogBox.y2 - dialogBox.y1) / 2;
 
         natWidth = Math.min(natWidth, dialogBox.x2 - dialogBox.x1);
         natHeight = Math.min(natHeight, dialogBox.y2 - dialogBox.y1);
@@ -157,13 +149,13 @@ old = """        let [, , natWidth, natHeight] = actor.get_preferred_size();
         actorBox.y1 = Math.floor(centerY - natHeight / 2);
 """
 new = """        let [, , natWidth, natHeight] = actor.get_preferred_size();
-        let centerY=(dialogBox.y1+dialogBox.y2)/2;
+        const centerY=(dialogBox.y1+dialogBox.y2)/2;
         natWidth=Math.min(natWidth,dialogBox.x2-dialogBox.x1);
         natHeight=Math.min(natHeight,dialogBox.y2-dialogBox.y1);
         //RIGHT
         let r=Math.max(Math.floor((dialogBox.x2-dialogBox.x1)*.055),48);
         actorBox.x1=Math.floor(Math.max(dialogBox.x1,dialogBox.x2-r-natWidth));
-        actorBox.y1=Math.floor(centerY-natHeight/2);
+        actorBox.y1=Math.floor(centerY-natHeight/2);;;
 """
 if len(old) != len(new):
     raise SystemExit(f"internal patch length changed: {len(old)} -> {len(new)}")

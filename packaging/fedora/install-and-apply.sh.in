@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+rpm_path="${script_dir}/@RPM_BASENAME@"
+profile_user="${1:-${SUDO_USER:-${USER:-}}}"
+
+[[ -f "${rpm_path}" ]] || {
+  echo "Missing RPM beside this installer: ${rpm_path}" >&2
+  exit 1
+}
+[[ -n "${profile_user}" && "${profile_user}" != root ]] || {
+  echo "Usage: ${0##*/} LOCAL_USER" >&2
+  exit 2
+}
+id "${profile_user}" >/dev/null 2>&1 || {
+  echo "Unknown local user: ${profile_user}" >&2
+  exit 2
+}
+command -v dnf >/dev/null || {
+  echo 'This installer requires Fedora dnf.' >&2
+  exit 1
+}
+
+privilege=()
+if ((EUID != 0)); then
+  command -v sudo >/dev/null || {
+    echo 'Run as root or install sudo.' >&2
+    exit 1
+  }
+  privilege=(sudo)
+fi
+
+"${privilege[@]}" dnf install -y "${rpm_path}"
+"${privilege[@]}" starlight-fedora-apply --user "${profile_user}"

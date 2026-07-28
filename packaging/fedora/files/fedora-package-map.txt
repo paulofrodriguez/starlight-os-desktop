@@ -3,9 +3,11 @@ Starlight OS Vega → Fedora conversion
 
 Applied visual profile
 ----------------------
-* Starlight wallpaper registration for both the desktop and GDM login screen,
-  blue/dark dconf defaults, floating navy Dash-to-Dock settings, Blur My Shell,
-  the User Themes extension, and the local Starlight Clock Right extension.
+* Starlight wallpaper registration for the desktop and a separate 4K Starlight
+  asset for the GDM login screen, amber/dark dconf defaults, floating dark
+  Dash-to-Dock settings, Blur My Shell,
+  the User Themes extension, the local Starlight Clock Right extension, and
+  the optional Starlight Brighter extension for dim notebook displays.
   The Starlight GNOME Shell layer styles the top bar, clock and quick settings;
   the GTK 3/4 layer styles applications that honor GTK themes.
 * Dash to Dock, AppIndicator, Caffeine, Blur My Shell, and Kiwi Menu (version
@@ -17,14 +19,20 @@ Applied visual profile
   from the Debian `.deb`.
 * Starlight-Colloid-Yellow-Dark icon theme is built from the repository's
   tracked source archive and installed under /usr/share/icons.
+* A dedicated Starlight Plymouth theme replaces Fedora's watermark during
+  boot, reboot and shutdown while the package is installed.
 
 Fedora application mappings (applied only when the package is available)
 -----------------------------------------------------------------------
 Firefox ESR → firefox; GNOME extension packages → Fedora's corresponding
 gnome-shell-extension-* packages; PipeWire, GNOME Software, Flatseal, fwupd,
 media, device integration, development, virtualization and gaming packages are
-mapped in /usr/sbin/starlight-fedora-apply. ZapZap and Bazaar remain system
-Flatpaks from Flathub.
+mapped in starlight-fedora-apply. The graphical Starlight profile launcher runs
+that helper, displays its progress and changes into a restore/removal entry when
+the operation succeeds. ZapZap, Bazaar and Telegram remain system Flatpaks from
+Flathub.
+The Fedora profile installs programming fonts without selecting a new global
+monospace or terminal font.
 
 Not applied: Debian-only or unavailable upstream components
 -----------------------------------------------------------
@@ -34,12 +42,14 @@ Not applied: Debian-only or unavailable upstream components
 * Debian packages bundled by the ISO: WPS Office .deb, LinuxToys .deb, Linux
   Mint WebApp Manager .deb, Element's Debian APT repository, and Debian's
   desktop-base wallpaper alternatives.
-* Debian-specific Firefox policy path (/usr/share/firefox-esr), GDM resource
-  handling, Plymouth/GRUB/Syslinux ISO branding, and live-session/autologin
-  components. Fedora keeps its own boot and GDM integration untouched.
-* WPS Office is proprietary and has no Fedora repository package. Downloading
-  its vendor RPM and accepting the vendor licence remain an explicit user action;
-  it is therefore not silently installed by this RPM.
+* Debian-specific Firefox policy path (/usr/share/firefox-esr), GRUB/Syslinux
+  ISO branding, and live-session/autologin components. The Fedora profile uses
+  its own reversible Plymouth and GDM integration instead.
+* WPS Office 12 is downloaded from the vendor's official Linux CDN as a native
+  x86_64 RPM and verified against a pinned SHA-256 before installation. Starlight
+  launchers select its bundled English interface without changing the desktop
+  locale. It replaces LibreOffice; the latter is recorded and restored by
+  rollback.
 * Incus, its client/tools, lxcfs, dnsmasq, Btrfs, and LVM are direct RPM
   dependencies. Steam is applied when its repository is enabled (normally RPM
   Fusion); because it is already installed it is not recorded or removed by
@@ -52,8 +62,8 @@ Rollback
 --------
 sudo starlight-fedora-rollback
   Removes only packages and Flatpaks recorded as newly installed by the apply
-  helper, then reinstalls applications removed by --remove-conflicts (including
-  LibreOffice components).
+  helper, then reinstalls the applications it replaced (including LibreOffice
+  components) and restores the previous user avatar when it is still unchanged.
 
 sudo starlight-fedora-rollback --purge-assets
   Also removes the RPM, which removes its wallpaper, icon theme, extension and

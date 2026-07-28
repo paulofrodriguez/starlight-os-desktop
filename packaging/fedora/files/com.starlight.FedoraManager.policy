@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC
+"-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+"http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
+<policyconfig>
+  <vendor>Starlight OS</vendor>
+  <vendor_url>https://starlightbrasil.com/</vendor_url>
+
+  <action id="com.starlight.fedora.apply">
+    <description>Apply the Starlight application profile</description>
+    <description xml:lang="pt_BR">Instalar o perfil de aplicativos Starlight</description>
+    <message>Authentication is required to apply the Starlight profile</message>
+    <message xml:lang="pt_BR">É necessário autenticar para instalar o perfil Starlight</message>
+    <icon_name>starlight-fedora-manager</icon_name>
+    <defaults>
+      <allow_any>no</allow_any>
+      <allow_inactive>no</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/bin/starlight-fedora-apply</annotate>
+  </action>
+
+  <action id="com.starlight.fedora.rollback">
+    <description>Restore or remove the Starlight application profile</description>
+    <description xml:lang="pt_BR">Restaurar ou remover o perfil Starlight</description>
+    <message>Authentication is required to restore the previous applications</message>
+    <message xml:lang="pt_BR">É necessário autenticar para restaurar os aplicativos anteriores</message>
+    <icon_name>starlight-fedora-manager</icon_name>
+    <defaults>
+      <allow_any>no</allow_any>
+      <allow_inactive>no</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/bin/starlight-fedora-rollback</annotate>
+  </action>
+</policyconfig>

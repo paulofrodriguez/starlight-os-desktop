@@ -1,8 +1,15 @@
 [org/gnome/desktop/background]
-picture-uri='file:///usr/share/backgrounds/starlight/starlight-wallpaper.png'
-picture-uri-dark='file:///usr/share/backgrounds/starlight/starlight-wallpaper.png'
+picture-uri='file:///usr/share/starlight-gdm/starlight-os-vega-4k.png'
+picture-uri-dark='file:///usr/share/starlight-gdm/starlight-os-vega-4k.png'
+# Fill the display; `scaled` exposes the desktop fallback as side bands.
 picture-options='zoom'
 
 [org/gnome/desktop/screensaver]
-picture-uri='file:///usr/share/backgrounds/starlight/starlight-wallpaper.png'
+picture-uri='file:///usr/share/starlight-gdm/starlight-os-vega-4k.png'
 picture-options='zoom'
+
+[org/gnome/login-screen]
+# Fedora supplies a vendor logo through a schema override.  Explicitly clear
+# both logo keys so only the Starlight artwork is shown in GDM.
+logo=''
+fallback-logo=''

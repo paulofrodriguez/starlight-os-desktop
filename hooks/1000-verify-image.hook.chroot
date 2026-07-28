@@ -161,6 +161,9 @@ test -x /etc/kernel/postrm.d/zz-update-grub
 test -f /usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/metadata.json
 test -f /usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/extension.js
 test -f /usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/starlight-calamares-light.png
+test -f /usr/share/gnome-shell/extensions/starlight-brighter@starlightbrasil.com/metadata.json
+test -f /usr/share/gnome-shell/extensions/starlight-brighter@starlightbrasil.com/extension.js
+test -f /usr/share/gnome-shell/extensions/starlight-brighter@starlightbrasil.com/stylesheet.css
 test -f /usr/share/gnome-shell/extensions/ubuntu-appindicators@ubuntu.com/metadata.json
 test -f /usr/share/gnome-shell/extensions/caffeine@patapon.info/metadata.json
 test ! -e /usr/share/gnome-shell/extensions/ding@rastersoft.com
@@ -178,6 +181,8 @@ grep -Fq '"icon": "starlight-calamares-light.png"' /usr/share/gnome-shell/extens
 grep -Fq 'Main.panel.statusArea.dateMenu' /usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/extension.js
 grep -Fq 'Main.panel._rightBox' /usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/extension.js
 grep -Fq 'insert_child_at_index' /usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/extension.js
+grep -Fq '"48"' /usr/share/gnome-shell/extensions/starlight-brighter@starlightbrasil.com/metadata.json
+grep -Fq 'background-gradient-start: #3d4551;' /usr/share/gnome-shell/extensions/starlight-brighter@starlightbrasil.com/stylesheet.css
 test -f /usr/share/applications/org.gnome.tweaks.desktop
 test -f /usr/share/icons/hicolor/scalable/apps/org.gnome.tweaks.svg
 grep -Fq 'Exec=gnome-tweaks' /usr/share/applications/org.gnome.tweaks.desktop
@@ -284,6 +289,10 @@ grep -Fq "'kiwimenu@kemma'" "${STARLIGHT_DCONF}"
 grep -Fq "'search-light@icedman.github.com'" "${STARLIGHT_DCONF}"
 if grep -Eq "Vitals@CoreCoding.com|gsconnect@andyholmes.github.io|openweather-extension@jenslody.de" "${STARLIGHT_DCONF}"; then
     echo "Optional Vitals, GSConnect and OpenWeather extensions must remain disabled." >&2
+    exit 1
+fi
+if grep -Fq "'starlight-brighter@starlightbrasil.com'" "${STARLIGHT_DCONF}"; then
+    echo "Starlight Brighter must remain disabled by default." >&2
     exit 1
 fi
 grep -Fq "shortcut-search=['<Control>space']" "${STARLIGHT_DCONF}"

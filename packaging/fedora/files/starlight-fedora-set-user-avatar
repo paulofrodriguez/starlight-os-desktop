@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+# Assign the Starlight light logo to a local AccountsService user.
+set -Eeuo pipefail
+
+username="${1:-${SUDO_USER:-}}"
+if [[ -z "${username}" ]] || ! id "${username}" >/dev/null 2>&1; then
+    echo 'Usage: starlight-fedora-set-user-avatar <local-user>' >&2
+    exit 2
+fi
+
+install -D -m 0644 /usr/share/starlight/starlight-user-avatar.png \
+    "/var/lib/AccountsService/icons/${username}"
+user_file="/var/lib/AccountsService/users/${username}"
+install -d -m 0755 "$(dirname "${user_file}")"
+if [[ -f "${user_file}" ]]; then
+    sed -i '/^Icon=/d; /^SystemAccount=/d' "${user_file}"
+fi
+if ! grep -qxF '[User]' "${user_file}" 2>/dev/null; then
+    echo '[User]' >>"${user_file}"
+fi
+{
+    echo "Icon=/var/lib/AccountsService/icons/${username}"
+    echo 'SystemAccount=false'
+} >>"${user_file}"
+chmod 0644 "${user_file}"
+command -v restorecon >/dev/null 2>&1 && \
+    restorecon "/var/lib/AccountsService/icons/${username}" "${user_file}" \
+        2>/dev/null || true
+
+# Writing the AccountsService files provides a reliable fallback. Calling the
+# service too makes the new avatar visible immediately in Settings and GDM.
+if command -v busctl >/dev/null 2>&1; then
+    user_reply="$(
+        busctl --system call \
+            org.freedesktop.Accounts \
+            /org/freedesktop/Accounts \
+            org.freedesktop.Accounts \
+            FindUserByName s "${username}" 2>/dev/null || true
+    )"
+    user_object="${user_reply#* }"
+    user_object="${user_object#\"}"
+    user_object="${user_object%\"}"
+    if [[ "${user_object}" == /org/freedesktop/Accounts/User* ]]; then
+        busctl --system call \
+            org.freedesktop.Accounts \
+            "${user_object}" \
+            org.freedesktop.Accounts.User \
+            SetIconFile s \
+            /usr/share/starlight/starlight-user-avatar.png \
+            >/dev/null 2>&1 || true
+    fi
+fi
+echo "Starlight avatar configured for ${username}."

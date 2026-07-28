@@ -1,0 +1,61 @@
+[Plymouth Theme]
+Name=Starlight
+Description=Starlight OS dark splash with the Starlight emblem
+ModuleName=two-step
+
+[two-step]
+Font=Cantarell 12
+TitleFont=Cantarell Light 30
+ImageDir=/usr/share/plymouth/themes/starlight
+DialogHorizontalAlignment=.5
+DialogVerticalAlignment=.382
+TitleHorizontalAlignment=.5
+TitleVerticalAlignment=.382
+HorizontalAlignment=.5
+VerticalAlignment=.68
+WatermarkHorizontalAlignment=.5
+WatermarkVerticalAlignment=.88
+Transition=none
+TransitionDuration=0.0
+BackgroundStartColor=0x08111e
+BackgroundEndColor=0x08111e
+ProgressBarBackgroundColor=0x26384d
+ProgressBarForegroundColor=0xf3c653
+MessageBelowAnimation=true
+
+[boot-up]
+UseEndAnimation=false
+
+[shutdown]
+UseEndAnimation=false
+
+[reboot]
+UseEndAnimation=false
+
+[updates]
+SuppressMessages=true
+ProgressBarShowPercentComplete=true
+UseProgressBar=true
+Title=Instalando atualizações...
+SubTitle=Não desligue o computador
+
+[system-upgrade]
+SuppressMessages=true
+ProgressBarShowPercentComplete=true
+UseProgressBar=true
+Title=Atualizando o sistema...
+SubTitle=Não desligue o computador
+
+[firmware-upgrade]
+SuppressMessages=true
+ProgressBarShowPercentComplete=true
+UseProgressBar=true
+Title=Atualizando o firmware...
+SubTitle=Não desligue o computador
+
+[system-reset]
+SuppressMessages=true
+ProgressBarShowPercentComplete=true
+UseProgressBar=true
+Title=Restaurando o sistema...
+SubTitle=Não desligue o computador

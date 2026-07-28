@@ -3,9 +3,9 @@ set -Eeuo pipefail
 [[ ${EUID} -ne 0 ]] || { echo 'Run inside the target GNOME user session, not as root.' >&2; exit 1; }
 command -v gsettings >/dev/null || { echo 'gsettings is required.' >&2; exit 1; }
 for schema_key in \
+  'org.gnome.desktop.interface gtk-theme' \
   'org.gnome.desktop.interface icon-theme' \
   'org.gnome.desktop.interface color-scheme' \
-  'org.gnome.desktop.interface monospace-font-name' \
   'org.gnome.desktop.background picture-uri' \
   'org.gnome.desktop.background picture-uri-dark' \
   'org.gnome.desktop.screensaver picture-uri' \
@@ -14,4 +14,4 @@ for schema_key in \
     schema="${schema_key% *}"; key="${schema_key##* }"
     gsettings reset "${schema}" "${key}" || true
 done
-echo 'Starlight user-level GNOME settings were reset to Fedora defaults.'
+echo 'Starlight user-level GNOME settings were reset to the system Starlight defaults.'

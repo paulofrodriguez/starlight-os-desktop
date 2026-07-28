@@ -1,6 +1,19 @@
 {
   "policies": {
+    "Homepage": {
+      "StartPage": "none",
+      "Locked": false
+    },
+    "NewTabPage": false,
     "NoDefaultBookmarks": true,
+    "OverrideFirstRunPage": "",
+    "OverridePostUpdatePage": "",
+    "Preferences": {
+      "browser.newtabpage.pinned": {
+        "Value": "[]",
+        "Status": "default"
+      }
+    },
     "SearchEngines": {
       "Remove": [
         "Debian packages"

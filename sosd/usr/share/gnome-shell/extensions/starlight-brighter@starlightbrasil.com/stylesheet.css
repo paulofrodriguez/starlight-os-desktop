@@ -1,0 +1,134 @@
+/*
+ * Starlight Brighter
+ *
+ * Each blue surface is an sRGB mix of 80% of the original Starlight colour
+ * and 20% white. Golden accents and their dark foreground remain unchanged.
+ */
+
+#panel {
+  background-color: #39414b;
+  background-gradient-direction: vertical;
+  background-gradient-start: #3d4551;
+  background-gradient-end: #373c45;
+}
+
+.quick-toggle-has-menu:checked .quick-toggle-separator {
+  background-color: rgba(57, 65, 75, 0.42);
+}
+
+.popup-menu,
+.popup-menu-content,
+.popup-sub-menu,
+.quick-settings,
+.datemenu-popover,
+.datemenu-calendar-column,
+.datemenu-displays-section,
+.datemenu-displays-box,
+.datemenu-today-button,
+.datemenu-date-label,
+.datemenu-weather-section,
+.datemenu-world-clocks-section,
+.calendar,
+.calendar-month-header,
+.calendar-month-label,
+.message-list,
+.message,
+.notification-banner,
+.events-button,
+.world-clocks-button,
+.weather-button {
+  background-color: #39414b;
+  background-gradient-direction: vertical;
+  background-gradient-start: #3d4551;
+  background-gradient-end: #373c45;
+}
+
+.modal-dialog,
+#LookingGlassDialog,
+.screenshot-ui-panel,
+.workspace-switcher,
+.switcher-list,
+.resize-popup,
+.osd-window,
+.pad-osd-window,
+.dash-label,
+.window-caption,
+.screenshot-ui-tooltip,
+.app-folder-dialog {
+  background-color: rgba(57, 65, 75, 0.96);
+  background-gradient-direction: vertical;
+  background-gradient-start: rgba(61, 69, 81, 0.98);
+  background-gradient-end: rgba(55, 60, 69, 0.96);
+}
+
+.dialog-list .dialog-list-box .dialog-list-item,
+.unlock-dialog-notifications-container .notification,
+.unlock-dialog-notifications-container .unlock-dialog-notification-source,
+.message {
+  background-color: rgba(61, 69, 81, 0.92);
+}
+
+.unlock-dialog .user-widget .user-icon {
+  background-color: #39414b;
+}
+
+.modal-dialog .modal-dialog-button-box .modal-dialog-button,
+.modal-dialog .button,
+.unlock-dialog .button,
+.unlock-dialog .icon-button,
+.unlock-dialog .login-dialog-button.cancel-button,
+.unlock-dialog .login-dialog-button.switch-user-button,
+.unlock-dialog .login-dialog-button.login-dialog-session-list-button,
+.run-dialog .button,
+.prompt-dialog .button,
+.access-dialog .button,
+.audio-device-selection-dialog .audio-selection-box .audio-selection-device,
+.switcher-list .item-box,
+.screenshot-ui-type-button,
+.screenshot-ui-shot-cast-button,
+#LookingGlassDialog .notebook-tab,
+#LookingGlassDebugFlags .lg-debug-flag-button {
+  background-color: rgba(57, 65, 75, 0.92);
+}
+
+.modal-dialog .modal-dialog-button-box .modal-dialog-button:insensitive,
+.modal-dialog .button:insensitive,
+.unlock-dialog .button:insensitive,
+.unlock-dialog .icon-button:insensitive,
+.audio-device-selection-dialog .audio-selection-box .audio-selection-device:insensitive,
+.switcher-list .item-box:insensitive,
+.screenshot-ui-type-button:insensitive,
+.screenshot-ui-shot-cast-button:insensitive {
+  background-color: rgba(57, 65, 75, 0.50);
+}
+
+.unlock-dialog .login-dialog-prompt-entry,
+.run-dialog .run-dialog-entry,
+.prompt-dialog .prompt-dialog-password-entry,
+.prompt-dialog .prompt-dialog-password-grid .prompt-dialog-password-entry,
+.app-folder-dialog .folder-name-container .folder-name-entry,
+.search-entry,
+.lg-dialog StEntry,
+StEntry {
+  background-color: rgba(55, 60, 69, 0.98);
+}
+
+.screenshot-ui-window-selector,
+.screenshot-ui-screen-selector {
+  background-color: rgba(55, 60, 69, 0.72);
+}
+
+#dashtodockContainer .dash-background,
+#dash .dash-background {
+  background-color: rgba(57, 70, 85, 0.74);
+  background-gradient-direction: vertical;
+  background-gradient-start: rgba(66, 88, 110, 0.82);
+  background-gradient-end: rgba(53, 60, 70, 0.76);
+  border-color: rgba(169, 203, 239, 0.28);
+}
+
+#dash .dash-item-container .show-apps .overview-icon,
+#dash .dash-item-container .overview-tile .overview-icon,
+#dash .dash-item-container .grid-search-result .overview-icon {
+  background-color: rgba(58, 71, 85, 0.62);
+}

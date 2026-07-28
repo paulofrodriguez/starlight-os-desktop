@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=WPS Presentation
+GenericName=WPS Presentation
+Comment=Use WPS Presentation to edit and play presentations.
+Exec=/usr/libexec/starlight-fedora/wps-language-wrapper wpp %F
+TryExec=/usr/bin/wpp
+Icon=wps-office2023-wppmain
+MimeType=application/wps-office.dps;application/wps-office.dpt;application/wps-office.dpss;application/wps-office.dpso;application/wps-office.ppt;application/wps-office.pot;application/vnd.ms-powerpoint;application/vnd.mspowerpoint;application/mspowerpoint;application/powerpoint;application/x-mspowerpoint;application/wps-office.pptx;application/wps-office.potx;application/vnd.openxmlformats-officedocument.presentationml.presentation;application/vnd.openxmlformats-officedocument.presentationml.slideshow;
+Categories=Office;Presentation;Qt;
+StartupNotify=false
+StartupWMClass=wpp
+InitialPreference=3

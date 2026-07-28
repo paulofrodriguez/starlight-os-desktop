@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+readonly theme=starlight
+readonly state_dir=/var/lib/starlight-fedora-assets
+readonly previous_theme_file="${state_dir}/previous-plymouth-theme"
+
+[[ ${EUID} -eq 0 ]] || {
+    echo 'The Plymouth theme helper must run as root.' >&2
+    exit 1
+}
+command -v plymouth-set-default-theme >/dev/null 2>&1 || exit 0
+
+current_theme="$(plymouth-set-default-theme 2>/dev/null || true)"
+previous_theme=
+if [[ -s "${previous_theme_file}" ]]; then
+    previous_theme="$(<"${previous_theme_file}")"
+fi
+previous_theme="${previous_theme:-bgrt}"
+
+if [[ "${current_theme}" == "${theme}" ]]; then
+    if ! plymouth-set-default-theme --list | grep -Fxq "${previous_theme}"; then
+        previous_theme=bgrt
+    fi
+    plymouth-set-default-theme -R "${previous_theme}"
+fi
+
+rm -rf "${state_dir}"

@@ -24,6 +24,45 @@ fi
 if [[ -s "${state_dir}/removed-rpms" ]]; then
     xargs -r dnf install -y <"${state_dir}/removed-rpms"
 fi
+
+avatar_state_dir="${state_dir}/avatar"
+if [[ -f "${avatar_state_dir}/saved" ]] && \
+    [[ -s "${avatar_state_dir}/user" ]]; then
+    avatar_user="$(<"${avatar_state_dir}/user")"
+    avatar_user_file="/var/lib/AccountsService/users/${avatar_user}"
+    avatar_icon_file="/var/lib/AccountsService/icons/${avatar_user}"
+    expected_icon_line="Icon=${avatar_icon_file}"
+    current_icon_line="$(
+        grep '^Icon=' "${avatar_user_file}" 2>/dev/null | tail -n 1 || true
+    )"
+
+    # Restore the previous avatar only while our image is still selected.
+    # A later avatar choice made by the user always wins.
+    if [[ "${current_icon_line}" == "${expected_icon_line}" ]] && \
+        cmp -s /usr/share/starlight/starlight-user-avatar.png \
+            "${avatar_icon_file}"; then
+        if [[ -f "${avatar_state_dir}/user-file-existed" ]]; then
+            sed -i '/^Icon=/d' "${avatar_user_file}"
+            if [[ -s "${avatar_state_dir}/previous-icon-line" ]]; then
+                cat "${avatar_state_dir}/previous-icon-line" \
+                    >>"${avatar_user_file}"
+            fi
+        else
+            rm -f "${avatar_user_file}"
+        fi
+
+        if [[ -f "${avatar_state_dir}/icon-file-existed" ]]; then
+            install -m 0644 "${avatar_state_dir}/previous-icon" \
+                "${avatar_icon_file}"
+        else
+            rm -f "${avatar_icon_file}"
+        fi
+        command -v restorecon >/dev/null 2>&1 && \
+            restorecon "${avatar_user_file}" "${avatar_icon_file}" 2>/dev/null \
+            || true
+    fi
+fi
+
 rm -rf "${state_dir}"
 if ${purge_assets}; then
     dnf remove -y starlight-fedora

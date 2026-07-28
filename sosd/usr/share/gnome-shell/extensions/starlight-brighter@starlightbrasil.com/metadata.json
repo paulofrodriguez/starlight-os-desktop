@@ -1,0 +1,15 @@
+{
+  "uuid": "starlight-brighter@starlightbrasil.com",
+  "name": "Starlight Brighter",
+  "description": "Makes the Starlight blue Shell surfaces 20% lighter for dimmer notebook displays.",
+  "shell-version": [
+    "47",
+    "48",
+    "49",
+    "50"
+  ],
+  "session-modes": [
+    "user"
+  ],
+  "version": 1
+}

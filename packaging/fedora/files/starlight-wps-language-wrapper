@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+case "${1:-}" in
+    wps|wpp|et|wpspdf)
+        application="/usr/bin/$1"
+        shift
+        ;;
+    *)
+        echo 'Usage: starlight-wps-language-wrapper {wps|wpp|et|wpspdf} [arguments...]' >&2
+        exit 2
+        ;;
+esac
+
+# The vendor build does not ship a Portuguese UI. Keep WPS in English without
+# changing the locale of the rest of the desktop session.
+export LANGUAGE=en_US:en
+export LC_MESSAGES=en_US.UTF-8
+exec "${application}" "$@"

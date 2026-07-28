@@ -7,24 +7,36 @@ state_dir=/var/lib/starlight-fedora
 installed_file="${state_dir}/installed-rpms"
 removed_file="${state_dir}/removed-rpms"
 flatpak_file="${state_dir}/flatpaks"
-remove_conflicts=false
+profile_marker="${state_dir}/profile-applied"
+profile_version=10
 skip_flatpaks=false
+profile_user=
+wps_version=12.1.2.26885.AK.preread.sw
+wps_rpm_name=wps-office-12.1.2.26885.AK.preread.sw.Personal-1-715973.x86_64.rpm
+wps_rpm_path="/wps/download/ep/Linux2023/26885/${wps_rpm_name}"
+wps_rpm_sha256=d98376b062afd6bc270872fce67f09d96735b88f4efe8eb2e45f51bde1c47595
+wps_download_key=7f8faaaa468174dc1c9cd62e5f218a5b
 
 usage() {
     cat <<'EOF'
-Usage: starlight-fedora-apply [--remove-conflicts] [--skip-flatpaks]
+Usage: starlight-fedora-apply [--skip-flatpaks] [--user LOCAL_USER]
 
 Installs the Fedora-mapped Starlight application set and records only packages
-that were absent beforehand. --remove-conflicts additionally removes Epiphany,
-Chromium and all installed LibreOffice components, recording them for rollback.
+that were absent beforehand. It removes Epiphany, Chromium and all installed
+LibreOffice components, recording them for rollback, then installs the official
+WPS Office 12 RPM. --user also assigns the Starlight avatar to that local user.
 It never removes user data.
 EOF
 }
 
 while (($#)); do
     case "$1" in
-        --remove-conflicts) remove_conflicts=true ;;
         --skip-flatpaks) skip_flatpaks=true ;;
+        --user)
+            shift
+            (($#)) || { echo 'Missing local user after --user.' >&2; exit 2; }
+            profile_user="$1"
+            ;;
         -h|--help) usage; exit 0 ;;
         *) echo "Unknown option: $1" >&2; usage >&2; exit 2 ;;
     esac
@@ -75,22 +87,61 @@ if ((${#to_install[@]})); then
     sort -u -o "${installed_file}" "${installed_file}"
 fi
 
-if ${remove_conflicts}; then
-    conflict_packages=(epiphany chromium)
-    mapfile -t libreoffice_packages < <(rpm -qa --qf '%{NAME}\n' 'libreoffice*' | sort -u)
-    conflict_packages+=("${libreoffice_packages[@]}")
-    for package in "${conflict_packages[@]}"; do
-        if rpm -q "${package}" >/dev/null 2>&1; then
-            dnf remove -y "${package}"
-            printf '%s\n' "${package}" >>"${removed_file}"
-        fi
-    done
+wps_was_installed=false
+if rpm -q wps-office >/dev/null 2>&1; then
+    wps_was_installed=true
+fi
+
+if ! rpm -q --qf '%{VERSION}\n' wps-office 2>/dev/null | grep -Fxq "${wps_version}"; then
+    [[ "$(rpm -E '%{_arch}')" == x86_64 ]] || {
+        echo 'WPS Office 12 is currently pinned only for Fedora x86_64.' >&2
+        exit 1
+    }
+
+    wps_stage="$(mktemp -d)"
+    trap 'rm -rf "${wps_stage}"' EXIT
+    wps_rpm="${wps_stage}/${wps_rpm_name}"
+    wps_timestamp="$(date +%s)"
+    wps_signature="$(
+        printf '%s' "${wps_download_key}${wps_rpm_path}${wps_timestamp}" |
+            md5sum |
+            cut -d' ' -f1
+    )"
+    wps_url="https://wps-linux-personal.wpscdn.cn${wps_rpm_path}?t=${wps_timestamp}&k=${wps_signature}"
+
+    curl -fL --retry 3 --retry-delay 2 "${wps_url}" -o "${wps_rpm}"
+    printf '%s  %s\n' "${wps_rpm_sha256}" "${wps_rpm}" | sha256sum -c -
+    dnf install -y "${wps_rpm}"
+    rm -rf "${wps_stage}"
+    trap - EXIT
+fi
+
+if ! ${wps_was_installed}; then
+    printf '%s\n' wps-office >>"${installed_file}"
+    sort -u -o "${installed_file}" "${installed_file}"
+fi
+
+conflict_packages=(epiphany chromium)
+mapfile -t libreoffice_packages < <(rpm -qa --qf '%{NAME}\n' 'libreoffice*' | sort -u)
+conflict_packages+=("${libreoffice_packages[@]}")
+installed_conflicts=()
+for package in "${conflict_packages[@]}"; do
+    if rpm -q "${package}" >/dev/null 2>&1; then
+        installed_conflicts+=("${package}")
+    fi
+done
+if ((${#installed_conflicts[@]})); then
+    dnf remove -y "${installed_conflicts[@]}"
+    printf '%s\n' "${installed_conflicts[@]}" >>"${removed_file}"
     sort -u -o "${removed_file}" "${removed_file}"
 fi
 
 if ! ${skip_flatpaks}; then
     flatpak remote-add --system --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-    for application in com.rtosta.zapzap io.github.kolunmi.Bazaar; do
+    for application in \
+        com.rtosta.zapzap \
+        io.github.kolunmi.Bazaar \
+        org.telegram.desktop; do
         if ! flatpak info --system "${application}" >/dev/null 2>&1; then
             flatpak install --system --noninteractive flathub "${application}"
             printf '%s\n' "${application}" >>"${flatpak_file}"
@@ -99,5 +150,41 @@ if ! ${skip_flatpaks}; then
     sort -u -o "${flatpak_file}" "${flatpak_file}"
 fi
 
+if [[ -n "${profile_user}" ]]; then
+    id "${profile_user}" >/dev/null 2>&1 || {
+        echo "Unknown local user: ${profile_user}" >&2
+        exit 2
+    }
+
+    avatar_state_dir="${state_dir}/avatar"
+    avatar_saved_user="${avatar_state_dir}/user"
+    install -d -m 0700 "${avatar_state_dir}"
+    if [[ -s "${avatar_saved_user}" ]] && \
+        [[ "$(<"${avatar_saved_user}")" != "${profile_user}" ]]; then
+        echo 'An avatar from another user is already recorded for rollback.' >&2
+        exit 1
+    fi
+
+    if [[ ! -f "${avatar_state_dir}/saved" ]]; then
+        printf '%s\n' "${profile_user}" >"${avatar_saved_user}"
+        avatar_user_file="/var/lib/AccountsService/users/${profile_user}"
+        avatar_icon_file="/var/lib/AccountsService/icons/${profile_user}"
+        if [[ -f "${avatar_user_file}" ]]; then
+            touch "${avatar_state_dir}/user-file-existed"
+            grep '^Icon=' "${avatar_user_file}" | tail -n 1 \
+                >"${avatar_state_dir}/previous-icon-line" || true
+        fi
+        if [[ -f "${avatar_icon_file}" ]]; then
+            touch "${avatar_state_dir}/icon-file-existed"
+            install -m 0600 "${avatar_icon_file}" \
+                "${avatar_state_dir}/previous-icon"
+        fi
+        touch "${avatar_state_dir}/saved"
+    fi
+
+    starlight-fedora-set-user-avatar "${profile_user}"
+fi
+
+printf '%s\n' "${profile_version}" >"${profile_marker}"
 echo 'Starlight Fedora profile applied. Log out and back in for GNOME defaults.'
 echo 'Rollback: sudo starlight-fedora-rollback'

@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Enable RPM Fusion and install the Starlight multimedia codec baseline.
+set -Eeuo pipefail
+
+fedora_release="$(rpm -E %fedora)"
+readonly fedora_release
+readonly free_url="https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-${fedora_release}.noarch.rpm"
+readonly nonfree_url="https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-${fedora_release}.noarch.rpm"
+
+if ! rpm -q rpmfusion-free-release rpmfusion-nonfree-release >/dev/null 2>&1; then
+    dnf install -y "${free_url}" "${nonfree_url}"
+fi
+
+# Fedora supplies the framework; RPM Fusion supplies the complete ffmpeg stack.
+dnf group install -y multimedia --setopt=install_weak_deps=False \
+    --exclude=PackageKit-gstreamer-plugin
+dnf install -y --allowerasing ffmpeg ffmpeg-libs \
+    gstreamer1-plugins-{bad-freeworld,ugly,base,good} \
+    gstreamer1-plugin-openh264 mozilla-openh264
+
+flatpak remote-add --if-not-exists --system flathub \
+    https://dl.flathub.org/repo/flathub.flatpakrepo
+
+echo 'RPM Fusion, the Starlight multimedia codec profile and Flathub are installed.'

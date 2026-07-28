@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+readonly theme=starlight
+readonly state_dir=/var/lib/starlight-fedora-assets
+readonly previous_theme_file="${state_dir}/previous-plymouth-theme"
+
+[[ ${EUID} -eq 0 ]] || {
+    echo 'The Plymouth theme helper must run as root.' >&2
+    exit 1
+}
+command -v plymouth-set-default-theme >/dev/null 2>&1 || exit 0
+
+current_theme="$(plymouth-set-default-theme 2>/dev/null || true)"
+install -d -m 0700 "${state_dir}"
+if [[ "${current_theme}" != "${theme}" ]] && \
+    [[ ! -s "${previous_theme_file}" ]]; then
+    printf '%s\n' "${current_theme:-bgrt}" >"${previous_theme_file}"
+fi
+
+# Rebuild even when Starlight is already selected so package upgrades refresh
+# the theme embedded in every initramfs.
+plymouth-set-default-theme -R "${theme}"

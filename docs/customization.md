@@ -32,8 +32,13 @@ enabled through the Starlight dconf defaults, not by mutating a live user's
 profile. Starlight enables Blur my Shell, Dash to Dock, AppIndicator support,
 Caffeine, Tiling Assistant, MonitorControl, Kiwi Menu, Search Light, and the
 local Starlight Clock Right extension by default. Vitals, GSConnect, and
-OpenWeather are installed for optional use but remain disabled. Desktop Icons NG is intentionally not shipped because it can cover the
-configured wallpaper with a solid colour on the current Starlight GNOME session.
+OpenWeather are installed for optional use but remain disabled. The local
+Starlight Brighter extension is also installed but remains disabled by default.
+It mixes every blue GNOME Shell surface with 20% white for notebook displays
+that render the standard navy palette too dark, while preserving the golden
+accent colours. Desktop Icons NG is intentionally not shipped because it can
+cover the configured wallpaper with a solid colour on the current Starlight
+GNOME session.
 Blur my Shell is scoped to the GNOME overview/app-grid wallpaper and
 application-folder dialogs. Its panel, dock, application-window, screenshot,
 lock-screen, window-list, Coverflow Alt-Tab, Hide Top Bar compatibility, and

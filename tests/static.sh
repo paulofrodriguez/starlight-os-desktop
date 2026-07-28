@@ -28,6 +28,7 @@ test -f "${PROJECT_ROOT}/sosd/usr/local/bin/starlight-launch-installer"
 test -f "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-run-installer"
 test -f "${PROJECT_ROOT}/sosd/usr/share/firefox-esr/distribution/policies.json"
 test -f "${PROJECT_ROOT}/docs/metapackages.md"
+test -f "${PROJECT_ROOT}/packaging/fedora/install-and-apply.sh.in"
 test -f "${PROJECT_ROOT}/packages/files-devices.list.chroot"
 test -f "${PROJECT_ROOT}/metapackages/distro-files-devices.depends"
 test -f "${PROJECT_ROOT}/metapackages/distro-desktop-gnome.depends"
@@ -36,6 +37,9 @@ test -f "${PROJECT_ROOT}/sosd/etc/skel/.bashrc"
 test -f "${PROJECT_ROOT}/sosd/etc/skel/.profile"
 test -f "${PROJECT_ROOT}/sosd/usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/metadata.json"
 test -f "${PROJECT_ROOT}/sosd/usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/extension.js"
+test -f "${PROJECT_ROOT}/sosd/usr/share/gnome-shell/extensions/starlight-brighter@starlightbrasil.com/metadata.json"
+test -f "${PROJECT_ROOT}/sosd/usr/share/gnome-shell/extensions/starlight-brighter@starlightbrasil.com/extension.js"
+test -f "${PROJECT_ROOT}/sosd/usr/share/gnome-shell/extensions/starlight-brighter@starlightbrasil.com/stylesheet.css"
 test -x "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-install-gnome-extensions"
 test -x "${PROJECT_ROOT}/sosd/usr/local/bin/wps.starlight-wrapper"
 test -x "${PROJECT_ROOT}/sosd/usr/local/bin/starlight-steam"
@@ -105,8 +109,17 @@ rg -Fxq "accent-color='yellow'" \
     "${STARLIGHT_DCONF}"
 rg -Fxq "color-scheme='prefer-dark'" \
     "${STARLIGHT_DCONF}"
-rg -Fxq "gtk-theme='Adwaita-dark'" \
+rg -Fxq "gtk-theme='Starlight'" \
     "${STARLIGHT_DCONF}"
+for gtk_css in \
+    "${PROJECT_ROOT}/sosd/etc/gtk-3.0/gtk.css" \
+    "${PROJECT_ROOT}/sosd/etc/gtk-4.0/gtk.css"; do
+    rg -Fq '@define-color sidebar_bg_color #08111e;' "${gtk_css}"
+    rg -Fq 'navigation-sidebar' "${gtk_css}"
+    rg -Fq '@define-color theme_selected_bg_color #f3c653;' "${gtk_css}"
+    rg -Fq '@define-color theme_selected_fg_color #050b16;' "${gtk_css}"
+    rg -Fq 'background-color: @theme_selected_bg_color;' "${gtk_css}"
+done
 rg -Fxq "icon-theme='Starlight-Colloid-Yellow-Dark'" \
     "${STARLIGHT_DCONF}"
 rg -Fxq "monospace-font-name='JetBrainsMono Nerd Font 11'" \
@@ -177,10 +190,15 @@ for image_mime in \
 done
 ! rg -q '^application/(vnd\.debian\.binary-package|x-deb|x-debian-package)=.*(file-roller|FileRoller)' \
     "${PROJECT_ROOT}/sosd/etc/xdg/mimeapps.list"
-python3 -c 'import json, pathlib, sys; policies = json.loads(pathlib.Path(sys.argv[1]).read_text())["policies"]; assert policies["NoDefaultBookmarks"] is True; assert "Debian packages" in policies["SearchEngines"]["Remove"]' \
+python3 -c 'import json, pathlib, sys; policies = json.loads(pathlib.Path(sys.argv[1]).read_text())["policies"]; assert policies["Homepage"] == {"StartPage": "none", "Locked": False}; assert policies["NewTabPage"] is False; assert policies["NoDefaultBookmarks"] is True; assert policies["Preferences"]["browser.newtabpage.pinned"]["Value"] == "[]"; assert "Debian packages" in policies["SearchEngines"]["Remove"]' \
     "${PROJECT_ROOT}/sosd/usr/share/firefox-esr/distribution/policies.json"
 test ! -e "${PROJECT_ROOT}/sosd/usr/share/applications/starlight-browser.desktop"
 ! rg -q 'epiphany' "${PROJECT_ROOT}/sosd/usr/local/bin/starlight-browser"
+test -x "${PROJECT_ROOT}/sosd/usr/local/bin/starlight-firefox"
+rg -Fxq 'exec env MOZ_ENABLE_WAYLAND=0 /usr/bin/firefox-esr "$@"' \
+    "${PROJECT_ROOT}/sosd/usr/local/bin/starlight-firefox"
+rg -Fxq 'Exec=/usr/local/bin/starlight-firefox %u' \
+    "${PROJECT_ROOT}/sosd/usr/local/share/applications/firefox-esr.desktop"
 rg -Fxq "background-color='#07182b'" \
     "${PROJECT_ROOT}/sosd/etc/dconf/db/starlight.d/00-starlight"
 rg -Fxq "background-opacity=0.74" \
@@ -199,6 +217,13 @@ rg -Fq 'insert_child_at_index' \
     "${PROJECT_ROOT}/sosd/usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/extension.js"
 python3 -c 'import json, pathlib, sys; data = json.loads(pathlib.Path(sys.argv[1]).read_text()); assert data["uuid"] == "starlight-clock-right@starlightbrasil.com"; assert "48" in data["shell-version"]' \
     "${PROJECT_ROOT}/sosd/usr/share/gnome-shell/extensions/starlight-clock-right@starlightbrasil.com/metadata.json"
+python3 -c 'import json, pathlib, sys; data = json.loads(pathlib.Path(sys.argv[1]).read_text()); assert data["uuid"] == "starlight-brighter@starlightbrasil.com"; assert all(version in data["shell-version"] for version in ("48", "50"))' \
+    "${PROJECT_ROOT}/sosd/usr/share/gnome-shell/extensions/starlight-brighter@starlightbrasil.com/metadata.json"
+rg -Fq 'background-gradient-start: #3d4551;' \
+    "${PROJECT_ROOT}/sosd/usr/share/gnome-shell/extensions/starlight-brighter@starlightbrasil.com/stylesheet.css"
+rg -Fq 'background-gradient-end: #373c45;' \
+    "${PROJECT_ROOT}/sosd/usr/share/gnome-shell/extensions/starlight-brighter@starlightbrasil.com/stylesheet.css"
+! rg -Fq "'starlight-brighter@starlightbrasil.com'" "${STARLIGHT_DCONF}"
 ! rg -q 'padding-left: 42%;' \
     "${PROJECT_ROOT}/assets/gdm/starlight-os-vega/assets/starlight-os-vega-gdm.css"
 rg -q '//RIGHT' \
@@ -274,6 +299,71 @@ rg -q '^com.rtosta.zapzap$' "${PROJECT_ROOT}/flatpaks/system-apps.txt"
 rg -q '^io.github.kolunmi.Bazaar$' "${PROJECT_ROOT}/flatpaks/system-apps.txt"
 rg -Fq 'flatpak install --system --noninteractive --or-update flathub' \
     "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-install-bundled-assets"
+FEDORA_APPLY="${PROJECT_ROOT}/packaging/fedora/files/starlight-fedora-apply"
+FEDORA_MANAGER="${PROJECT_ROOT}/packaging/fedora/files/starlight-fedora-manager"
+FEDORA_INSTALLER="${PROJECT_ROOT}/packaging/fedora/install-and-apply.sh.in"
+FEDORA_DCONF="${PROJECT_ROOT}/packaging/fedora/files/00-starlight"
+FEDORA_SPEC="${PROJECT_ROOT}/packaging/fedora/starlight-fedora.spec"
+FEDORA_PLYMOUTH="${PROJECT_ROOT}/packaging/fedora/files/starlight.plymouth"
+FEDORA_APPLY_PLYMOUTH="${PROJECT_ROOT}/packaging/fedora/files/starlight-fedora-apply-plymouth"
+FEDORA_RESTORE_PLYMOUTH="${PROJECT_ROOT}/packaging/fedora/files/starlight-fedora-restore-plymouth"
+bash -n "${FEDORA_APPLY}"
+bash -n "${FEDORA_INSTALLER}"
+bash -n "${FEDORA_APPLY_PLYMOUTH}" "${FEDORA_RESTORE_PLYMOUTH}"
+python3 -c 'compile(open(__import__("sys").argv[1], encoding="utf-8").read(), __import__("sys").argv[1], "exec")' \
+    "${FEDORA_MANAGER}"
+test -x "${FEDORA_MANAGER}"
+test -x "${FEDORA_APPLY_PLYMOUTH}"
+test -x "${FEDORA_RESTORE_PLYMOUTH}"
+test -s "${FEDORA_PLYMOUTH}"
+test -s "${PROJECT_ROOT}/packaging/fedora/files/com.starlight.FedoraManager.desktop"
+test -s "${PROJECT_ROOT}/packaging/fedora/files/com.starlight.FedoraManager.policy"
+rg -Fq 'Exec=/usr/bin/starlight-fedora-manager' \
+    "${PROJECT_ROOT}/packaging/fedora/files/com.starlight.FedoraManager.desktop"
+rg -Fq '/var/lib/starlight-fedora/profile-applied' "${FEDORA_MANAGER}"
+rg -Fq '/usr/bin/pkexec' "${FEDORA_MANAGER}"
+rg -Fq 'self.show_all()' "${FEDORA_MANAGER}"
+rg -Fq 'starlight-fedora-apply' \
+    "${PROJECT_ROOT}/packaging/fedora/files/com.starlight.FedoraManager.policy"
+rg -Fq 'starlight-fedora-rollback' \
+    "${PROJECT_ROOT}/packaging/fedora/files/com.starlight.FedoraManager.policy"
+rg -Fq 'profile-applied' "${FEDORA_APPLY}"
+rg -Fq '@RPM_BASENAME@' "${FEDORA_INSTALLER}"
+rg -Fq 'starlight-fedora-apply --user "${profile_user}"' "${FEDORA_INSTALLER}"
+rg -Fq 'install-and-apply-${rpm_basename%.rpm}.sh' \
+    "${PROJECT_ROOT}/packaging/fedora/build-rpm.sh"
+rg -Fq '%{_prefix}/lib64/firefox/distribution/policies.json' "${FEDORA_SPEC}"
+rg -Fq 'profile_version=10' "${FEDORA_APPLY}"
+rg -Fq 'PROFILE_VERSION = "10"' "${FEDORA_MANAGER}"
+rg -Fq 'starlight-fedora-set-user-avatar "${profile_user}"' "${FEDORA_APPLY}"
+rg -Fq 'org.telegram.desktop' "${FEDORA_APPLY}"
+! rg -Fq 'monospace-font-name=' "${FEDORA_DCONF}"
+! rg -Fq 'monospace-font-name' \
+    "${PROJECT_ROOT}/packaging/fedora/files/starlight-fedora-reset-gnome"
+rg -Fq "'com.starlight.FedoraManager.desktop'" "${FEDORA_DCONF}"
+rg -Fxq 'hide-power-button=true' "${FEDORA_DCONF}"
+rg -Fxq 'hide-power-button=true' "${STARLIGHT_DCONF}"
+rg -Fq 'BackgroundStartColor=0x08111e' "${FEDORA_PLYMOUTH}"
+rg -Fq 'ProgressBarForegroundColor=0xf3c653' "${FEDORA_PLYMOUTH}"
+rg -Fq 'apply-plymouth-theme' "${FEDORA_SPEC}"
+rg -Fq 'restore-plymouth-theme' "${FEDORA_SPEC}"
+rg -Fq 'branding/starlight-gdm-logo.png' "${FEDORA_SPEC}"
+rg -Fq 'SetIconFile' \
+    "${PROJECT_ROOT}/packaging/fedora/files/starlight-fedora-set-user-avatar"
+rg -Fq 'wps_version=12.1.2.26885.AK.preread.sw' "${FEDORA_APPLY}"
+rg -Fq 'd98376b062afd6bc270872fce67f09d96735b88f4efe8eb2e45f51bde1c47595' \
+    "${FEDORA_APPLY}"
+rg -Fq 'sha256sum -c -' "${FEDORA_APPLY}"
+rg -Fq 'dnf install -y "${wps_rpm}"' "${FEDORA_APPLY}"
+rg -Fq 'dnf remove -y "${installed_conflicts[@]}"' "${FEDORA_APPLY}"
+! rg -Fq 'com.wps.Office' "${FEDORA_APPLY}"
+test -x "${PROJECT_ROOT}/packaging/fedora/files/starlight-wps-language-wrapper"
+rg -Fq 'LC_MESSAGES=en_US.UTF-8' \
+    "${PROJECT_ROOT}/packaging/fedora/files/starlight-wps-language-wrapper"
+for wps_desktop in wps wpp et pdf prometheus; do
+    rg -Fq '/usr/libexec/starlight-fedora/wps-language-wrapper' \
+        "${PROJECT_ROOT}/packaging/fedora/files/wps-office-${wps_desktop}.desktop"
+done
 rg -Fq 'install_wps_office' \
     "${PROJECT_ROOT}/sosd/usr/local/sbin/starlight-install-bundled-assets"
 rg -Fq 'postinst.starlight-original' \
